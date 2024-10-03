@@ -21,7 +21,7 @@ This project aims to develop a mobile application that tackles food waste and fo
 Our vision is to create a platform that fosters a strong community network by connecting surplus food sources with those in need. By facilitating food donation, reduced prices, and efficient food access, we strive to:
 
 - Reduce food waste and its associated environmental and economic impacts.
-  Combat food insecurity by providing access to nutritious food for underserved communities.
+- Combat food insecurity by providing access to nutritious food for underserved communities.
 - Promote sustainability within the food system by encouraging resourcefulness and reducing waste.
 - Cultivate a culture of community care by enabling businesses, individuals, and organizations to contribute to a more equitable and food-secure society.
 
@@ -106,10 +106,9 @@ Our vision is to create a platform that fosters a strong community network by co
 - Do not resolve conversations you did not create. All conversations should be resolved before merging
   - If your change after opening the Pull Request greatly modified your code, you should request a re-review
 - All tests and lints should pass before merging
+- Only the developer who opened the Pull Request should merge the Pull Request
 - Always use `Squash and merge` to keep the commit history clean
 - Delete branch after merging to keep the branch tree clean
-
-## Linting
 
 ## Linting
 
