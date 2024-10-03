@@ -31,4 +31,4 @@ jobs:
       - name: Run djlint on templates
         run: |
           source venv/bin/activate
-          djlint src/templates/ --lint
+          djlint templates/ --lint
