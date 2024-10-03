@@ -40,15 +40,17 @@ Our vision is to create a platform that fosters a strong community network by co
 
 ```
 .
-├── .github/ # GitHub workflows and settings
-├── system_design_docs/ # System design documentation
-├── README.md # This file
-├── src/ # Django application root
-│ ├── manage.py # Django management script
-│ └── myproject/ # Main Django project folder
-├── static/ # Static files (CSS, JS, images)
-├── templates/ # HTML templates for front-end
-└── venv/ # Virtual environment files
+├── .github/               # GitHub workflows and settings
+├── system_design_docs/    # System design documentation
+├── src/                   # Django application root
+│ ├── manage.py            # Django management script
+│ ├── django_management/   # Main Django project folder
+│ ├── static/              # Static files (CSS, JS, images)
+│ └── templates/           # HTML templates for front-end
+├── README.md              # This file
+├── requirements.txt       # Requirements to be installed with pip
+├── .djlintrc              # Setup for HTML linting and formatting
+└── .pylintrc              # Setup for Python linting and formatting
 ```
 
 ### Prerequisites
