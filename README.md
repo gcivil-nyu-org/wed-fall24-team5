@@ -117,7 +117,7 @@ This project uses `pylint` for linting and formatting Python files and `djlint` 
 
 ```bash
 pylint src/
-djlint templates/
+djlint src/templates/
 ```
 
 ## Running tests

@@ -15,6 +15,7 @@ disable=
     E0401,  # Import error
     W0212,  # Access to a protected member
     R0801,  # Duplicate code
+    C0415,  # Import outside top level
 
 [REPORTS]
 output-format=colorized
