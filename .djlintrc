@@ -1,0 +1,33 @@
+# Defines rules for HTML Linting. This should be in JSON format
+
+[djlint]
+
+# Directories or files to ignore during linting (optional)
+
+exclude = node_modules, venv, static
+
+# Maximum line length for the linter to respect
+
+line-length = 88
+
+# List of linting rules to ignore
+
+ignore = no-self-closing-tags, prefer-double-quotes
+
+# List of linting rules to enforce strictly
+
+require = require-doctype-first, prefer-compact-if
+
+# Enable or disable linting for various template types
+
+jinja = true
+django = true
+html = true
+
+# Use indentation settings
+
+indent = 4
+
+# Autofix linting issues on save
+
+autofix = true
