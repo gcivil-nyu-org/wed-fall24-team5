@@ -1,5 +1,3 @@
-# Defines rules for HTML Linting. This should be in JSON format
-
 [djlint]
 
 # Directories or files to ignore during linting (optional)
