@@ -2,11 +2,11 @@ from django import forms
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 
 class MyAuthenticationForm(AuthenticationForm):
-    username = forms.CharField(
+    email = forms.EmailField(
         required=True,
-        widget=forms.TextInput(attrs={
+        widget=forms.EmailInput(attrs={
             'class': 'input',
-            'type': 'text',
+            'type': 'email',
         })
     )
     password = forms.CharField(
@@ -17,11 +17,12 @@ class MyAuthenticationForm(AuthenticationForm):
         })
     )
 
-class MyUserCreationForm(UserCreationForm):
-    username = forms.CharField(
-        widget=forms.TextInput(attrs={
+class MyUserCreationForm(UserCreationForm):  # pylint: disable=too-many-ancestors
+    email = forms.EmailField(
+        required=True,
+        widget=forms.EmailInput(attrs={
             'class': 'input',
-            'type': 'text',
+            'type': 'email',
         })
     )
     password1 = forms.CharField(

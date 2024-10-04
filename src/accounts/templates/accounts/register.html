@@ -8,12 +8,11 @@
                 <form method="post">
                 {% csrf_token %}
                 <div class="field">
-                    <label class="label">Username</label>
+                    <label class="label">Email</label>
                     <div class="control has-icons-left">
-                        <span class="icon is-small is-left"><i class="fas fa-user"></i></span>
-                        {{ form.username }}
+                        <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                        {{ form.email }}
                     </div>
-                    <p class="help">150 characters or fewer. Letters, digits and @/./+/-/_ only.</p>
                 </div>
                 <div class="field">
                     <label class="label">Password</label>
@@ -41,11 +40,4 @@
         </div>
     </div>
 </section>
-
-    <!-- <h1>Register</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="button is-primary">Register</button>
-    </form> -->
 {% endblock content %}
