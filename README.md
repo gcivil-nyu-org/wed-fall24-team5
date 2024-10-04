@@ -132,11 +132,22 @@ Our vision is to create a platform that fosters a strong community network by co
    ]
    ```
 
-5. Be sure to add the url path to the `src/django_management/urls.py` path
+5. Add the url path to the `src/django_management/urls.py` path
 
    ```python
    # Example to add to urlpatterns in src/django_management/urls.py
    path('accounts/', include('accounts.urls')),
+   ```
+
+6. Add the subapplication to `src/django_management/settings.py`
+
+   ```python
+   INSTALLED_APPS = [
+      ...
+      # Other apps
+      'accounts',
+      'future_subapplication_names'
+   ]
    ```
 
 ### Branches
