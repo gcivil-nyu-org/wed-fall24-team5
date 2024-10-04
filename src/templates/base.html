@@ -8,7 +8,7 @@
     <title>{% block title %}My Django Project{% endblock title %}</title>
     <!--Bulma-->
     {% load static %}
-    <link rel="stylesheet" href="{% static 'css/style.css'%}"/>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}"/>
     <!-- Font Awesome CDN -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     {% block extra_head %}
@@ -22,7 +22,7 @@
       {% block content %}
       <!-- Default content, if not overridden -->
       {% endblock content %}
-    </main>
+    </section>
     {% include "partials/footer.html" %}
 
     {% block extra_js %}
