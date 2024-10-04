@@ -1,6 +1,10 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Profile</h1>
-    <p>Welcome, {{ user.username }}!</p>
-    <a href="{% url 'logout' %}" class="button is-danger">Logout</a>
+<section class="hero">
+    <div class="hero-body">
+        <p class="title">Profile</h1>
+        <p>Welcome, {{ user.username }}!</p>
+        <a href="{% url 'logout' %}" class="button is-danger">Logout</a>
+    </div>
+</section>
 {% endblock content %}

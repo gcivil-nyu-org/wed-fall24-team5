@@ -1,9 +1,24 @@
 {% extends "base.html" %}
 {% block content %}
-    <h1>Login</h1>
-    <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit" class="button is-primary">Login</button>
-    </form>
+<section class="hero">
+    <div class="hero-body">
+        <p class="title">Login</h1>
+        <form method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label class="label">Username</label>
+                <div class="control">
+                    {{ form.username }}
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Password</label>
+                <div class="control">
+                    {{ form.password }}
+                </div>
+            </div>
+            <button type="submit" class="button is-primary">Login</button>
+        </form>
+    </div>
+</section>
 {% endblock content %}
