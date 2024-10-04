@@ -45,6 +45,7 @@ Our vision is to create a platform that fosters a strong community network by co
 ├── src/                   # Django application root
 │ ├── manage.py            # Django management script
 │ ├── django_management/   # Main Django project folder
+│ ├── accounts/            # Sub-application for register / login / accounts
 │ ├── static/              # Static files (CSS, JS, images)
 │ └── templates/           # HTML templates for front-end
 ├── README.md              # This file
@@ -95,18 +96,61 @@ Our vision is to create a platform that fosters a strong community network by co
 
 ## Development
 
+### Creating a new sub-application
+
+1. To create a new subapplication, change to the `src/` folder and use the built-in Django `startapp` feature
+
+   ```bash
+   cd src
+   python manage.py startapp [subapplication_name]
+   ```
+
+2. Create a folder for the templates and static files for this subapplication.
+
+   ```bash
+   cd [subapplication_name]
+   mkdir static templates templates/subapplication_name
+   ```
+
+3. Add the `src/subapplication_name/urls.py` file to the subapplication
+
+   ```bash
+   touch urls.py
+   ```
+
+4. Add the appropriate paths to the `src/subapplication_name/urls.py` file
+
+   ```python
+   # Example src/subapplication_name/urls.py file
+   from django.urls import path
+   from . import views
+
+   urlpatterns = [
+      path('login/', views.login_view, name='login'),
+      path('register/', views.register_view, name='register'),
+      path('profile/', views.profile_view, name='profile'),
+   ]
+   ```
+
+5. Be sure to add the url path to the `src/django_management/urls.py` path
+
+   ```python
+   # Example to add to urlpatterns in src/django_management/urls.py
+   path('accounts/', include('accounts.urls')),
+   ```
+
 ### Branches
 
 - Branches must be named as follows in order for a pull request with that branch to be accepted: `branch-type/issue-##/short-description`
 
-  - branch-type must be one of `bugfix`, `feature`, `hotfix`, `chore`, `release`, `test`, `doc`, or `refactor`
+- branch-type must be one of `bugfix`, `feature`, `hotfix`, `chore`, `release`, `test`, `doc`, or `refactor`
 
 ### Pull Requests
 
 - Ensure your branch follows the appropriate naming conventions (above)
 - While only one review is required, aim for two reviews.
 - Do not resolve conversations you did not create. All conversations should be resolved before merging
-  - If your change after opening the Pull Request greatly modified your code, you should request a re-review
+- If your change after opening the Pull Request greatly modified your code, you should request a re-review
 - All tests and lints should pass before merging
 - Only the developer who opened the Pull Request should merge the Pull Request
 - Always use `Squash and merge` to keep the commit history clean
@@ -118,8 +162,13 @@ This project uses `pylint` for linting and formatting Python files and `djlint` 
 
 ```bash
 pylint src/
-djlint src/templates/
+djlint src/ --lint
 ```
+
+- If you want to reformat your HTML files, this will automatically re-format and indent them. Errors in linting that need to manually corrected may still exist after reformatting.
+  ```bash
+  djlint src/ --reformat
+  ```
 
 ## Running tests
 
