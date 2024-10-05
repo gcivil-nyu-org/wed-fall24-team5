@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="hero-body">
+        <p class="title">Login</p>
+        <hr class="hr">
+        <div class="columns">
+            <div class="column is-one-third">
+                <form method="post">
+                {% csrf_token %}
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                        {{ form.email }}
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+                        {{ form.password }}
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary is-fullwidth">Login</button>
+                    </div>
+                </div>
+                <div class="field">
+                        <button class="button is-light is-fullwidth" href="{% url 'accounts:register' %}">Sign Up</button>
+                </div>
+                <div class="field">
+                    <label class="label">Or</label>
+                    <div class="control">
+                        <button type="submit" class="button is-fullwidth">Continue with Google</button>
+                    </div>
+                </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}

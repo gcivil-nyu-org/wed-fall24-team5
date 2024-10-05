@@ -1,0 +1,29 @@
+@import "https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css";
+
+/* Documentation can be found at https://bulma.io/documentation/
+
+Overriding Bulma and defining our own metrics:
+
+.custom-header {
+    background-color: #4CAF50;
+} */
+
+.divider {
+    display: flex;
+    align-items: center;
+    text-align: center;
+}
+
+.divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    border-bottom: 1px solid #ddd;
+}
+
+.divider:not(:empty)::before {
+    margin-right: 1em;
+}
+
+.divider:not(:empty)::after {
+    margin-left: 1em;
+}

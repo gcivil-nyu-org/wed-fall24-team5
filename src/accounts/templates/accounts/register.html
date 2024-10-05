@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block content %}
+<section class="hero">
+    <div class="hero-body">
+        <p class="title">Register</p>
+        <div class="columns">
+            <div class="column is-half">
+                <form method="post">
+                {% csrf_token %}
+                <div class="field">
+                    <label class="label">Email</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                        {{ form.email }}
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Password</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+                        {{ form.password1 }}
+                    </div>
+                    <p class="help">
+                        Your password can’t be too similar to your other personal information.<br>
+                        Your password must contain at least 8 characters.<br>
+                        Your password can’t be a commonly used password.<br>
+                        Your password can’t be entirely numeric.</p>
+                </div>
+                <div class="field">
+                    <label class="label">Confirm Password</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-lock"></i></span>
+                        {{ form.password2 }}
+                    </div>
+                    <p class="help">Enter the same password as before, for verification.</p>
+                </div>
+                <button type="submit" class="button is-primary">Register</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock content %}
