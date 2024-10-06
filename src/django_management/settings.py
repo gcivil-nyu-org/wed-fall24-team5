@@ -149,7 +149,7 @@ AUTHENTICATION_BACKENDS = [
     'accounts.backends.EmailBackend',  # Add your custom email backend
 ]
 
-LOGIN_REDIRECT_URL = "accounts:profile" 
+LOGIN_REDIRECT_URL = "accounts:profile"
 LOGOUT_REDIRECT_URL = "/"
 ACCOUNT_AUTHENTICATION_METHOD = 'email'
 ACCOUNT_EMAIL_REQUIRED = True

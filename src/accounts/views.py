@@ -2,9 +2,9 @@
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages 
-from .forms import MyAuthenticationForm, MyUserCreationForm
+from django.contrib import messages
 from django.contrib.auth.models import User
+from .forms import MyAuthenticationForm, MyUserCreationForm
 
 def register_view(request):
     if request.method == 'POST':
@@ -15,7 +15,7 @@ def register_view(request):
         if User.objects.filter(email=email).exists():
             messages.error(request, "This email is already registered.")
             return render(request, 'accounts/register.html', {'form': form})
-        
+
         if form.is_valid():
             user = form.save(commit=False)  # Create a user object but don't save it yet
             user.username = form.cleaned_data.get('email')  # Set username as email
@@ -28,6 +28,7 @@ def register_view(request):
             return render(request, 'accounts/register.html', {'form': form})
     else:
         form = MyUserCreationForm()
+
     return render(request, 'accounts/register.html', {'form': form})
 
 def login_view(request):
