@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            {% if forloop.counter > 0 %}
+                    {{ message }}
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}
 <section class="hero">
     <div class="hero-body">
         <div class="columns">

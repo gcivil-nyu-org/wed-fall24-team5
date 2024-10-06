@@ -4,10 +4,18 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages 
 from .forms import MyAuthenticationForm, MyUserCreationForm
+from django.contrib.auth.models import User
 
 def register_view(request):
     if request.method == 'POST':
         form = MyUserCreationForm(request.POST)
+        email = request.POST.get('email')
+
+        # Check if the email is already in use
+        if User.objects.filter(email=email).exists():
+            messages.error(request, "This email is already registered.")
+            return render(request, 'accounts/register.html', {'form': form})
+        
         if form.is_valid():
             user = form.save(commit=False)  # Create a user object but don't save it yet
             user.username = form.cleaned_data.get('email')  # Set username as email
@@ -15,7 +23,7 @@ def register_view(request):
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('accounts:profile')
         else:
-            messages.error(request, form.errors)
+            messages.error(request, "Registration Failed!! Password mismatch or too generic")
             form = MyUserCreationForm()
             return render(request, 'accounts/register.html', {'form': form})
     else:
