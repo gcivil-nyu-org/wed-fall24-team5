@@ -15,7 +15,9 @@ defusedxml==0.8.0rc2
 dill==0.3.9
 Django==5.1.1
 django-allauth==65.0.2
+django-appconf==1.0.6
 django-browser-reload==1.15.0
+django-compressor==4.5.1
 django-tailwind==3.8.0
 djlint==1.35.2
 EditorConfig==0.12.4
@@ -43,10 +45,12 @@ python-dotenv==1.0.1
 python-slugify==8.0.4
 python3-openid==3.2.0
 PyYAML==6.0.2
+rcssmin==1.1.2
 regex==2024.9.11
 requests==2.32.3
 requests-oauthlib==2.0.0
 rich==13.9.2
+rjsmin==1.2.2
 six==1.16.0
 social-auth-app-django==5.4.2
 social-auth-core==4.5.4

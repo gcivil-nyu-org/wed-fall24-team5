@@ -12,3 +12,11 @@ db.sqlite3
 
 # Mac OS
 .DS_Store
+
+# Node Modules
+node_modules/
+
+# Output CSS
+src/static/css/output.css
+src/static/CACHE/
+*.log

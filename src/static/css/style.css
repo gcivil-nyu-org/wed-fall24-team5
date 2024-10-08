@@ -1,4 +1,7 @@
-@import "https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css";
+/* @import "https://cdn.jsdelivr.net/npm/bulma@1.0.2/css/bulma.min.css"; */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 /* Documentation can be found at https://bulma.io/documentation/
 
@@ -8,6 +11,4 @@ Overriding Bulma and defining our own metrics:
     background-color: #4CAF50;
 } */
 
-.navbar {
-    --bulma-navbar-padding-vertical: 2rem !important;
-}
+
