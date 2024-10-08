@@ -29,13 +29,13 @@ def my_signal_receiver(sender, **kwargs): # pylint: disable=unused-argument
 
     # Path to your .env file
     load_dotenv()
-    env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env') # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+    env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env') # pylint: disable=line-too-long
     set_key(env_file, 'SITE_ID', str(site.id)) # Write or update SITE_ID
 
     # create SocialAPP
     app, _ = SocialApp.objects.get_or_create(provider='google', name='google')
-    app.client_id = os.getenv('client_id', 'none')
-    app.secret = os.getenv('secret_key', 'none')
+    app.client_id = os.getenv('google_auth_client_id', 'none')
+    app.secret = os.getenv('google_auth_secret_key', 'none')
     app.sites.add(site)
     app.save()
 
@@ -49,14 +49,14 @@ def register_view(request):
             messages.error(request, "This email is already registered.")
             return render(request, 'accounts/register.html', {'form': form})
 
-        if form.is_valid(): # pylint: disable=no-else-return, locally-disabled, multiple-statements, fixme, line-too-long
+        if form.is_valid(): # pylint: disable=no-else-return
             user = form.save(commit=False)  # Create a user object but don't save it yet
             user.username = form.cleaned_data.get('email')  # Set username as email
             user.save()  # Save the user object
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('accounts:profile')
         else:
-            messages.error(request, "Registration Failed!! Password mismatch or too generic") # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+            messages.error(request, "Registration Failed!! Password mismatch or too generic") # pylint: disable=line-too-long
             form = MyUserCreationForm()
             return render(request, 'accounts/register.html', {'form': form})
     else:
@@ -67,7 +67,7 @@ def register_view(request):
 def login_view(request):
     if request.method == 'POST':
         form = MyAuthenticationForm(request, data=request.POST)
-        if form.is_valid(): # pylint: disable=no-else-return, locally-disabled, multiple-statements, fixme, line-too-long
+        if form.is_valid(): # pylint: disable=no-else-return
             user = form.get_user()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('accounts:profile')
