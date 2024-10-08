@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-bydqct==mg#ii(79dn!=t77we%@1lw+m!fmdxueqo&*nqc_#53
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['http://food-donation-swe-dev.us-east-1.elasticbeanstalk.com', '127.0.0.1', 'localhost']
 
 # Application definition
 
