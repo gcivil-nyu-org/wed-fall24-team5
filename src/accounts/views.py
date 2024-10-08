@@ -17,14 +17,14 @@ def register_view(request):
             messages.error(request, "This email is already registered.")
             return render(request, 'accounts/register.html', {'form': form})
 
-        if form.is_valid():
+        if form.is_valid(): # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
             user = form.save(commit=False)  # Create a user object but don't save it yet
             user.username = form.cleaned_data.get('email')  # Set username as email
             user.save()  # Save the user object
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('accounts:profile')
         else:
-            messages.error(request, "Registration Failed!! Password mismatch or too generic")
+            messages.error(request, "Registration Failed!! Password mismatch or too generic") # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
             form = MyUserCreationForm()
             return render(request, 'accounts/register.html', {'form': form})
     else:
@@ -35,7 +35,7 @@ def register_view(request):
 def login_view(request):
     if request.method == 'POST':
         form = MyAuthenticationForm(request, data=request.POST)
-        if form.is_valid():
+        if form.is_valid(): # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
             user = form.get_user()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('accounts:profile')
@@ -53,7 +53,7 @@ def profile_view(request):
 
 def logout_view(request):
     storage = get_messages(request)
-    for message in storage:
+    for _ in storage:
         # Simply iterate over the messages to clear them
         pass
     logout(request)

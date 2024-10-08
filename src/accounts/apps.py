@@ -1,5 +1,5 @@
-from django.apps import AppConfig
 import os
+from django.apps import AppConfig
 from django.conf import settings
 
 class AccountsConfig(AppConfig):
@@ -10,13 +10,13 @@ class AccountsConfig(AppConfig):
         self.configure_social_apps()
 
     def configure_social_apps(self):
-        
+
         def create_social_app(provider, name, client_id, secret_key):
             from allauth.socialaccount.models import SocialApp
             from django.contrib.sites.models import Site
             from dotenv import load_dotenv, set_key
-            
-            site, created = Site.objects.get_or_create(
+
+            site, _ = Site.objects.get_or_create(
                 domain=os.getenv('domain','http://127.0.0.1:8000'),
                 defaults={'name': os.getenv('domain_name', 'http://127.0.0.1:8000')}
             )
@@ -26,7 +26,7 @@ class AccountsConfig(AppConfig):
 
             # Path to your .env file
             load_dotenv()
-            env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env')
+            env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env') # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
             set_key(env_file, 'SITE_ID', str(site.id)) # Write or update SITE_ID
 
             app, created = SocialApp.objects.get_or_create(provider=provider, name=name)
