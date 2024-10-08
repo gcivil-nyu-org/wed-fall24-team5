@@ -74,7 +74,7 @@ WSGI_APPLICATION = 'django_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Get .env variables from Qahtan 
+# Get .env variables from Qahtan
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
