@@ -3,8 +3,7 @@
 <section class="hero">
     <div class="hero-body">
         <p class="title">Profile</p>
-        <p>Welcome, {{ user.username }}!</p>
-        <a href="{% url 'logout' %}" class="button is-danger">Logout</a>
+        <p>Welcome, {{ user.first_name }} {{ user.last_name }}!</p>
     </div>
 </section>
 {% endblock content %}

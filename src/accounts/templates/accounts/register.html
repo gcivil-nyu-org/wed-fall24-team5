@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            {% if forloop.counter > 0 %}
+                    {{ message }}
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}
 <section class="hero">
     <div class="hero-body">
         <div class="columns">
@@ -13,6 +22,20 @@
                     <div class="control has-icons-left">
                         <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
                         {{ form.email }}
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">First Name</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                        {{ form.first_name }}
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Last Name</label>
+                    <div class="control has-icons-left">
+                        <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
+                        {{ form.last_name }}
                     </div>
                 </div>
                 <div class="field">
