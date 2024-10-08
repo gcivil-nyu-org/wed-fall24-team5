@@ -27,7 +27,9 @@ SECRET_KEY = 'django-insecure-bydqct==mg#ii(79dn!=t77we%@1lw+m!fmdxueqo&*nqc_#53
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['food-donation-swe-dev.us-east-1.elasticbeanstalk.com',
+                 '127.0.0.1',
+                 'localhost']
 
 # Application definition
 load_dotenv()
@@ -42,7 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles', # Manages static files (CSS, JavaScript, images, etc.)
 
     # Other apps (custom or third-party apps go here)
-    'accounts', # Custom app for user accounts
+    'accounts.apps.AccountsConfig', # Custom app for user accounts
     'django.contrib.sites', # Sites framework (enables associating data with different sites/domains) # pylint: disable=line-too-long
 
     # Allauth - Third-party library for authentication and social account management
@@ -129,8 +131,14 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# Static files (CSS, JavaScript, Images).
+# This is where the browser will serve.
+STATIC_URL = '/static/'
+
+# Additional locations for static files in our repository
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
