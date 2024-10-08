@@ -4,6 +4,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
+from django.contrib.messages import get_messages
 from .forms import MyAuthenticationForm, MyUserCreationForm
 
 def register_view(request):
@@ -51,5 +52,9 @@ def profile_view(request):
     return render(request, 'accounts/profile.html')
 
 def logout_view(request):
+    storage = get_messages(request)
+    for message in storage:
+        # Simply iterate over the messages to clear them
+        pass
     logout(request)
     return redirect('/')
