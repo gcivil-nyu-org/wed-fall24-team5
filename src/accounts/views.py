@@ -16,7 +16,7 @@ from .forms import MyAuthenticationForm, MyUserCreationForm
 @receiver(post_migrate)
 def my_signal_receiver(sender, **kwargs): # pylint: disable=unused-argument
     # Safe to access the database here
-    
+
     # Create Site
     from django.contrib.sites.models import Site
 
