@@ -1,11 +1,41 @@
 # Create your views here.
+import os
 from django.contrib.auth import login, logout
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+from django.conf import settings
+from allauth.socialaccount.models import SocialApp
+from dotenv import load_dotenv, set_key
 from .forms import MyAuthenticationForm, MyUserCreationForm
+
+# In your app's views.py or signals.py
+@receiver(post_migrate)
+def my_signal_receiver(sender, **kwargs):
+    # Safe to access the database here
+    from django.contrib.sites.models import Site
+    
+    site, _ = Site.objects.get_or_create(
+        domain=os.getenv('domain','http://127.0.0.1:8000'),
+        defaults={'name': os.getenv('domain_name', 'http://127.0.0.1:8000')}
+    )
+
+    site.save()
+
+    # Path to your .env file
+    load_dotenv()
+    env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env') # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+    set_key(env_file, 'SITE_ID', str(site.id)) # Write or update SITE_ID
+
+    app, _ = SocialApp.objects.get_or_create(provider='google', name='google')
+    app.client_id = os.getenv('client_id')
+    app.secret = os.getenv('secret_key')
+    app.sites.add(site)
+    app.save()
 
 def register_view(request):
     if request.method == 'POST':
