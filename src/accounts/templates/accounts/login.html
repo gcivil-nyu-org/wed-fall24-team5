@@ -40,7 +40,7 @@
                 {% load socialaccount %}
                 <div class="field pt-3">
                     <div class="control">
-                        <form method="POST" action="{% provider_login_url 'google' %}">
+                        <form method="post" action="{% provider_login_url 'google' %}">
                             {% csrf_token %}
                             <button type="submit" class="button is-light is-fullwidth">
                                 <span class="icon">
