@@ -11,7 +11,9 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os 
 from dotenv import load_dotenv, dotenv_values
+from decouple import config
 from pathlib import Path
+load_dotenv()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -75,17 +77,18 @@ WSGI_APPLICATION = 'django_management.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
+#Get .env variables from Qahtan 
 if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ['RDS_DB_NAME'],
-            'USER': os.environ['RDS_USERNAME'],
-            'PASSWORD': os.environ['RDS_PASSWORD'],
-            'HOST': os.environ['RDS_HOSTNAME'],
-            'PORT': os.environ['RDS_PORT'],
+            'NAME': os.environ.get("RDS_DB_NAME"),
+            'USER': os.environ.get("RDS_USERNAME"),
+            'PASSWORD': os.environ.get("RDS_PASSWORD"),
+            'HOST': os.environ.get("RDS_HOSTNAME"),
+            'PORT': os.environ.get("RDS_PORT"),
+            }
         }
-    }
 else:
     DATABASES = {
         'default': {
@@ -93,9 +96,7 @@ else:
             'NAME': BASE_DIR / 'db.sqlite3',
         }
     }
-
-
-
+    
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
 
