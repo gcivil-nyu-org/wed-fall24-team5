@@ -120,8 +120,8 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 STATIC_URL = '/static/'
 
-# Define the location where static files will be collected
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
+# # Define the location where static files will be collected
+# STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
 # Additional locations for static files
 STATICFILES_DIRS = [
