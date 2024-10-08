@@ -1,0 +1,25 @@
+{% load static tailwind_tags %}
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+    <title>{% block title %}My Django Project{% endblock title %}</title>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<meta name="description" content="This is Team 5's Django project, showcasing our awesome web application." />
+        <meta name="keywords" content="Django, Team 5, Web Development, Project, 2024" />
+		<meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <!-- <link rel="stylesheet" href="{% static 'css/styles.css' %}"/> -->
+		{% tailwind_css %}
+
+		{% block extra_head %}
+        <!-- Additional CSS or JS can be inserted by child templates -->
+        {% endblock extra_head %}
+	</head>
+
+	<body class="h-full">
+		{% include "partials/theader.html" %}
+		{% block content %}
+    	{% endblock content %}
+		{% include "partials/footer.html" %}
+	</body>
+</html>

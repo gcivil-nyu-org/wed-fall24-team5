@@ -1,0 +1,84 @@
+<header class="fixed inset-x-0 top-0 z-50 bg-white border-t border-gray-100 shadow-sm leading-6">
+	<div class="flex items-center justify-between p-6 lg:px-8">
+		<div class="flex items-center lg:flex-1 space-x-8">
+			<a href="#" class="-m-1.5 p-1.5 flex items-center">
+				<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+					stroke="currentColor" class="size-6">
+					<path stroke-linecap="round" stroke-linejoin="round"
+						d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+				</svg>
+				<span class="ml-3 text-lg font-bold text-gray-900">Food Donation</span>
+			</a>
+			{% if user.is_authenticated %}
+			<div class="relative">
+				<div>
+					<button type="button"
+						class="inline-flex w-full justify-center gap-x-1.5 rounded-full bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-sm ring-1 ring-inset ring-gray-300 hover:bg-gray-50"
+						id="menu-button" aria-expanded="false" aria-haspopup="true">
+						View As
+						<svg class="-mr-1 h-5 w-5 text-gray-400" viewBox="0 0 20 20" fill="currentColor"
+							aria-hidden="true" data-slot="icon">
+							<path fill-rule="evenodd"
+								d="M5.22 8.22a.75.75 0 0 1 1.06 0L10 11.94l3.72-3.72a.75.75 0 1 1 1.06 1.06l-4.25 4.25a.75.75 0 0 1-1.06 0L5.22 9.28a.75.75 0 0 1 0-1.06Z"
+								clip-rule="evenodd" />
+						</svg>
+					</button>
+				</div>
+				<div id="view-menu"
+					class="absolute top-full rounded-lg z-10 mt-1 w-40 origin-top-left divide-y divide-gray-100 rounded-md bg-white shadow-md ring-1 ring-black ring-opacity-5 focus:outline-none hidden"
+					role="menu" aria-orientation="vertical" aria-labelledby="menu-button" tabindex="-1">
+					<div class="py-1" role="none">
+						<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+							id="menu-item-0">User</a>
+						<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+							id="menu-item-1">Organization 1</a>
+					</div>
+					<div class="py-1" role="none">
+						<a href="#" class="block px-4 py-2 text-sm text-gray-700" role="menuitem" tabindex="-1"
+							id="menu-item-2">Add Organization</a>
+					</div>
+				</div>
+			</div>
+			{% endif %}
+		</div>
+		<div class="relative hidden lg:flex items-center ml-auto">
+			{% if user.is_authenticated %}
+			<nav class="text-sm font-semibold">
+				<ul class="flex space-x-8">
+					<li><a class="hover:text-sky-600" href="#">Dashboard</a></li>
+					<li><a class="hover:text-sky-600" href="#">Orders</a></li>
+					<li><a class="hover:text-sky-600" href="#">Profile</a></li>
+				</ul>
+			</nav>
+			{% endif %}
+			<div class="hidden lg:ml-6 lg:flex lg:items-center lg:pl-8">
+				{% if user.is_authenticated %}
+				<a class="inline-flex justify-center rounded-lg text-sm font-semibold py-2 px-4 border border-slate-900"
+					href="#"><span>Messages</span></a>
+				<a class="inline-flex justify-center rounded-lg text-sm font-semibold py-2 px-4 bg-slate-900 text-white -my-2.5 ml-6"
+					href="{% url 'accounts:logout' %}"><span>Log Out</span></a>
+				{% else %}
+				<a class="inline-flex justify-center rounded-lg text-sm font-semibold py-2 px-4 border border-slate-900"
+					href="{% url 'accounts:login' %}"><span>Log In</span></a>
+				<a class="inline-flex justify-center rounded-lg text-sm font-semibold py-2 px-4 bg-slate-900 text-white -my-2.5 ml-6"
+					href="{% url 'accounts:register' %}"><span>Sign Up</span></a>
+				{% endif %}
+			</div>
+		</div>
+	</div>
+</header>
+
+<script>
+	const viewButton = document.getElementById('menu-button');
+	const viewMenu = document.getElementById('view-menu');
+
+	viewButton.addEventListener('click', () => {
+		viewMenu.classList.toggle('hidden');
+	});
+
+	document.addEventListener('click', function (event) {
+		if (!viewButton.contains(event.target) && !viewMenu.contains(event.target)) {
+			viewMenu.classList.add('hidden');
+		}
+	});
+</script>
