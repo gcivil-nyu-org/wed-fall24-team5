@@ -29,7 +29,7 @@ class AccountsConfig(AppConfig):
             env_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), '.env') # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
             set_key(env_file, 'SITE_ID', str(site.id)) # Write or update SITE_ID
 
-            app, created = SocialApp.objects.get_or_create(provider=provider, name=name)
+            app, _ = SocialApp.objects.get_or_create(provider=provider, name=name)
             app.client_id = client_id
             app.secret = secret_key
             app.sites.add(site)

@@ -17,7 +17,7 @@ def register_view(request):
             messages.error(request, "This email is already registered.")
             return render(request, 'accounts/register.html', {'form': form})
 
-        if form.is_valid(): # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+        if form.is_valid(): # pylint: disable=no-else-return, locally-disabled, multiple-statements, fixme, line-too-long
             user = form.save(commit=False)  # Create a user object but don't save it yet
             user.username = form.cleaned_data.get('email')  # Set username as email
             user.save()  # Save the user object
@@ -35,7 +35,7 @@ def register_view(request):
 def login_view(request):
     if request.method == 'POST':
         form = MyAuthenticationForm(request, data=request.POST)
-        if form.is_valid(): # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+        if form.is_valid(): # pylint: disable=no-else-return, locally-disabled, multiple-statements, fixme, line-too-long
             user = form.get_user()
             login(request, user, backend='django.contrib.auth.backends.ModelBackend')
             return redirect('accounts:profile')

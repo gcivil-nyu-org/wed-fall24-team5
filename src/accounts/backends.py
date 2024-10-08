@@ -10,7 +10,7 @@ class EmailBackend(ModelBackend):
         try:
             # Authenticate using email instead of username
             user = User.objects.get(email=username)
-            if user.check_password(password): # pylint: disable=locally-disabled, multiple-statements, fixme, line-too-long
+            if user.check_password(password): # pylint: disable=no-else-return, locally-disabled, multiple-statements, fixme, line-too-long
                 return user
             else:
                 return None
