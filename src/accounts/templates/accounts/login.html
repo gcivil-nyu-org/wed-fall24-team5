@@ -1,5 +1,14 @@
 {% extends "base.html" %}
 {% block content %}
+{% if messages %}
+    <ul class="messages">
+        {% for message in messages %}
+            {% if forloop.counter > 0 %}
+                    {{ message }}
+            {% endif %}
+        {% endfor %}
+    </ul>
+{% endif %}
 <section class="hero">
     <div class="hero-body">
         <div class="columns">
@@ -12,7 +21,7 @@
                     <label class="label">Email</label>
                     <div class="control has-icons-left">
                         <span class="icon is-small is-left"><i class="fas fa-envelope"></i></span>
-                        {{ form.email }}
+                        {{ form.username }}
                     </div>
                 </div>
                 <div class="field">
@@ -28,14 +37,18 @@
                     </div>
                 </div>
                 </form>
+                {% load socialaccount %}
                 <div class="field pt-3">
                     <div class="control">
-                        <button class="button is-light is-fullwidth">
-                            <span class="icon">
-                                <i class="fa-brands fa-google"></i>
-                            </span>
-                            <span>Continue with Google</span>
-                        </button>
+                        <form method="post" action="{% provider_login_url 'google' %}">
+                            {% csrf_token %}
+                            <button type="submit" class="button is-light is-fullwidth">
+                                <span class="icon">
+                                    <i class="fa-brands fa-google"></i>
+                                </span>
+                                <span>Continue with Google</span>
+                            </button>
+                        </form>
                     </div>
                 </div>
             </div>
