@@ -44,8 +44,8 @@ class User(models.Model):
 
 class OrganizationAdmin(models.Model):
     admin_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, to_field='user_email')
+    organization_id = models.ForeignKey(Organization, on_delete=models.CASCADE, to_field='organization_id')
+    user_email = models.ForeignKey(User, on_delete=models.CASCADE, to_field='user_email')
     access_level = models.CharField(max_length=50)
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -56,7 +56,7 @@ class OrganizationAdmin(models.Model):
 
 class Donation(models.Model):
     donation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    organization_id = models.ForeignKey(Organization, on_delete=models.CASCADE, to_field='organization_id')
     food_item = models.CharField(max_length=255)
     quantity = models.IntegerField()
     pickup_by = models.DateField()
@@ -69,8 +69,8 @@ class Donation(models.Model):
 
 class UserReview(models.Model):
     review_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, to_field='user_email')
+    organization_id = models.ForeignKey(Organization, on_delete=models.CASCADE, to_field='organization_id')
+    user_email = models.ForeignKey(User, on_delete=models.CASCADE, to_field='user_email')
     rating = models.IntegerField()
     comment = models.TextField(blank=True, null=True)
     active = models.BooleanField(default=True)
@@ -80,10 +80,11 @@ class UserReview(models.Model):
     def __str__(self):
         return f"Review by {self.user.first_name} for {self.organization.organization_name}"
 
+# As it currently stands it is users sending eachother messages, which needs to change to users exchanging messages with organizations.
 class Message(models.Model):
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages')
-    receiver = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages')
+    sender_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', to_field='user_email')
+    receiver_id = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages', to_field='user_email')
     message_body = models.TextField()
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
@@ -99,8 +100,8 @@ class Order(models.Model):
     ]
 
     order_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    donation = models.ForeignKey(Donation, on_delete=models.CASCADE)
-    user = models.ForeignKey(User, on_delete=models.CASCADE, to_field='user_email')
+    donation_id = models.ForeignKey(Donation, on_delete=models.CASCADE)
+    user_email = models.ForeignKey(User, on_delete=models.CASCADE, to_field='user_email')
     order_quantity = models.IntegerField()
     order_status = models.CharField(max_length=20, choices=ORDER_STATUS_CHOICES, default='pending')
     active = models.BooleanField(default=True)
