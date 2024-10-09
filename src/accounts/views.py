@@ -79,6 +79,9 @@ def login_view(request):
         form = MyAuthenticationForm()
     return render(request, 'accounts/login.html', {'form': form})
 
+def landing_view(request):
+    return render(request, 'accounts/landing.html')
+
 @login_required
 def profile_view(request):
     return render(request, 'accounts/profile.html')
