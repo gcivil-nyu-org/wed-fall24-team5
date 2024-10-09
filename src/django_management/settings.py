@@ -27,29 +27,32 @@ SECRET_KEY = 'django-insecure-bydqct==mg#ii(79dn!=t77we%@1lw+m!fmdxueqo&*nqc_#53
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['food-donation-swe-dev.us-east-1.elasticbeanstalk.com',
+                 '127.0.0.1',
+                 'localhost']
 
 # Application definition
 load_dotenv()
 SITE_ID = int(os.getenv('SITE_ID', '1'))
 
 INSTALLED_APPS = [
-    'django.contrib.admin',
-    'django.contrib.auth',
-    'django.contrib.contenttypes',
-    'django.contrib.sessions',
-    'django.contrib.messages',
-    'django.contrib.staticfiles',
-    #other apps
-    'compressor',
-    'accounts',
-    'django.contrib.sites',
-    'allauth',
-    'allauth.account',
-    'allauth.socialaccount',
-    'allauth.socialaccount.providers.google',
-	# 'tailwind',
-	# 'django_browser_reload',
+    'django.contrib.admin', # Django's built-in admin interface app # pylint: disable=line-too-long
+    'django.contrib.auth', # Authentication system (handles user authentication and permissions) # pylint: disable=line-too-long
+    'django.contrib.contenttypes', # Content type framework (allows relations between models) # pylint: disable=line-too-long
+    'django.contrib.sessions', # Session framework (manages user sessions, typically cookies-based) # pylint: disable=line-too-long
+    'django.contrib.messages', # Messaging framework (enables message passing between views and templates) # pylint: disable=line-too-long
+    'django.contrib.staticfiles', # Manages static files (CSS, JavaScript, images, etc.)
+
+    # Other apps (custom or third-party apps go here)
+    'accounts.apps.AccountsConfig', # Custom app for user accounts
+    'django.contrib.sites', # Sites framework (enables associating data with different sites/domains) # pylint: disable=line-too-long
+    'compressor', # Compresses linked and inline JavaScript or CSS into a single cached file # pylint: disable=line-too-long
+
+    # Allauth - Third-party library for authentication and social account management
+    'allauth', # Core of django-allauth package (handles signups, logins, etc.)
+    'allauth.account', # Allauth's account module (handles user accounts, registration, etc.) # pylint: disable=line-too-long
+    'allauth.socialaccount', # Allauth's social account module (for managing social logins)
+    'allauth.socialaccount.providers.google', # Specific provider for Google login integration # pylint: disable=line-too-long
 ]
 
 MIDDLEWARE = [
@@ -60,8 +63,7 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
-    'allauth.account.middleware.AccountMiddleware',
-	'django_browser_reload.middleware.BrowserReloadMiddleware',
+    'allauth.account.middleware.AccountMiddleware', # Middleware provided by django-allauth to handle user accounts (e.g., login state, session) # pylint: disable=line-too-long
 ]
 
 ROOT_URLCONF = 'django_management.urls'
@@ -138,8 +140,14 @@ COMPRESS_ROOT = BASE_DIR / 'static'
 COMPRESS_ENABLED = True
 STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
-STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / "static"]
+# Static files (CSS, JavaScript, Images).
+# This is where the browser will serve.
+STATIC_URL = '/static/'
+
+# Additional locations for static files in our repository
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),
+]
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
