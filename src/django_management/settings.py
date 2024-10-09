@@ -28,6 +28,7 @@ SECRET_KEY = 'django-insecure-bydqct==mg#ii(79dn!=t77we%@1lw+m!fmdxueqo&*nqc_#53
 DEBUG = True
 
 ALLOWED_HOSTS = ['food-donation-swe-dev.us-east-1.elasticbeanstalk.com',
+                 '172.31.30.180', # PostGres
                  '127.0.0.1',
                  'localhost']
 
