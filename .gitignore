@@ -12,10 +12,19 @@ db.sqlite3
 
 # Mac OS
 .DS_Store
+
+# Node Modules
+node_modules/
+
 # Elastic Beanstalk Files
 .elasticbeanstalk/*
 !.elasticbeanstalk/*.cfg.yml
 !.elasticbeanstalk/*.global.yml
+
+# CSS build files
+src/static/CACHE/
+src/static/css/input.css
+*.log
 
 # Static
 staticfiles/

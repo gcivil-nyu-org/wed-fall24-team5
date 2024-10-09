@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     # Other apps (custom or third-party apps go here)
     'accounts.apps.AccountsConfig', # Custom app for user accounts
     'django.contrib.sites', # Sites framework (enables associating data with different sites/domains) # pylint: disable=line-too-long
+    'compressor', # Compresses linked and inline JavaScript or CSS into a single cached file # pylint: disable=line-too-long
 
     # Allauth - Third-party library for authentication and social account management
     'allauth', # Core of django-allauth package (handles signups, logins, etc.)
@@ -142,6 +143,10 @@ USE_TZ = True
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
+
+COMPRESS_ROOT = BASE_DIR / 'static'
+COMPRESS_ENABLED = True
+STATICFILES_FINDERS = ('compressor.finders.CompressorFinder',)
 
 # Static files (CSS, JavaScript, Images).
 # This is where the browser will serve.
