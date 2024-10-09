@@ -16,7 +16,11 @@ db.sqlite3
 # Node Modules
 node_modules/
 
+# Elastic Beanstalk Files
+.elasticbeanstalk/*
+!.elasticbeanstalk/*.cfg.yml
+!.elasticbeanstalk/*.global.yml
+
 # Output CSS
-src/static/css/output.css
 src/static/CACHE/
 *.log
