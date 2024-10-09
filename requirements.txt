@@ -23,6 +23,11 @@ mccabe==0.7.0
 oauthlib==3.2.2
 pathspec==0.12.1
 platformdirs==4.3.6
+psycopg2==2.9.9
+psycopg2-binary==2.9.9
+pylint==3.3.1
+python-decouple==3.8
+python-dotenv==1.0.1
 pycparser==2.22
 PyJWT==2.9.0
 pylint==3.3.1
