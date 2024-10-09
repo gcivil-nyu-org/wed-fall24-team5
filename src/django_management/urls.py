@@ -26,5 +26,4 @@ urlpatterns = [
 
     # Redirect the root URL to the login page
     path('', lambda request: redirect('accounts/landing')),
-	path('__reload__/', include('django_browser_reload.urls')),
 ]
