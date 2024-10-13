@@ -14,7 +14,7 @@ jobs:
         - black --check ./src
         - flake8 ./src
         - djlint src/ --lint
-        - coverage run --source='src' manage.py test
+        - coverage run --source='src' src/manage.py test
       after_script:
         - coveralls
 
@@ -24,7 +24,7 @@ jobs:
         - black --check ./src
         - flake8 ./src
         - djlint src/ --lint        
-        - coverage run --source='src' manage.py test
+        - coverage run --source='src' src/manage.py test
         - echo "Deploying..."
       after_script:
         - echo "Finished deploying!"
@@ -47,7 +47,7 @@ jobs:
         - black --check ./src
         - flake8 ./src
         - djlint src/ --lint
-        - coverage run --source='src' manage.py test
+        - coverage run --source='src' src/manage.py test
         - echo "Deploying..."
       after_script:
         - echo "Finished deploying!"
