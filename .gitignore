@@ -28,3 +28,6 @@ src/static/css/input.css
 
 # Static
 staticfiles/
+
+# Coverage
+.coverage
