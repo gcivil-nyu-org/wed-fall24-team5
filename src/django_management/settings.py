@@ -22,12 +22,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-bydqct==mg#ii(79dn!=t77we%@1lw+m!fmdxueqo&*nqc_#53'
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+# Load DEBUG from environment variables, default to False if not set
+DEBUG = os.getenv('DJANGO_DEBUG', 'False') == 'True'
 
 ALLOWED_HOSTS = ['food-donation-swe-dev.us-east-1.elasticbeanstalk.com',
+                 '172.31.30.180', # PostGres
+                 '34.202.22.62', # PostGres
                  '127.0.0.1',
                  'localhost']
 
@@ -94,11 +96,11 @@ if 'RDS_DB_NAME' in os.environ:
     DATABASES = {
         'default': {
             'ENGINE': 'django.db.backends.postgresql_psycopg2',
-            'NAME': os.environ.get("RDS_DB_NAME"),
-            'USER': os.environ.get("RDS_USERNAME"),
-            'PASSWORD': os.environ.get("RDS_PASSWORD"),
-            'HOST': os.environ.get("RDS_HOSTNAME"),
-            'PORT': os.environ.get("RDS_PORT"),
+            'NAME': os.getenv("RDS_DB_NAME"),
+            'USER': os.getenv("RDS_USERNAME"),
+            'PASSWORD': os.getenv("RDS_PASSWORD"),
+            'HOST': os.getenv("RDS_HOSTNAME"),
+            'PORT': os.getenv("RDS_PORT"),
             }
         }
 else:
