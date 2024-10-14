@@ -1,5 +1,8 @@
 # Food Waste Reduction App
 
+- `main` branch: [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5.svg?token=MTgnqHfTp8UjvtysZ5vw&branch=develop)](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5) [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=develop)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=develop)
+- `develop` branch: [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5.svg?token=MTgnqHfTp8UjvtysZ5vw&branch=main)](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5) [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=main)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=main)
+
 ## Project Overview
 
 This project aims to develop a mobile application that tackles food waste and food insecurity in NYC. It connects businesses, restaurants, and individuals with surplus food to users in need, promoting a more sustainable and equitable food system.
@@ -50,8 +53,9 @@ Our vision is to create a platform that fosters a strong community network by co
 │ └── templates/           # HTML templates for front-end
 ├── README.md              # This file
 ├── requirements.txt       # Requirements to be installed with pip
+├── .travis.yml            # Setup for Travis CI / CD
 ├── .djlintrc              # Setup for HTML linting and formatting
-└── .pylintrc              # Setup for Python linting and formatting
+└── .flake8                # Setup for Python linting and formatting
 ```
 
 ### Prerequisites
@@ -69,7 +73,7 @@ Our vision is to create a platform that fosters a strong community network by co
    cd wed-fall24-team5
    ```
 
-2. Set up the virtual environment:
+2. Set up a virtual environment:
 
    ```bash
    python3 -m venv venv
@@ -85,6 +89,7 @@ Our vision is to create a platform that fosters a strong community network by co
 4. Run database migrations
 
    ```bash
+   python src/manage.py makemigrations
    python src/manage.py migrate
    ```
 
@@ -169,10 +174,11 @@ Our vision is to create a platform that fosters a strong community network by co
 
 ## Linting
 
-This project uses `pylint` for linting and formatting Python files and `djlint` for HTML templates. To run linting locally:
+This project uses `flake8` and `black` for linting and formatting Python files and `djlint` for HTML templates. To run linting locally:
 
 ```bash
-pylint src/
+black ./src # This automatically reformats
+flake8 ./src
 djlint src/ --lint
 ```
 
@@ -181,10 +187,16 @@ djlint src/ --lint
   djlint src/ --reformat
   ```
 
-## Running tests
+## Running tests and coverage
 
-- More information will come as tests and coverage are added
+To run coverage tests locally:
+```bash
+coverage run --source='src' src/manage.py test
+```
 
 ## Deployment
 
-- This application is set up for deployment using AWS Elastic Beanstalk. Detailed deployment instructions will be added when the application is ready for deployment.
+- This application is set up for deployment using AWS Elastic Beanstalk.
+- Deployment is handled using Travis CI. Deployments are automatic on pushes to the `main` branch or the `develop` branch
+- The `develop` branch deploys [here](http://food-donation-swe-dev.us-east-1.elasticbeanstalk.com).
+- The `main` branch is currently undeployed.
