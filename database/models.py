@@ -7,13 +7,6 @@ class Organization(models.Model):
         ("restaurant", "Restaurant"),
         ("grocery_store", "Grocery Store"),
         ("food_pantry", "Food Pantry"),
-        ("soup_kitchen", "Soup Kitchen"),
-        ("community_fridge", "Community Fridge"),
-        ("bakery", "Bakery"),
-        ("farm", "Farm"),
-        ("catering_service", "Catering Service"),
-        ("school_cafeteria", "School Cafeteria"),
-        ("hotel", "Hotel"),
     ]
 
     organization_id = models.UUIDField(
