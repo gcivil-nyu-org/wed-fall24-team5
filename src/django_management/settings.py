@@ -39,6 +39,7 @@ load_dotenv()
 SITE_ID = int(os.getenv("SITE_ID", "1"))
 
 INSTALLED_APPS = [
+    "database", # Custom app for database models
     "django.contrib.admin",  # Django's built-in admin interface app # pylint: disable=line-too-long
     "django.contrib.auth",  # Authentication system (handles user authentication and permissions) # pylint: disable=line-too-long
     "django.contrib.contenttypes",  # Content type framework (allows relations between models) # pylint: disable=line-too-long

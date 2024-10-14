@@ -9,7 +9,7 @@ venv/
 
 # Django
 db.sqlite3
-src/accounts/migrations/
+src/database/migrations/
 
 # Mac OS
 .DS_Store
