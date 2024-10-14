@@ -19,11 +19,10 @@ from django.shortcuts import redirect
 from django.urls import include, path
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('google/accounts/', include('allauth.urls')),
-    path('', include("django.contrib.auth.urls")),
-    path('accounts/', include('accounts.urls', namespace='accounts')),
-
+    path("admin/", admin.site.urls),
+    path("google/accounts/", include("allauth.urls")),
+    path("", include("django.contrib.auth.urls")),
+    path("accounts/", include("accounts.urls", namespace="accounts")),
     # Redirect the root URL to the login page
-    path('', lambda request: redirect('accounts/login')),
+    path("", lambda request: redirect("accounts/login")),
 ]
