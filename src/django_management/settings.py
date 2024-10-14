@@ -50,13 +50,6 @@ INSTALLED_APPS = [
     "django.contrib.sessions",  # Session framework (manages user sessions, typically cookies-based) # pylint: disable=line-too-long
     "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # pylint: disable=line-too-long
     "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.)
-    "database", # Custom app for database models
-    "django.contrib.admin",  # Django's built-in admin interface app # noqa
-    "django.contrib.auth",  # Authentication system (handles user authentication and permissions) # noqa
-    "django.contrib.contenttypes",  # Content type framework (allows relations between models) # noqa
-    "django.contrib.sessions",  # Session framework (manages user sessions, typically cookies-based) # noqa
-    "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # noqa
-    "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.) # noqa
     # Other apps (custom or third-party apps go here)
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
