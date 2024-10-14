@@ -12,6 +12,7 @@ from allauth.socialaccount.models import SocialApp
 from dotenv import load_dotenv, set_key
 from .forms import MyAuthenticationForm, MyUserCreationForm
 
+
 # In your app's views.py or signals.py
 @receiver(post_migrate)
 def my_signal_receiver(sender, **kwargs):  # pylint: disable=unused-argument
@@ -31,7 +32,7 @@ def my_signal_receiver(sender, **kwargs):  # pylint: disable=unused-argument
     load_dotenv()
     env_file = os.path.join(
         os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env"
-    )  # pylint: disable=line-too-long
+    )  # noqa
     set_key(env_file, "SITE_ID", str(site.id))  # Write or update SITE_ID
 
     # create SocialAPP
@@ -61,7 +62,7 @@ def register_view(request):
         else:
             messages.error(
                 request, "Registration Failed!! Password mismatch or too generic"
-            )  # pylint: disable=line-too-long
+            )  # noqa
             form = MyUserCreationForm()
             return render(request, "accounts/register.html", {"form": form})
     else:
@@ -84,6 +85,10 @@ def login_view(request):
     else:
         form = MyAuthenticationForm()
     return render(request, "accounts/login.html", {"form": form})
+
+
+def landing_view(request):
+    return render(request, "accounts/landing.html")
 
 
 @login_required

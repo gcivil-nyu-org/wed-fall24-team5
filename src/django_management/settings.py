@@ -23,13 +23,17 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-bydqct==mg#ii(79dn!=t77we%@1lw+m!fmdxueqo&*nqc_#53"
 
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
+
+# Load DEBUG from environment variables, default to False if not set
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "food-donation-swe-dev.us-east-1.elasticbeanstalk.com",
+
+    "172.31.30.180",  # PostGres
+    "34.202.22.62",  # PostGres
     "127.0.0.1",
     "localhost",
 ]
@@ -46,14 +50,22 @@ INSTALLED_APPS = [
     "django.contrib.sessions",  # Session framework (manages user sessions, typically cookies-based) # pylint: disable=line-too-long
     "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # pylint: disable=line-too-long
     "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.)
+    "database", # Custom app for database models
+    "django.contrib.admin",  # Django's built-in admin interface app # noqa
+    "django.contrib.auth",  # Authentication system (handles user authentication and permissions) # noqa
+    "django.contrib.contenttypes",  # Content type framework (allows relations between models) # noqa
+    "django.contrib.sessions",  # Session framework (manages user sessions, typically cookies-based) # noqa
+    "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # noqa
+    "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.) # noqa
     # Other apps (custom or third-party apps go here)
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
-    "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # pylint: disable=line-too-long
+    "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
+    "compressor",  # Compresses linked and inline JavaScript or CSS into a single cached file # noqa
     # Allauth - Third-party library for authentication and social account management
     "allauth",  # Core of django-allauth package (handles signups, logins, etc.)
-    "allauth.account",  # Allauth's account module (handles user accounts, registration, etc.) # pylint: disable=line-too-long
-    "allauth.socialaccount",  # Allauth's social account module (for managing social logins)
-    "allauth.socialaccount.providers.google",  # Specific provider for Google login integration # pylint: disable=line-too-long
+    "allauth.account",  # Allauth's account module (handles user accounts, registration, etc.) # noqa
+    "allauth.socialaccount",  # Allauth's social account module (for managing social logins) # noqa
+    "allauth.socialaccount.providers.google",  # Specific provider for Google login integration # noqa
 ]
 
 MIDDLEWARE = [
@@ -64,7 +76,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "allauth.account.middleware.AccountMiddleware",  # Middleware provided by django-allauth to handle user accounts (e.g., login state, session) # pylint: disable=line-too-long
+    "allauth.account.middleware.AccountMiddleware",  # Middleware provided by django-allauth to handle user accounts (e.g., login state, session) # noqa
 ]
 
 ROOT_URLCONF = "django_management.urls"
@@ -95,11 +107,11 @@ if "RDS_DB_NAME" in os.environ:
     DATABASES = {
         "default": {
             "ENGINE": "django.db.backends.postgresql_psycopg2",
-            "NAME": os.environ.get("RDS_DB_NAME"),
-            "USER": os.environ.get("RDS_USERNAME"),
-            "PASSWORD": os.environ.get("RDS_PASSWORD"),
-            "HOST": os.environ.get("RDS_HOSTNAME"),
-            "PORT": os.environ.get("RDS_PORT"),
+            "NAME": os.getenv("RDS_DB_NAME"),
+            "USER": os.getenv("RDS_USERNAME"),
+            "PASSWORD": os.getenv("RDS_PASSWORD"),
+            "HOST": os.getenv("RDS_HOSTNAME"),
+            "PORT": os.getenv("RDS_PORT"),
         }
     }
 else:
@@ -115,7 +127,16 @@ else:
 
 AUTH_PASSWORD_VALIDATORS = [
     {
-        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",
+        "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",},
     {"NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",},
@@ -137,6 +158,10 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
+COMPRESS_ROOT = BASE_DIR / "static"
+COMPRESS_ENABLED = True
+STATICFILES_FINDERS = ("compressor.finders.CompressorFinder",)
+
 # Static files (CSS, JavaScript, Images).
 # This is where the browser will serve.
 STATIC_URL = "/static/"
@@ -152,7 +177,13 @@ STATICFILES_DIRS = [
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 SOCIALACCOUNT_PROVIDERS = {
-    "google": {"SCOPE": ["profile", "email",], "AUTH_PARAMS": {"access_type": "online"}}
+    "google": {
+        "SCOPE": [
+            "profile",
+            "email",
+        ],
+        "AUTH_PARAMS": {"access_type": "online"},
+    }
 }
 
 AUTHENTICATION_BACKENDS = [
