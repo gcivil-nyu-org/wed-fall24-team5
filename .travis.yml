@@ -19,7 +19,7 @@ jobs:
         - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls
 
     - stage: deploy to develop
-      if: branch = develop AND type != pull_request
+      if: branch = develop AND type = pull_request
       script:
         - black --check ./src
         - flake8 ./src
