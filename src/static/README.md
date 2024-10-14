@@ -11,6 +11,8 @@ This directory is used to store static assets for the Django project. These asse
 
 Django will collect all static files from this directory when running `python manage.py collectstatic` before deployment.
 
+During development, run `npx tailwindcss -i ./src/static/css/style.css -o ./src/static/css/output.css --watch` to compile style.css.
+
 ## Structure:
 
 ```
