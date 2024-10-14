@@ -15,11 +15,10 @@ jobs:
         - flake8 ./src
         - djlint src/ --lint
         - coverage run --source='src' src/manage.py test
-      after_script:
-        - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls
+        - coveralls
 
     - stage: deploy to develop
-      if: branch = develop AND type = pull_request
+      if: branch = develop AND type != pull_request
       script:
         - black --check ./src
         - flake8 ./src
@@ -28,8 +27,7 @@ jobs:
         - python src/manage.py makemigrations
         - python src/manage.py migrate
         - python src/manage.py collectstatic --noinput
-      after_script:
-        - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls
+        - coveralls
       deploy:
         provider: elasticbeanstalk
         access_key_id: $AWS_ACCESS_KEY_ID
@@ -52,8 +50,7 @@ jobs:
         - python src/manage.py makemigrations
         - python src/manage.py migrate
         - python src/manage.py collectstatic --noinput
-      after_script:
-        - COVERALLS_REPO_TOKEN=$COVERALLS_REPO_TOKEN coveralls
+        - coveralls
       deploy:
         provider: elasticbeanstalk
         access_key_id: $AWS_ACCESS_KEY_ID
