@@ -23,12 +23,14 @@
                                 <div class="columns">
                                     <div class="column is-two-thirds">
                                         <a class="button is-link is-light is-fullwidth"
-                                           style="white-space: normal; word-wrap: break-word;"
+                                           style="white-space: normal;
+                                                  word-wrap: break-word"
                                            href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization_id.address|urlencode }}"
                                            target="_blank"
                                            rel="noopener noreferrer">
                                             {{ donation.organization_id.organization_name }}
-                                            <br>{{ donation.organization_id.address }}
+                                            <br>
+                                            {{ donation.organization_id.address }}
                                         </a>
                                     </div>
                                     <div class="column is-one-third has-text-centered">

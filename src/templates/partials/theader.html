@@ -45,13 +45,14 @@
         <div id="navMenu" class="navbar-menu">
             <div class="navbar-start">
                 {% if user.is_authenticated %}
-                <div class="navbar-item has-dropdown">
-                    <a class="navbar-link">View</a>
-                    <div class="navbar-dropdown">
-                        <a href="{% url 'recipient_dashboard' %}" class="navbar-item">Available Donations</a>
-                        <a href="{% url 'donor_dashboard:org_list' %}" class="navbar-item">My Organizations</a>
-                    </div>
-                {% endif %}
+                    <div class="navbar-item has-dropdown">
+                        <a class="navbar-link">View</a>
+                        <div class="navbar-dropdown">
+                            <a href="{% url 'recipient_dashboard' %}" class="navbar-item">Available Donations</a>
+                            <a href="{% url 'donor_dashboard:org_list' %}" class="navbar-item">My Organizations</a>
+                        </div>
+                    {% endif %}
+                </div>
             </div>
             <div class="navbar-end">
                 {% if user.is_authenticated %}
@@ -70,9 +71,8 @@
                 </div>
             </div>
         </div>
-    </div>
-</header>
-<script>
+    </header>
+    <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Get all "navbar-burger" elements
         const $navbarBurgers = Array.prototype.slice.call(document.querySelectorAll('.navbar-burger'), 0);
@@ -105,4 +105,4 @@
             });
         });
     });
-</script>
+    </script>
