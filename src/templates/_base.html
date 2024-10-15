@@ -12,16 +12,14 @@
 	<meta name="keywords" content="Django, Team 5, Web Development, Project, 2024" />
 	<meta http-equiv="X-UA-Compatible" content="ie=edge">
 
-	{% compress css %}
 	<link rel="stylesheet" href="{% static 'css/style.css' %}">
-	{% endcompress %}
 
 	{% block extra_head %}
 	<!-- Additional CSS or JS can be inserted by child templates -->
 	{% endblock extra_head %}
 </head>
 
-<body class="h-full">
+<body style="padding-top: 40px;">
 	{% include "partials/theader.html" %}
 	{% block content %}
 	{% endblock content %}

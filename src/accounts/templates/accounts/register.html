@@ -8,71 +8,182 @@
             banner.style.display = 'none';
         }
     }
+    document.addEventListener('DOMContentLoaded', () => {
+        const passwordInput = document.getElementById('id_password1');
+        const passwordConfirmInput = document.getElementById('id_password2');
+        const submitButton = document.getElementById('submit-btn');
+    
+        const checks = {
+            length: document.getElementById('password-length-check'),
+            uppercase: document.getElementById('password-uppercase-check'),
+            number: document.getElementById('password-number-check'),
+            special: document.getElementById('password-special-check'),
+            match: document.getElementById('password-match-check')
+        };
+    
+        function validatePassword() {
+            const password = passwordInput.value;
+            let isValid = true;
+    
+            // Check password length
+            if (password.length >= 8) {
+                checks.length.classList.remove('has-text-danger');
+                checks.length.classList.add('has-text-success', 'has-text-decoration-line-through');
+            } else {
+                checks.length.classList.remove('has-text-success', 'has-text-decoration-line-through');
+                checks.length.classList.add('has-text-danger');
+                isValid = false;
+            }
+    
+            // Check for uppercase letter
+            if (/[A-Z]/.test(password)) {
+                checks.uppercase.classList.remove('has-text-danger');
+                checks.uppercase.classList.add('has-text-success', 'has-text-decoration-line-through');
+            } else {
+                checks.uppercase.classList.remove('has-text-success', 'has-text-decoration-line-through');
+                checks.uppercase.classList.add('has-text-danger');
+                isValid = false;
+            }
+    
+            // Check for a number
+            if (/\d/.test(password)) {
+                checks.number.classList.remove('has-text-danger');
+                checks.number.classList.add('has-text-success', 'has-text-decoration-line-through');
+            } else {
+                checks.number.classList.remove('has-text-success', 'has-text-decoration-line-through');
+                checks.number.classList.add('has-text-danger');
+                isValid = false;
+            }
+    
+            // Check for special character
+            if (/[!@#$%^&*(),.?":{}|<>]/.test(password)) {
+                checks.special.classList.remove('has-text-danger');
+                checks.special.classList.add('has-text-success', 'has-text-decoration-line-through');
+            } else {
+                checks.special.classList.remove('has-text-success', 'has-text-decoration-line-through');
+                checks.special.classList.add('has-text-danger');
+                isValid = false;
+            }
+    
+            return isValid;
+        }
+    
+        function validatePasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = passwordConfirmInput.value;
+            if (password === confirmPassword && password.length > 0) {
+                checks.match.classList.remove('has-text-danger');
+                checks.match.classList.add('has-text-success', 'has-text-decoration-line-through');
+                return true;
+            } else {
+                checks.match.classList.remove('has-text-success', 'has-text-decoration-line-through');
+                checks.match.classList.add('has-text-danger');
+                return false;
+            }
+        }
+    
+        // Validate on password input
+        passwordInput.addEventListener('input', () => {
+            const passwordValid = validatePassword();
+            const matchValid = validatePasswordMatch();
+            submitButton.disabled = !(passwordValid && matchValid);
+        });
+    
+        // Validate on confirm password input
+        passwordConfirmInput.addEventListener('input', () => {
+            const matchValid = validatePasswordMatch();
+            submitButton.disabled = !matchValid;
+        });
+    });    
 </script>
 {% endblock extra_head %}
 
 {% block content %}
-<div class="bg-gray-100 h-screen flex flex-col items-center justify-center">
-    <div class="bg-white shadow-md rounded-lg px-8 py-10 w-full max-w-md">
-        <h2 class="text-center text-2xl font-bold text-gray-700 mb-6">Create an account</h2>
-        <form method="post">
-            {% csrf_token %}
-            <div class="text-sm font-medium leading-6 text-gray-900">
-                <div class="mb-4">
-                    {{ form.email.label_tag }}
-                    {{ form.email }}
-                </div>
-                <div class="flex space-x-4 mb-4">
-                    <div class="flex-1">
-                        <label for="first_name">First Name</label>
-                        {{ form.first_name }}
+<div class="hero is-fullheight is-light">
+    <div class="hero-body">
+        <div class="container">
+            <div class="box" style="max-width: 600px; margin: 0 auto;">
+                <h2 class="title is-4 has-text-centered">Create an account</h2>
+                <form method="post">
+                    {% csrf_token %}
+                    <div class="field">
+                        <label class="label">{{ form.email.label_tag }}</label>
+                        <div class="control">
+                            {{ form.email }}
+                        </div>
                     </div>
-                    <div class="flex-1">
-                        <label for="last_name">Last Name</label>
-                        {{ form.last_name }}
+                    <div class="field is-grouped">
+                        <div class="control is-expanded">
+                            <label class="label" for="first_name">First Name</label>
+                            {{ form.first_name }}
+                        </div>
+                        <div class="control is-expanded">
+                            <label class="label" for="last_name">Last Name</label>
+                            {{ form.last_name }}
+                        </div>
                     </div>
+                    <div class="field">
+                        <label class="label" for="password1">Password</label>
+                        <div class="control">
+                            {{ form.password1 }}
+                        </div>
+                        <ul id="password-requirements" class="help is-size-6">
+                            <li id="password-length-check" class="has-text-danger">At least 8 characters</li>
+                            <li id="password-uppercase-check" class="has-text-danger">Contains an uppercase letter</li>
+                            <li id="password-number-check" class="has-text-danger">Contains a number</li>
+                            <li id="password-special-check" class="has-text-danger">Contains a special character</li>
+                        </ul>
+                    </div>
+                    <div class="field">
+                        <label class="label" for="password2">Confirm Password</label>
+                        <div class="control">
+                            {{ form.password2 }}
+                        </div>
+                        <p id="password-match-check" class="help is-size-6 has-text-danger">Passwords must match</p>
+                    </div>
+                    <div class="field">
+                        <div class="control">
+                            <button
+                                id="submit-btn"
+                                type="submit"
+                                class="button is-primary is-fullwidth"
+                                disabled="true"
+                            >Sign up</button>
+                        </div>
+                    </div>
+                </form>
+                <div class="has-text-centered mt-2">
+                    <span>or</span>
                 </div>
-                <div class="mb-4">
-                    <label for="password1">Password:</label>
-                    {{ form.password1 }}
-                </div>
-                <div class="mb-6">
-                    <label for="password2">Confirm Password:</label>
-                    {{ form.password2 }}
-                </div>
+                {% load socialaccount %}
+                <form method="post" action="{% provider_login_url 'google' %}">
+                    {% csrf_token %}
+                    <div class="field mt-2">
+                        <div class="control">
+                            <button type="submit" class="button is-light is-fullwidth">
+                                <span class="icon is-small">
+                                    <img src="https://www.google.com/favicon.ico" alt="Google logo">
+                                </span>
+                                <span>Sign up with Google</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+
+                <p class="has-text-centered mt-4">
+                    Already registered? <a href="{% url 'accounts:login' %}" class="has-text-link">Log in.</a>
+                </p>
             </div>
-            <button type="submit"
-                class="w-full bg-sky-500 text-white py-2 rounded-md font-semibold hover:bg-sky-600 focus:outline-none">
-                Sign up
-            </button>
-        </form>
 
-        <p class="mt-4 text-center text-sm text-gray-600">
-            Already registered? <a href="{% url 'accounts:login' %}"
-                class="font-medium text-sky-600 hover:text-sky-500">Log in.</a>
-        </p>
-    </div>
-
-    {% if messages %}
-    <div id="message-banner"
-        class="relative isolate gap-x-5 flex mt-6 bg-slate-900 text-white text-sm px-4 py-3 rounded w-1/3">
-        <strong class="font-bold">Error: </strong>
-        <span class="block sm:inline">
-            {% for message in messages %}
-            {{ message }}
-            {% if not forloop.last %} <br>
+            {% if messages %}
+            <div id="message-banner" class="notification is-danger mt-4" style="max-width: 600px; margin: 0 auto;">
+                <button class="delete" onclick="dismissMessage()"></button>
+                {% for message in messages %}
+                    {{ message }}{% if not forloop.last %} <br>{% endif %}
+                {% endfor %}
+            </div>
             {% endif %}
-            {% endfor %}
-        </span>
-        <div class="flex flex-1 justify-end">
-            <button onclick="dismissMessage()" class="-m-3 p-3 focus-visible:outline-offset-[-4px]">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 20 20" stroke-width="1.5"
-                    stroke="currentColor" class="h-5 w-5 text-white" data-slot="icon">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
-                </svg>
-            </button>
         </div>
     </div>
-    {% endif %}
 </div>
 {% endblock content %}
