@@ -3,20 +3,12 @@
 {% block title %}Welcome{% endblock title %}
 
 {% block content %}
-<div class="relative isolate h-screen px-6 pt-14 lg:px-8">
-	<div class="mx-auto max-w-2xl py-32 sm:py-48 lg:py-56">
-		<div class="text-center">
-			<h1 class="text-balance text-4xl font-bold tracking-tight text-gray-900 sm:text-6xl">Food Donation App</h1>
-			<p class="mt-6 text-lg leading-8 text-gray-600">Start combating food waste today.</p>
-			<div class="mt-10 flex items-center justify-center gap-x-6">
-				<a href="{% url 'accounts:register' %}"
-					class="rounded-md bg-sky-500 px-3.5 py-2.5 text-sm font-semibold text-white shadow-sm hover:bg-sky-600">Get
-					started</a>
-				<a href="{% url 'accounts:login' %}"
-					class="text-sm font-semibold leading-6 text-gray-900 hover:text-sky-600">I have an account <span
-						aria-hidden="true">→</span></a>
+		<div class="container has-text-centered">
+			<h1 class="title is-2 is-spaced">Food Donation App</h1>
+			<p class="subtitle">Start combating food waste today.</p>
+			<div class="buttons is-centered mt-5">
+				<a href="{% url 'accounts:register' %}" class="button is-primary is-medium">Get started</a>
+				<a href="{% url 'accounts:login' %}" class="button is-medium has-text-weight-semibold">I have an account <span aria-hidden="true">→</span></a>
 			</div>
 		</div>
-	</div>
-</div>
 {% endblock content %}
