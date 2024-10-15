@@ -1,0 +1,31 @@
+{% extends "_base.html" %}
+
+{% block title %}Donation Dashboard{% endblock title %}
+
+{% block content %}
+<main class="pt-16"></main>
+    <div class="relative isolate overflow-hidden py-24">
+        <div class="mx-auto max-w-7xl px-6 lg:px-8">
+            <h1>Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+            <h4><strong>List of Available Donations: </strong></h4>
+            <div class="mx-auto max-w-2xl lg:mx-0">
+                <ul>
+                    {% if donations %}
+                        {% for donation in donations %}
+                            <li>
+                                <strong>Food Item:</strong> {{ donation.food_item }} <br>
+                                <strong>Quantity:</strong> {{ donation.quantity }} <br>
+                                <strong>Pickup by:</strong> {{ donation.pickup_by }} <br>
+                                <strong>Offered By:</strong> {{ donation.organization_id.organization_name }} <br>
+                            </li>
+                            <hr>
+                        {% endfor %}
+                    {% else %}
+                        <li>No donations available at the moment.</li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </div>
+</main>
+{% endblock content %}
