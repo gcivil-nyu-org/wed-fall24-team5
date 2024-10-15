@@ -1,81 +1,78 @@
 {% extends "_base.html" %}
-
-{% block title %}Log in{% endblock title %}
-
+{% block title %}
+    Log in
+{% endblock title %}
 {% block extra_head %}
-<script>
+    <script>
     function dismissMessage() {
         const banner = document.getElementById('message-banner');
         if (banner) {
             banner.style.display = 'none';
         }
     }
-</script>
+    </script>
 {% endblock extra_head %}
-
 {% block content %}
-        <div class="container">
-            <!-- djlint:off -->
-            <div class="box" style="max-width: 500px; margin: 0 auto;">
-            <!-- djlint:on -->
-                <h2 class="title is-4 has-text-centered">Log in</h2>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="field">
-                        <label class="label">{{ form.username.label_tag }}</label>
-                        <div class="control">
-                            {{ form.username }}
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">{{ form.password.label_tag }}</label>
-                        <div class="control">
-                            {{ form.password }}
-                        </div>
-                    </div>
-                    <div class="field mt-5">
-                        <div class="control">
-                            <button type="submit" class="button is-primary is-fullwidth">Log in</button>
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control has-text-centered">
-                            <span>or</span>
-                        </div>
-                    </div>
-                </form>
-
-                {% load socialaccount %}
-                <form method="post" action="{% provider_login_url 'google' %}">
-                    {% csrf_token %}
-                    <div class="field mt-4">
-                        <div class="control">
-                            <button type="submit" class="button is-light is-fullwidth">
-                                <span class="icon is-small">
-                                    <img width="20" height="20"
-                                    src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                                    alt="Google logo">
-                                </span>
-                                <span>Continue with Google</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-
-                <p class="has-text-centered mt-4">
-                    Don't have an account? <a href="{% url 'accounts:register' %}" class="has-text-link">Sign up.</a>
-                </p>
+    <div class="container">
+        <!-- djlint:off -->
+                            <div class="box" style="max-width: 500px; margin: 0 auto;">
+        <!-- djlint:on -->
+        <h2 class="title is-4 has-text-centered">Log in</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label class="label">{{ form.username.label_tag }}</label>
+                <div class="control">{{ form.username }}</div>
             </div>
-
-            {% if messages %}
-            <!-- djlint:off -->
-            <div id="message-banner" class="notification is-danger is-light mt-4" style="max-width: 500px; margin: 0 auto;">
-            <!-- djlint:on -->
-                <button class="delete" onclick="dismissMessage()"></button>
-                {% for message in messages %}
-                    {{ message }}{% if not forloop.last %} <br>{% endif %}
-                {% endfor %}
+            <div class="field">
+                <label class="label">{{ form.password.label_tag }}</label>
+                <div class="control">{{ form.password }}</div>
             </div>
-            {% endif %}
-        </div>
+            <div class="field mt-5">
+                <div class="control">
+                    <button type="submit" class="button is-primary is-fullwidth">Log in</button>
+                </div>
+            </div>
+            <div class="field">
+                <div class="control has-text-centered">
+                    <span>or</span>
+                </div>
+            </div>
+        </form>
+        {% load socialaccount %}
+        <form method="post" action="{% provider_login_url 'google' %}">
+            {% csrf_token %}
+            <div class="field mt-4">
+                <div class="control">
+                    <button type="submit" class="button is-light is-fullwidth">
+                        <span class="icon is-small">
+                            <img width="20"
+                                 height="20"
+                                 src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                                 alt="Google logo">
+                        </span>
+                        <span>Continue with Google</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <p class="has-text-centered mt-4">
+            Don't have an account? <a href="{% url 'accounts:register' %}" class="has-text-link">Sign up.</a>
+        </p>
+    </div>
+    {% if messages %}
+        <!-- djlint:off -->
+                            <div id="message-banner"
+                                 class="notification is-danger is-light mt-4"
+                                 style="max-width: 500px;
+                                        margin: 0 auto">
+        <!-- djlint:on -->
+        <button class="delete" onclick="dismissMessage()"></button>
+        {% for message in messages %}
+            {{ message }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+</div>
 {% endblock content %}

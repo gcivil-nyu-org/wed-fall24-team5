@@ -1,14 +1,16 @@
 {% extends "_base.html" %}
-
-{% block title %}Welcome{% endblock title %}
-
+{% block title %}
+    Welcome
+{% endblock title %}
 {% block content %}
-		<div class="container has-text-centered">
-			<h1 class="title is-2 is-spaced">Food Donation App</h1>
-			<p class="subtitle">Start combating food waste today.</p>
-			<div class="buttons is-centered mt-5">
-				<a href="{% url 'accounts:register' %}" class="button is-primary is-medium">Get started</a>
-				<a href="{% url 'accounts:login' %}" class="button is-medium has-text-weight-semibold">I have an account <span aria-hidden="true">→</span></a>
-			</div>
-		</div>
+    <div class="container has-text-centered">
+        <h1 class="title is-2 is-spaced">Food Donation App</h1>
+        <p class="subtitle">Start combating food waste today.</p>
+        <div class="buttons is-centered mt-5">
+            <a href="{% url 'accounts:register' %}"
+               class="button is-primary is-medium">Get started</a>
+            <a href="{% url 'accounts:login' %}"
+               class="button is-medium has-text-weight-semibold">I have an account <span aria-hidden="true">→</span></a>
+        </div>
+    </div>
 {% endblock content %}
