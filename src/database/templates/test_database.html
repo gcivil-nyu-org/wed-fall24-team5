@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Database - Organizations and Orders</title>
+</head>
+<body>
+    <h1>Test Database - Organizations</h1>
+    <ul>
+        {% for org in organizations %}
+            <li>
+                <strong>{{ org.organization_name }}</strong><br>
+                Type: {{ org.type }}<br>
+                Address: {{ org.address }}, {{ org.zipcode }}<br>
+                Contact: {{ org.contact_number }}<br>
+                Website: <a href="{{ org.website }}" target="_blank">{{ org.website }}</a><br>
+                Active: {{ org.active }}
+            </li>
+        {% endfor %}
+    </ul>
+
+    <h2>Donations</h2>
+    <ul>
+        {% for donation in donations %}
+            <li>Donation ID: {{ donation.donation_id }} | Food Item: {{ donation.food_item }} | Organization: {{ donation.organization_id.organization_name }} | Quantity: {{ donation.quantity }} | Pickup By: {{ donation.pickup_by }}</li>
+        {% empty %}
+            <li>No donations available.</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Organizations and Donations</h2>
+    {% for organization in organizations %}
+        <h3>{{ organization.organization_name }}</h3>
+        <ul>
+            {% for donation in organization.donation_set.all %}
+                <li>Donation ID: {{ donation.donation_id }} | Food Item: {{ donation.food_item }} | Quantity: {{ donation.quantity }} | Pickup By: {{ donation.pickup_by }}</li>
+            {% empty %}
+                <li>No donations available for this organization.</li>
+            {% endfor %}
+        </ul>
+    {% endfor %}
+</body>
+</html>
