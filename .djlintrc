@@ -1,6 +1,6 @@
 {
   "exclude": "node_modules,venv,static",
-  "line-length": "88",
+  "line-length": "140",
   "ignore": "no-self-closing-tags,prefer-double-quotes,H030,H031",
   "require": "require-doctype-first,prefer-compact-if",
   "profile": "django",
