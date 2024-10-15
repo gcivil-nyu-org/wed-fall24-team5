@@ -11,11 +11,21 @@ INPUT_CLASS = (
 class MyAuthenticationForm(AuthenticationForm):
     username = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={"class": INPUT_CLASS, "type": "email",}),
+        widget=forms.EmailInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "email",
+            }
+        ),
         error_messages={"required": "Email is required."},
     )
     password = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": INPUT_CLASS, "type": "password",}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "password",
+            }
+        ),
         error_messages={"required": "Password is required."},
     )
 
@@ -30,25 +40,50 @@ class MyUserCreationForm(UserCreationForm):  # pylint: disable=too-many-ancestor
     )
     email = forms.EmailField(
         required=True,
-        widget=forms.EmailInput(attrs={"class": INPUT_CLASS, "type": "email",}),
+        widget=forms.EmailInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "email",
+            }
+        ),
         error_messages={"required": "Email is required."},
     )
     first_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(attrs={"class": INPUT_CLASS, "type": "text",}),
+        widget=forms.TextInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "text",
+            }
+        ),
         error_messages={"required": "Name is required."},
     )
     last_name = forms.CharField(
         required=True,
-        widget=forms.TextInput(attrs={"class": INPUT_CLASS, "type": "text",}),
+        widget=forms.TextInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "text",
+            }
+        ),
         error_messages={"required": "Name is required."},
     )
     password1 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": INPUT_CLASS, "type": "password",}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "password",
+            }
+        ),
         error_messages={"required": "Password is required."},
     )
     password2 = forms.CharField(
-        widget=forms.PasswordInput(attrs={"class": INPUT_CLASS, "type": "password",}),
+        widget=forms.PasswordInput(
+            attrs={
+                "class": INPUT_CLASS,
+                "type": "password",
+            }
+        ),
     )
 
     class Meta:

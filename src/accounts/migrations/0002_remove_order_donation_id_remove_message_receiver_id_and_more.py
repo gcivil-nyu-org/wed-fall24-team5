@@ -10,19 +10,57 @@ class Migration(migrations.Migration):
     ]
 
     operations = [
-        migrations.RemoveField(model_name="order", name="donation_id",),
-        migrations.RemoveField(model_name="message", name="receiver_id",),
-        migrations.RemoveField(model_name="message", name="sender_id",),
-        migrations.RemoveField(model_name="order", name="user_email",),
-        migrations.RemoveField(model_name="userreview", name="organization_id",),
-        migrations.RemoveField(model_name="organizationadmin", name="organization_id",),
-        migrations.RemoveField(model_name="organizationadmin", name="user_email",),
-        migrations.RemoveField(model_name="userreview", name="user_email",),
-        migrations.DeleteModel(name="Donation",),
-        migrations.DeleteModel(name="Message",),
-        migrations.DeleteModel(name="Order",),
-        migrations.DeleteModel(name="Organization",),
-        migrations.DeleteModel(name="OrganizationAdmin",),
-        migrations.DeleteModel(name="User",),
-        migrations.DeleteModel(name="UserReview",),
+        migrations.RemoveField(
+            model_name="order",
+            name="donation_id",
+        ),
+        migrations.RemoveField(
+            model_name="message",
+            name="receiver_id",
+        ),
+        migrations.RemoveField(
+            model_name="message",
+            name="sender_id",
+        ),
+        migrations.RemoveField(
+            model_name="order",
+            name="user_email",
+        ),
+        migrations.RemoveField(
+            model_name="userreview",
+            name="organization_id",
+        ),
+        migrations.RemoveField(
+            model_name="organizationadmin",
+            name="organization_id",
+        ),
+        migrations.RemoveField(
+            model_name="organizationadmin",
+            name="user_email",
+        ),
+        migrations.RemoveField(
+            model_name="userreview",
+            name="user_email",
+        ),
+        migrations.DeleteModel(
+            name="Donation",
+        ),
+        migrations.DeleteModel(
+            name="Message",
+        ),
+        migrations.DeleteModel(
+            name="Order",
+        ),
+        migrations.DeleteModel(
+            name="Organization",
+        ),
+        migrations.DeleteModel(
+            name="OrganizationAdmin",
+        ),
+        migrations.DeleteModel(
+            name="User",
+        ),
+        migrations.DeleteModel(
+            name="UserReview",
+        ),
     ]
