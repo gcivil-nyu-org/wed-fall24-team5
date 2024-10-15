@@ -16,7 +16,6 @@
                 Contact: {{ org.contact_number }}<br>
                 Website: <a href="{{ org.website }}" target="_blank">{{ org.website }}</a><br>
                 Active: {{ org.active }}
-                ID: {{ org.id }}
             </li>
         {% endfor %}
     </ul>
@@ -27,15 +26,6 @@
             <li>Donation ID: {{ donation.donation_id }} | Food Item: {{ donation.food_item }} | Organization: {{ donation.organization_id.organization_name }} | Quantity: {{ donation.quantity }} | Pickup By: {{ donation.pickup_by }}</li>
         {% empty %}
             <li>No donations available.</li>
-        {% endfor %}
-    </ul>
-
-    <h2>Users</h2>
-    <ul>
-        {% for user in users %}
-            <li>User ID: {{ user.user_email }}</li>
-        {% empty %}
-            <li>No users available.</li>
         {% endfor %}
     </ul>
 

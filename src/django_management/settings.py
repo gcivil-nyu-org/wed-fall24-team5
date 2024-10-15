@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.)
     # Other apps (custom or third-party apps go here)
     "donor_dashboard",  # Custom app for Donor dashboard
+    "recipient_dashboard",  # Custom app for recipient_dashboard
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
     "compressor",  # Compresses linked and inline JavaScript or CSS into a single cached file # noqa

@@ -36,9 +36,9 @@ jobs:
         app: "wed-fall24-team5"
         env: "food-donation-swe-dev"
         bucket_name: "elasticbeanstalk-us-east-1-149536460878"
-      on:
-        repo: gcivil-nyu-org/wed-fall24-team5
-        branch: develop
+        on:
+          repo: gcivil-nyu-org/wed-fall24-team5
+          branch: develop
 
     - stage: deploy to prod
       if: branch = main AND type != pull_request
@@ -59,6 +59,6 @@ jobs:
         app: "wed-fall24-team5"
         env: "food-donation-swe-prod"
         bucket_name: "elasticbeanstalk-us-east-1-149536460878"
-      on:
-        repo: gcivil-nyu-org/wed-fall24-team5
-        branch: main
+        on:
+          repo: gcivil-nyu-org/wed-fall24-team5
+          branch: main
