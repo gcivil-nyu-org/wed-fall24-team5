@@ -7,6 +7,8 @@ class Organization(models.Model):
         ("restaurant", "Restaurant"),
         ("grocery_store", "Grocery Store"),
         ("food_pantry", "Food Pantry"),
+        ("self", "Self"),
+        ("other", "Other"),
     ]
 
     organization_id = models.UUIDField(

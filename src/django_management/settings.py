@@ -27,7 +27,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # Load DEBUG from environment variables, default to False if not set
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "food-donation-swe-dev.us-east-1.elasticbeanstalk.com",
@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # pylint: disable=line-too-long
     "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.)
     # Other apps (custom or third-party apps go here)
+    "donor_dashboard",  # Custom app for Donor dashboard
     "recipient_dashboard",  # Custom app for recipient_dashboard
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa

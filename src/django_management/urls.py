@@ -27,4 +27,5 @@ urlpatterns = [
     path("recipient_dashboard/", include("recipient_dashboard.urls")),
     # Redirect the root URL to the login page
     path("", lambda request: redirect("accounts/landing")),
+    path("database/", include("database.urls")),
 ]
