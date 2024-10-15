@@ -1,34 +1,42 @@
 {% extends "_base.html" %}
-
-{% block title %}Organizations Dashboard{% endblock title %}
-
+{% block title %}
+    Organizations Dashboard
+{% endblock title %}
 {% block content %}
-<a href="#" class="navbar-item">Add Organization</a>
-
-<main class="pt-16">
-    <div>
-        <div class="mx-auto max-w-7xl px-6 lg:px-8">
-            <h1>Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-            <h4>List of Organizations: </h4>
-            <div class="mx-auto max-w-2xl lg:mx-0">
-                {% if org_list %}
-                    
-                    {% for org in org_list %}
-                        <h2>{{ org.org_name }}</h2>
-                        <p><strong>Type:</strong> {{ org.org_type }}</p>
-                        <p><strong>Address:</strong> {{ org.org_address }}</p>
-                        <p><strong>Zipcode:</strong> {{ org.org_zipcode }}</p>
-                        <p><strong>Email:</strong> <a href="mailto:{{ org.org_email }}">{{ org.org_email }}</a></p>
-                        <p><strong>Website:</strong> <a href="{{ org.org_website }}" target="_blank">{{ org.org_website }}</a></p>
-                        <p><strong>Contact Number:</strong> {{ org.org_contact_number }}</p>
-                    {% endfor %}
-                    
-                {% else %}
-                    <p>No donations available at the moment.</p>
-                {% endif %}
+    <a href="#" class="navbar-item">Add Organization</a>
+    <main class="pt-16">
+        <div>
+            <div class="mx-auto max-w-7xl px-6 lg:px-8">
+                <h1>Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+                <h4>List of Organizations:</h4>
+                <div class="mx-auto max-w-2xl lg:mx-0">
+                    {% if org_list %}
+                        {% for org in org_list %}
+                            <h2>{{ org.org_name }}</h2>
+                            <p>
+                                <strong>Type:</strong> {{ org.org_type }}
+                            </p>
+                            <p>
+                                <strong>Address:</strong> {{ org.org_address }}
+                            </p>
+                            <p>
+                                <strong>Zipcode:</strong> {{ org.org_zipcode }}
+                            </p>
+                            <p>
+                                <strong>Email:</strong> <a href="mailto:{{ org.org_email }}">{{ org.org_email }}</a>
+                            </p>
+                            <p>
+                                <strong>Website:</strong> <a href="{{ org.org_website }}" target="_blank">{{ org.org_website }}</a>
+                            </p>
+                            <p>
+                                <strong>Contact Number:</strong> {{ org.org_contact_number }}
+                            </p>
+                        {% endfor %}
+                    {% else %}
+                        <p>No donations available at the moment.</p>
+                    {% endif %}
+                </div>
             </div>
-            
         </div>
-    </div>
-</main>
+    </main>
 {% endblock content %}

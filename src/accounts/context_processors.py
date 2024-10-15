@@ -1,5 +1,6 @@
 from database.models import OrganizationAdmin
 
+
 def user_organizations(request):
     if request.user.is_authenticated:
         # Get all organizations the logged-in user belongs to
@@ -8,6 +9,4 @@ def user_organizations(request):
     else:
         organizations = []
 
-    return {
-        "user_organizations": organizations
-    }
+    return {"user_organizations": organizations}
