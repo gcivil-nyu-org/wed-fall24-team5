@@ -88,6 +88,8 @@ def login_view(request):
 
 
 def landing_view(request):
+    if request.user.is_authenticated:
+        return profile_view(request)
     return render(request, "accounts/landing.html")
 
 
