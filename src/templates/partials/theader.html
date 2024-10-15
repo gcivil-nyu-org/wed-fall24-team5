@@ -45,13 +45,11 @@
         <div id="navMenu" class="navbar-menu">
             <div class="navbar-start">
                 {% if user.is_authenticated %}
-                    <div class="navbar-item has-dropdown">
-                        <a class="navbar-link">View As</a>
-                        <div class="navbar-dropdown">
-                            <a href="#" class="navbar-item">User</a>
-                            <a href="#" class="navbar-item">Organization 1</a>
-                            <a href="#" class="navbar-item">Add Organization</a>
-                        </div>
+                <div class="navbar-item has-dropdown">
+                    <a class="navbar-link">View</a>
+                    <div class="navbar-dropdown">
+                        <a href="{% url 'recipient_dashboard' %}" class="navbar-item">Available Donations</a>
+                        <a href="{% url 'donor_dashboard:org_list' %}" class="navbar-item">My Organizations</a>
                     </div>
                 {% endif %}
             </div>
