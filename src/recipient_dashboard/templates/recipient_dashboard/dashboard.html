@@ -6,194 +6,46 @@
     <div class="container">
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-3">List of Available Donations:</h2>
-        <div class="grid is-col-min-14 is-column-gap-4">
-            <!-- Card 1 -->
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
-                        <div class="media-content">
-                            <p class="title is-4">Food Item</p>
+        {% if donations %}
+            <div class="grid is-col-min-14 is-column-gap-4">
+                {% for donation in donations %}
+                    <div class="card mb-5">
+                        <div class="card-content">
+                            <div class="media is-flex is-justify-content-space-between">
+                                <div class="media-content">
+                                    <p class="title is-4">{{ donation.food_item }}</p>
+                                </div>
+                                <div class="media-right">
+                                    <span class="tag is-primary is-light mt-1">{{ donation.quantity }} Available</span>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <div class="columns">
+                                    <div class="column is-two-thirds">
+                                        <a class="button is-link is-light is-fullwidth"
+                                           style="white-space: normal; word-wrap: break-word;"
+                                           href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization_id.address|urlencode }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            {{ donation.organization_id.organization_name }}
+                                            <br>{{ donation.organization_id.address }}
+                                        </a>
+                                    </div>
+                                    <div class="column is-one-third has-text-centered">
+                                        <strong>Pickup by:</strong>
+                                        <p>{{ donation.pickup_by }}</p>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
-                        <div class="media-right">
-                            <span class="tag is-primary is-light mt-1">3 Available</span>
-                        </div>
+                        <footer class="card-footer">
+                            <a href="#" class="card-footer-item">Reserve</a>
+                        </footer>
                     </div>
-                    <div class="content">
-                        <p>
-                            <strong>Pickup by:</strong> March 10, 2024
-                        </p>
-                        <p>
-                            <strong>Donor:</strong> Organization 123
-                        </p>
-                        <p>
-                            <strong>Location:</strong> 123 Main Street, Philadelphia PA 19104
-                        </p>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Reserve</a>
-                    <a href="#" class="card-footer-item">More Info</a>
-                </footer>
+                {% endfor %}
             </div>
-            <!-- Card 2 -->
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
-                        <div class="media-content">
-                            <p class="title is-4">Food Item</p>
-                        </div>
-                        <div class="media-right">
-                            <span class="tag is-primary is-light mt-1">3 Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <p>
-                            <strong>Pickup by:</strong> March 10, 2024
-                        </p>
-                        <p>
-                            <strong>Donor:</strong> Organization 123
-                        </p>
-                        <p>
-                            <strong>Location:</strong> 123 Main Street, Philadelphia PA 19104
-                        </p>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Reserve</a>
-                    <a href="#" class="card-footer-item">More Info</a>
-                </footer>
-            </div>
-            <!-- Card 3 -->
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
-                        <div class="media-content">
-                            <p class="title is-4">Food Item</p>
-                        </div>
-                        <div class="media-right">
-                            <span class="tag is-primary is-light mt-1">3 Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <p>
-                            <strong>Pickup by:</strong> March 10, 2024
-                        </p>
-                        <p>
-                            <strong>Donor:</strong> Organization 123
-                        </p>
-                        <p>
-                            <strong>Location:</strong> 123 Main Street, Philadelphia PA 19104
-                        </p>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Reserve</a>
-                    <a href="#" class="card-footer-item">More Info</a>
-                </footer>
-            </div>
-            <!-- Card 4 -->
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
-                        <div class="media-content">
-                            <p class="title is-4">Food Item</p>
-                        </div>
-                        <div class="media-right">
-                            <span class="tag is-primary is-light mt-1">3 Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <p>
-                            <strong>Pickup by:</strong> March 10, 2024
-                        </p>
-                        <p>
-                            <strong>Donor:</strong> Organization 123
-                        </p>
-                        <p>
-                            <strong>Location:</strong> 123 Main Street, Philadelphia PA 19104
-                        </p>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Reserve</a>
-                    <a href="#" class="card-footer-item">More Info</a>
-                </footer>
-            </div>
-            <!-- Card 5 -->
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
-                        <div class="media-content">
-                            <p class="title is-4">Food Item</p>
-                        </div>
-                        <div class="media-right">
-                            <span class="tag is-primary is-light mt-1">3 Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <p>
-                            <strong>Pickup by:</strong> March 10, 2024
-                        </p>
-                        <p>
-                            <strong>Donor:</strong> Organization 123
-                        </p>
-                        <p>
-                            <strong>Location:</strong> 123 Main Street, Philadelphia PA 19104
-                        </p>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Reserve</a>
-                    <a href="#" class="card-footer-item">More Info</a>
-                </footer>
-            </div>
-            <!-- Card 6 -->
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
-                        <div class="media-content">
-                            <p class="title is-4">Food Item</p>
-                        </div>
-                        <div class="media-right">
-                            <span class="tag is-primary is-light mt-1">3 Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <p>
-                            <strong>Pickup by:</strong> March 10, 2024
-                        </p>
-                        <p>
-                            <strong>Donor:</strong> Organization 123
-                        </p>
-                        <p>
-                            <strong>Location:</strong> 123 Main Street, Philadelphia PA 19104
-                        </p>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item">Reserve</a>
-                    <a href="#" class="card-footer-item">More Info</a>
-                </footer>
-            </div>
-            <!--
-                {% if donations %}
-                    <table>
-                        <tbody>
-                            {% for donation in donations %}
-                                <tr>
-                                    <td>{{ donation.food_item }}</td>
-                                    <td>{{ donation.quantity }}</td>
-                                    <td>{{ donation.pickup_by }}</td>
-                                    <td>{{ donation.organization_id.organization_name }}</td>
-                                    <td>{{ donation.organization_id.address }}</td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-
-                {% else %}
-                <p class="box">No donations available at the moment.</p>
-                {% endif %} -->
-        </div>
+        {% else %}
+            <p class="box">No donations available at the moment.</p>
+        {% endif %}
     </div>
 {% endblock content %}
