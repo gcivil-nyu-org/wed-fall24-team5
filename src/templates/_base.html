@@ -17,12 +17,17 @@
 	{% block extra_head %}
 	<!-- Additional CSS or JS can be inserted by child templates -->
 	{% endblock extra_head %}
+	
 </head>
 
 <body style="padding-top: 40px;">
 	{% include "partials/theader.html" %}
-	{% block content %}
-	{% endblock content %}
+		<div class="hero is-fullheight is-light">
+			<div class="hero-body">
+				{% block content %}
+				{% endblock content %}
+			</div>
+		</div>
 	{% include "partials/footer.html" %}
 </body>
 
