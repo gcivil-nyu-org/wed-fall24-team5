@@ -1,3 +1,4 @@
+# Env Files
 .env
 
 # Python
@@ -9,6 +10,7 @@ venv/
 
 # Django
 db.sqlite3
+src/database/migrations/
 
 # Mac OS
 .DS_Store
@@ -31,3 +33,6 @@ staticfiles/
 
 # Coverage
 .coverage
+
+# Qahtan's Notes
+qahtansnotes.txt
