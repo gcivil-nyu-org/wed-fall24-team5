@@ -23,10 +23,11 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # Load DEBUG from environment variables, default to False if not set
-DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
+DEBUG = True
 
 ALLOWED_HOSTS = [
     "food-donation-swe-dev.us-east-1.elasticbeanstalk.com",
@@ -41,12 +42,13 @@ load_dotenv()
 SITE_ID = int(os.getenv("SITE_ID", "1"))
 
 INSTALLED_APPS = [
-    "django.contrib.admin",  # Django's built-in admin interface app # noqa
-    "django.contrib.auth",  # Authentication system (handles user authentication and permissions) # noqa
-    "django.contrib.contenttypes",  # Content type framework (allows relations between models) # noqa
-    "django.contrib.sessions",  # Session framework (manages user sessions, typically cookies-based) # noqa
-    "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # noqa
-    "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.) # noqa
+    "database",  # Custom app for database models
+    "django.contrib.admin",  # Django's built-in admin interface app # pylint: disable=line-too-long
+    "django.contrib.auth",  # Authentication system (handles user authentication and permissions) # pylint: disable=line-too-long
+    "django.contrib.contenttypes",  # Content type framework (allows relations between models) # pylint: disable=line-too-long
+    "django.contrib.sessions",  # Session framework (manages user sessions, typically cookies-based) # pylint: disable=line-too-long
+    "django.contrib.messages",  # Messaging framework (enables message passing between views and templates) # pylint: disable=line-too-long
+    "django.contrib.staticfiles",  # Manages static files (CSS, JavaScript, images, etc.)
     # Other apps (custom or third-party apps go here)
     "donor_dashboard",  # Custom app for Donor dashboard
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
@@ -119,6 +121,15 @@ else:
 AUTH_PASSWORD_VALIDATORS = [
     {
         "NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator",  # noqa
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.CommonPasswordValidator",
+    },
+    {
+        "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
     {
         "NAME": "django.contrib.auth.password_validation.MinimumLengthValidator",
