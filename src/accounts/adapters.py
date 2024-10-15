@@ -7,7 +7,6 @@ from django.urls import reverse
 
 
 class CustomSocialAccountAdapter(DefaultSocialAccountAdapter):
-
     def is_open_for_signup(self, request, sociallogin):
         # Get the email associated with the social account
         email = sociallogin.user.email
