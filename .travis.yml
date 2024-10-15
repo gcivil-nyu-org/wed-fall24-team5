@@ -15,7 +15,6 @@ jobs:
         - flake8 ./src
         - djlint src/ --lint
         - coverage run --source='src' src/manage.py test
-      after_script:
         - coveralls
 
     - stage: deploy to develop
@@ -28,9 +27,6 @@ jobs:
         - python src/manage.py makemigrations
         - python src/manage.py migrate
         - python src/manage.py collectstatic --noinput
-        - echo "Deploying..."
-      after_script:
-        - echo "Finished deploying!"
         - coveralls
       deploy:
         provider: elasticbeanstalk
@@ -54,9 +50,6 @@ jobs:
         - python src/manage.py makemigrations
         - python src/manage.py migrate
         - python src/manage.py collectstatic --noinput
-        - echo "Deploying..."
-      after_script:
-        - echo "Finished deploying!"
         - coveralls
       deploy:
         provider: elasticbeanstalk
