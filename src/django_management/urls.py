@@ -26,4 +26,5 @@ urlpatterns = [
     path("accounts/", include("accounts.urls", namespace="accounts")),
     # Redirect the root URL to the login page
     path("", lambda request: redirect("accounts/landing")),
+    path('database/', include('database.urls')),
 ]
