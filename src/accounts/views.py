@@ -10,6 +10,7 @@ from django.db.models.signals import post_migrate
 from django.dispatch import receiver
 from allauth.socialaccount.models import SocialApp
 from dotenv import load_dotenv, set_key
+from database.models import User as MyUser
 from .forms import MyAuthenticationForm, MyUserCreationForm
 
 
@@ -57,6 +58,7 @@ def register_view(request):
             user = form.save(commit=False)  # Create a user object but don't save it yet
             user.username = form.cleaned_data.get("email")  # Set username as email
             user.save()  # Save the user object
+            MyUser.objects.create(user_email=email)
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("accounts:profile")
         else:
