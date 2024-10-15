@@ -15,7 +15,9 @@
 
 {% block content %}
         <div class="container">
+            <!-- djlint:off -->
             <div class="box" style="max-width: 500px; margin: 0 auto;">
+            <!-- djlint:on -->
                 <h2 class="title is-4 has-text-centered">Log in</h2>
                 <form method="post">
                     {% csrf_token %}
@@ -50,7 +52,9 @@
                         <div class="control">
                             <button type="submit" class="button is-light is-fullwidth">
                                 <span class="icon is-small">
-                                    <img src="https://www.google.com/favicon.ico" alt="Google logo">
+                                    <img width="20" height="20"
+                                    src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                                    alt="Google logo">
                                 </span>
                                 <span>Continue with Google</span>
                             </button>
@@ -64,7 +68,9 @@
             </div>
 
             {% if messages %}
+            <!-- djlint:off -->
             <div id="message-banner" class="notification is-danger is-light mt-4" style="max-width: 500px; margin: 0 auto;">
+            <!-- djlint:on -->
                 <button class="delete" onclick="dismissMessage()"></button>
                 {% for message in messages %}
                     {{ message }}{% if not forloop.last %} <br>{% endif %}
