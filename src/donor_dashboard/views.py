@@ -1,9 +1,11 @@
 from django.shortcuts import render  # noqa
 from database.models import OrganizationAdmin, Organization
+from django.contrib.auth.decorators import login_required
 
 # Create your views here.
 
 
+@login_required
 def get_org_list(request):
 
     user_email = request.user.email
