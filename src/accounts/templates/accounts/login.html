@@ -2,8 +2,11 @@
 {% block title %}
     Log in
 {% endblock title %}
+{% block title %}
+    Log in
+{% endblock title %}
 {% block extra_head %}
-    <script>
+        <script>
     function dismissMessage() {
         const banner = document.getElementById('message-banner');
         if (banner) {
@@ -15,7 +18,7 @@
 {% block content %}
     <div class="container">
         <!-- djlint:off -->
-                                                                                                                            <div class="box" style="max-width: 500px; margin: 0 auto;">
+        <div class="box" style="max-width: 500px; margin: 0 auto;">
         <!-- djlint:on -->
         <h2 class="title is-4 has-text-centered">Log in</h2>
         <form method="post">
@@ -62,10 +65,10 @@
     </div>
     {% if messages %}
         <!-- djlint:off -->
-                                                                                                                            <div id="message-banner"
-                                                                                                                                 class="notification is-danger is-light mt-4"
-                                                                                                                                 style="max-width: 500px;
-                                                                                                                                        margin: 0 auto">
+        <div id="message-banner"
+                class="notification is-danger is-light mt-4"
+                style="max-width: 500px;
+                    margin: 0 auto">
         <!-- djlint:on -->
         <button class="delete" onclick="dismissMessage()"></button>
         {% for message in messages %}
