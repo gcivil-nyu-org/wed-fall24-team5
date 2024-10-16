@@ -11,6 +11,7 @@
                 <div class="media is-flex is-justify-content-space-between">
                     <div class="media-content">
                         <p class="title is-4">Add a new organization</p>
+                        <p>(not in use)</p>
                     </div>
                     <div class="media-right">
                         <span class="tag is-primary is-light is-medium mt-1">Org Type</span>
@@ -23,9 +24,7 @@
                                style="white-space: normal;
                                       word-wrap: break-word"
                                href="#"
-                               rel="noopener noreferrer">
-                                Org Address
-                            </a>
+                               rel="noopener noreferrer">Org Address</a>
                         </div>
                         <div class="column is-one-third has-text-centered">
                             <p>Email</p>
@@ -36,8 +35,7 @@
                 </div>
             </div>
             <footer class="card-footer">
-                <a href="#"
-                class="card-footer-item">Submit</a>
+                <a href="#" class="card-footer-item">Submit</a>
             </footer>
         </div>
         {% if org_list %}
@@ -58,9 +56,7 @@
                                    style="white-space: normal;
                                           word-wrap: break-word"
                                    href="#"
-                                   rel="noopener noreferrer">
-                                    {{ org.org_address }}   
-                                </a>
+                                   rel="noopener noreferrer">{{ org.org_address }}</a>
                             </div>
                             <div class="column is-one-third has-text-centered">
                                 <p>{{ org.org_email }}</p>
@@ -71,10 +67,7 @@
                     </div>
                 </div>
                 <footer class="card-footer">
-                    <a href="{{ org.org_website }}"
-                    class="card-footer-item"
-                    >
-                    {{ org.org_website }}</a>
+                    <a href="{{ org.org_website }}" class="card-footer-item">{{ org.org_website }}</a>
                 </footer>
             {% endfor %}
         {% endif %}
