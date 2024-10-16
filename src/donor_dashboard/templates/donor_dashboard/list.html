@@ -5,77 +5,78 @@
 {% block content %}
     <div class="container">
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <h2 class="subtitle mt-3">Your organizations</h2>
-        <!-- Add Organization Card -->
+        <h2 class="subtitle mt-4">
+            <strong>Add a new Organization</strong>
+        </h2>
         <form method="post">
-        {% csrf_token %}
-        <div class="card mb-5">
-            <div class="card-content">
-                <div class="media is-flex is-justify-content-space-between">
-                    <div class="media-content">
-                        <p class="title is-4">Add a new organization</p>
-                        <p>{{form.organization_name}}</p>
-                    </div>
-                    <div class="media-right">
-                        <span class="tag is-primary is-light is-medium mt-1">{{form.type}}</span>
-                    </div>
-                </div>
-                <div class="content">
-                    <div class="columns">
-                        <div class="column is-two-thirds is-centered has-text-centered">
-                            <div
-                                class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap"
-                            >
-                                {{form.address}}
-                            </div>      
-                            <div class="mt-2">
-                                {{form.zipcode}}
-                            </div>                   
-                        </div>
-                        <div class="column is-one-third has-text-centered">
-                            <p>{{form.email}}</p>
-                            <p>{{form.contact_number}}</p>
-                            <p>{{form.website}}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <footer class="card-footer">
-                <button id="submit-btn" type="submit" class="card-footer-item">Add</button>
-            </footer>
-        </div>
-        </form>
-        <!-- List of Organizations if they exist -->
-        {% if org_list %}
-            {% for org in org_list %}
+            {% csrf_token %}
+            <div class="card">
                 <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between">
+                    <div class="media is-flex is-justify-content-space-between mb-3">
                         <div class="media-content">
-                            <p class="title is-4">{{ org.org_name }}</p>
+                            <div class="field">{{ form.organization_name }}</div>
                         </div>
                         <div class="media-right">
-                            <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                            <div class="field tag is-medium is-light">{{ form.type }}</div>
                         </div>
                     </div>
-                    <div class="content">
-                        <div class="columns">
-                            <div class="column is-two-thirds">
-                                <a class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap"
-                                href="#"
-                                rel="noopener noreferrer">{{ org.org_address }}</a>
-                            </div>
-                            <div class="column is-one-third has-text-centered">
-                                <p>{{ org.org_email }}</p>
-                                <br>
-                                <p>{{ org.org_contact_number }}</p>
-                            </div>
+                    <div class="columns is-multiline">
+                        <div class="column is-two-thirds">
+                            <div class="field button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
+                            <div class="field">{{ form.zipcode }}</div>
+                        </div>
+                        <div class="column is-one-third">
+                            <div class="field">{{ form.email }}</div>
+                            <div class="field">{{ form.contact_number }}</div>
+                            <div class="field">{{ form.website }}</div>
                         </div>
                     </div>
                 </div>
                 <footer class="card-footer">
-                    <a href="{{ org.org_website }}" class="card-footer-item">{{ org.org_website }}</a>
+                    <button id="submit-btn" type="submit" class="card-footer-item">
+                        <strong>Add</strong>
+                    </button>
                 </footer>
-            {% endfor %}
-        {% endif %}
+            </div>
+        </form>
+        <h2 class="subtitle mt-5">
+            <strong>Your organizations</strong>
+        </h2>
+        <div class="grid is-col-min-21 is-column-gap-4">
+            <!-- List of Organizations if they exist -->
+            {% if org_list %}
+                {% for org in org_list %}
+                    <div class="card mb-5 is-flex is-flex-direction-column">
+                        <div class="card-content is-flex-grow-1">
+                            <div class="media is-flex is-justify-content-space-between">
+                                <div class="media-content">
+                                    <p class="title is-4">{{ org.org_name }}</p>
+                                </div>
+                                <div class="media-right">
+                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <div class="columns">
+                                    <div class="column is-two-thirds">
+                                        <a class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap"
+                                           href="#"
+                                           rel="noopener noreferrer">{{ org.org_address }}</a>
+                                    </div>
+                                    <div class="column is-one-third has-text-centered">
+                                        <p>{{ org.org_email }}</p>
+                                        <p>{{ org.org_contact_number }}</p>
+                                        <a href="{{ org.org_website }}">{{ org.org_website }}</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="card-footer mt-auto">
+                            <a href="" class="card-footer-item">Manage Organization</a>
+                        </footer>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        </div>
     </div>
 {% endblock content %}
