@@ -6,28 +6,34 @@
     <div class="container">
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-3">Your organizations</h2>
+        <!-- Add Organization Card -->
         <div class="card mb-5">
             <div class="card-content">
                 <div class="media is-flex is-justify-content-space-between">
                     <div class="media-content">
                         <p class="title is-4">Add a new organization</p>
-                        <p>(not in use)</p>
+                        <p>{{form.organization_name}}</p>
                     </div>
                     <div class="media-right">
-                        <span class="tag is-primary is-light is-medium mt-1">Org Type</span>
+                        <span class="tag is-primary is-light is-medium mt-1">{{form.type}}</span>
                     </div>
                 </div>
                 <div class="content">
                     <div class="columns">
-                        <div class="column is-two-thirds">
-                            <a class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap"
-                            href="#"
-                            rel="noopener noreferrer">Org Address</a>                         
+                        <div class="column is-two-thirds is-centered has-text-centered">
+                            <div
+                                class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap"
+                            >
+                                {{form.address}}
+                            </div>      
+                            <div class="mt-2">
+                                {{form.zipcode}}
+                            </div>                   
                         </div>
                         <div class="column is-one-third has-text-centered">
-                            <p>Email</p>
-                            <p>Contact Number</p>
-                            <p>Website</p>
+                            <p>{{form.email}}</p>
+                            <p>{{form.contact_number}}</p>
+                            <p>{{form.website}}</p>
                         </div>
                     </div>
                 </div>
@@ -36,6 +42,7 @@
                 <a href="#" class="card-footer-item">Submit</a>
             </footer>
         </div>
+        <!-- List of Organizations if they exist -->
         {% if org_list %}
             {% for org in org_list %}
                 <div class="card-content">
