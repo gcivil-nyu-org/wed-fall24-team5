@@ -7,6 +7,8 @@
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-3">Your organizations</h2>
         <!-- Add Organization Card -->
+        <form method="post">
+        {% csrf_token %}
         <div class="card mb-5">
             <div class="card-content">
                 <div class="media is-flex is-justify-content-space-between">
@@ -39,9 +41,10 @@
                 </div>
             </div>
             <footer class="card-footer">
-                <a href="#" class="card-footer-item">Submit</a>
+                <button id="submit-btn" type="submit" class="card-footer-item">Add</button>
             </footer>
         </div>
+        </form>
         <!-- List of Organizations if they exist -->
         {% if org_list %}
             {% for org in org_list %}
