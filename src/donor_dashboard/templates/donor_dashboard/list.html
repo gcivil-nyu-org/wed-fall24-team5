@@ -12,20 +12,28 @@
             {% csrf_token %}
             <div class="card">
                 <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between mb-3">
-                        <div class="media-content">
+                    <div class="columns is-multiline">
+                        <div class="column is-full-mobile is-two-thirds-tablet">
                             <div class="field">{{ form.organization_name }}</div>
                         </div>
-                        <div class="media-right">
-                            <div class="field tag is-medium is-light">{{ form.type }}</div>
+                        <div class="column is-full-mobile is-one-third-tablet">
+                            <div class="field">
+                                <div class="control">
+                                    <div class="tag is-medium is-light is-fullwidth">{{ form.type }}</div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="columns is-multiline">
-                        <div class="column is-two-thirds">
-                            <div class="field button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
+                        <div class="column is-two-thirds-tablet is-full-mobile">
+                            <div class="field">
+                                <div class="control">
+                                    <div class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
+                                </div>
+                            </div>
                             <div class="field">{{ form.zipcode }}</div>
                         </div>
-                        <div class="column is-one-third">
+                        <div class="column is-one-third-tablet is-full-mobile">
                             <div class="field">{{ form.email }}</div>
                             <div class="field">{{ form.contact_number }}</div>
                             <div class="field">{{ form.website }}</div>
@@ -42,15 +50,14 @@
         <h2 class="subtitle mt-5">
             <strong>Your organizations</strong>
         </h2>
-        <div class="grid is-col-min-21 is-column-gap-4">
-            <!-- List of Organizations if they exist -->
-            {% if org_list %}
-                {% for org in org_list %}
+        <div class="columns is-multiline is-variable is-4">
+            {% for org in org_list %}
+                <div class="column is-full-mobile is-half-tablet is-half-desktop">
                     <div class="card mb-5 is-flex is-flex-direction-column">
                         <div class="card-content is-flex-grow-1">
                             <div class="media is-flex is-justify-content-space-between">
                                 <div class="media-content">
-                                    <p class="title is-4">{{ org.org_name }}</p>
+                                    <p class="title is-4 is-clipped">{{ org.org_name }}</p>
                                 </div>
                                 <div class="media-right">
                                     <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
@@ -58,15 +65,20 @@
                             </div>
                             <div class="content">
                                 <div class="columns">
-                                    <div class="column is-two-thirds">
-                                        <a class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap"
-                                           href="#"
-                                           rel="noopener noreferrer">{{ org.org_address }}</a>
+                                    <div class="column is-full-mobile is-half-tablet">
+                                        <!-- djlint:off -->
+                                        <div class="button is-link is-light has-text-centered"
+                                             style="white-space: normal;
+                                                    word-wrap: break-word;
+                                                    overflow-wrap: break-word">{{ org.org_address }}</div>
                                     </div>
-                                    <div class="column is-one-third has-text-centered">
-                                        <p>{{ org.org_email }}</p>
+                                    <div class="column is-full-mobile is-half-tablet has-text-centered">
+                                        <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
                                         <p>{{ org.org_contact_number }}</p>
-                                        <a href="{{ org.org_website }}">{{ org.org_website }}</a>
+                                        <a href="{{ org.org_website }}"
+                                           style="word-wrap: break-word;
+                                                  overflow-wrap: break-word">{{ org.org_website }}</a>
+                                        <!-- djlint:on -->
                                     </div>
                                 </div>
                             </div>
@@ -75,8 +87,8 @@
                             <a href="" class="card-footer-item">Manage Organization</a>
                         </footer>
                     </div>
-                {% endfor %}
-            {% endif %}
+                </div>
+            {% endfor %}
         </div>
     </div>
 {% endblock content %}
