@@ -1,7 +1,6 @@
 {% extends "_base.html" %}
-
 {% block extra_head %}
-<script>
+    <script>
     function dismissMessage() {
         const banner = document.getElementById('message-banner');
         if (banner) {
@@ -95,97 +94,91 @@
             submitButton.disabled = !matchValid;
         });
     });    
-</script>
+    </script>
 {% endblock extra_head %}
-
 {% block content %}
-        <div class="container">
-            <!-- djlint:off -->
-            <div class="box" style="max-width: 600px; margin: 0 auto;">
-            <!-- djlint:on -->
-                <h2 class="title is-4 has-text-centered">Create an account</h2>
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="field">
-                        <label class="label">{{ form.email.label_tag }}</label>
-                        <div class="control">
-                            {{ form.email }}
-                        </div>
-                    </div>
-                    <div class="field is-grouped">
-                        <div class="control is-expanded">
-                            <label class="label" for="first_name">First Name</label>
-                            {{ form.first_name }}
-                        </div>
-                        <div class="control is-expanded">
-                            <label class="label" for="last_name">Last Name</label>
-                            {{ form.last_name }}
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label" for="password1">Password</label>
-                        <div class="control">
-                            {{ form.password1 }}
-                        </div>
-                        <ul id="password-requirements" class="help is-size-6">
-                            <li id="password-length-check" class="has-text-danger">At least 8 characters</li>
-                            <li id="password-uppercase-check" class="has-text-danger">Contains an uppercase letter</li>
-                            <li id="password-number-check" class="has-text-danger">Contains a number</li>
-                            <li id="password-special-check" class="has-text-danger">Contains a special character</li>
-                        </ul>
-                    </div>
-                    <div class="field">
-                        <label class="label" for="password2">Confirm Password</label>
-                        <div class="control">
-                            {{ form.password2 }}
-                        </div>
-                        <p id="password-match-check" class="help is-size-6 has-text-danger">Passwords must match</p>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <button
-                                id="submit-btn"
-                                type="submit"
-                                class="button is-primary is-fullwidth"
-                                disabled="true"
-                            >Sign up</button>
-                        </div>
-                    </div>
-                </form>
-                <div class="has-text-centered mt-2">
-                    <span>or</span>
+    <div class="container">
+        <!-- djlint:off -->
+                    <div class="box" style="max-width: 600px; margin: 0 auto;">
+        <!-- djlint:on -->
+        <h2 class="title is-4 has-text-centered">Create an account</h2>
+        <form method="post">
+            {% csrf_token %}
+            <div class="field">
+                <label class="label">{{ form.email.label_tag }}</label>
+                <div class="control">{{ form.email }}</div>
+            </div>
+            <div class="field is-grouped">
+                <div class="control is-expanded">
+                    <label class="label" for="first_name">First Name</label>
+                    {{ form.first_name }}
                 </div>
-                {% load socialaccount %}
-                <form method="post" action="{% provider_login_url 'google' %}">
-                    {% csrf_token %}
-                    <div class="field mt-2">
-                        <div class="control">
-                            <button type="submit" class="button is-light is-fullwidth">
-                                <span class="icon is-small">
-                                    <img width="20" height="20"
-                                    src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
-                                    alt="Google logo">
-                                </span>
-                                <span>Sign up with Google</span>
-                            </button>
-                        </div>
-                    </div>
-                </form>
-
-                <p class="has-text-centered mt-4">
-                    Already registered? <a href="{% url 'accounts:login' %}" class="has-text-link">Log in.</a>
-                </p>
+                <div class="control is-expanded">
+                    <label class="label" for="last_name">Last Name</label>
+                    {{ form.last_name }}
+                </div>
             </div>
-
-            {% if messages %}
-            <!-- djlint:off -->
-            <div id="message-banner" class="notification is-danger mt-4" style="max-width: 600px; margin: 0 auto;">
-            <!-- djlint:on -->
-                <button class="delete" onclick="dismissMessage()"></button>
-                {% for message in messages %}
-                    {{ message }}{% if not forloop.last %} <br>{% endif %}
-                {% endfor %}
+            <div class="field">
+                <label class="label" for="password1">Password</label>
+                <div class="control">{{ form.password1 }}</div>
+                <ul id="password-requirements" class="help is-size-6">
+                    <li id="password-length-check" class="has-text-danger">At least 8 characters</li>
+                    <li id="password-uppercase-check" class="has-text-danger">Contains an uppercase letter</li>
+                    <li id="password-number-check" class="has-text-danger">Contains a number</li>
+                    <li id="password-special-check" class="has-text-danger">Contains a special character</li>
+                </ul>
             </div>
-            {% endif %}
+            <div class="field">
+                <label class="label" for="password2">Confirm Password</label>
+                <div class="control">{{ form.password2 }}</div>
+                <p id="password-match-check" class="help is-size-6 has-text-danger">Passwords must match</p>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button id="submit-btn"
+                            type="submit"
+                            class="button is-primary is-fullwidth"
+                            disabled="true">Sign up</button>
+                </div>
+            </div>
+        </form>
+        <div class="has-text-centered mt-2">
+            <span>or</span>
         </div>
+        {% load socialaccount %}
+        <form method="post" action="{% provider_login_url 'google' %}">
+            {% csrf_token %}
+            <div class="field mt-2">
+                <div class="control">
+                    <button type="submit" class="button is-light is-fullwidth">
+                        <span class="icon is-small">
+                            <img width="20"
+                                 height="20"
+                                 src="https://upload.wikimedia.org/wikipedia/commons/c/c1/Google_%22G%22_logo.svg"
+                                 alt="Google logo">
+                        </span>
+                        <span>Sign up with Google</span>
+                    </button>
+                </div>
+            </div>
+        </form>
+        <p class="has-text-centered mt-4">
+            Already registered? <a href="{% url 'accounts:login' %}" class="has-text-link">Log in.</a>
+        </p>
+    </div>
+    {% if messages %}
+        <!-- djlint:off -->
+                    <div id="message-banner"
+                         class="notification is-danger mt-4"
+                         style="max-width: 600px;
+                                margin: 0 auto">
+        <!-- djlint:on -->
+        <button class="delete" onclick="dismissMessage()"></button>
+        {% for message in messages %}
+            {{ message }}
+            {% if not forloop.last %}<br>{% endif %}
+        {% endfor %}
+    </div>
+{% endif %}
+</div>
 {% endblock content %}

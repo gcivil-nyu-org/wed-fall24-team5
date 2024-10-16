@@ -1,5 +1,4 @@
 {% load static %}
-
 <style>
     @media screen and (max-width: 1023px) {
         .navbar-item.has-dropdown .navbar-dropdown {
@@ -19,61 +18,61 @@
         }
     }
 </style>
-
 <header class="navbar is-fixed-top has-shadow is-white">
     <div class="container">
         <div class="navbar-brand">
             <a href="#" class="navbar-item">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
-                    stroke="currentColor" class="size-6">
-                    <path stroke-linecap="round" stroke-linejoin="round"
-                        d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                <svg xmlns="http://www.w3.org/2000/svg"
+                     fill="none"
+                     viewBox="0 0 24 24"
+                     stroke-width="1.5"
+                     stroke="currentColor"
+                     class="size-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m2.25 12 8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                 </svg>
                 <span class="ml-3 is-size-5 has-text-weight-bold has-text-grey-dark">Food Donation</span>
             </a>
-
-            <a role="button" class="navbar-burger" aria-label="menu" aria-expanded="false" data-target="navMenu">
+            <a role="button"
+               class="navbar-burger"
+               aria-label="menu"
+               aria-expanded="false"
+               data-target="navMenu">
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
                 <span aria-hidden="true"></span>
             </a>
         </div>
-
         <div id="navMenu" class="navbar-menu">
             <div class="navbar-start">
                 {% if user.is_authenticated %}
-                <div class="navbar-item has-dropdown">
-                    <a class="navbar-link">View As</a>
-                    <div class="navbar-dropdown">
-                        <a href="#" class="navbar-item">User</a>
-                        <a href="#" class="navbar-item">Organization 1</a>
-                        <a href="#" class="navbar-item">Add Organization</a>
+                    <div class="navbar-item has-dropdown">
+                        <a class="navbar-link">View</a>
+                        <div class="navbar-dropdown">
+                            <a href="{% url 'recipient_dashboard' %}" class="navbar-item">Available Donations</a>
+                            <a href="{% url 'donor_dashboard:org_list' %}" class="navbar-item">My Organizations</a>
+                        </div>
                     </div>
-                </div>
                 {% endif %}
             </div>
-
             <div class="navbar-end">
                 {% if user.is_authenticated %}
-                <a class="navbar-item" href="#">Dashboard</a>
-                <a class="navbar-item" href="#">Orders</a>
-                <a class="navbar-item" href="#">Profile</a>
+                    <a class="navbar-item" href="#">Dashboard</a>
+                    <a class="navbar-item" href="#">Orders</a>
+                    <a class="navbar-item" href="#">Profile</a>
                 {% endif %}
-
                 <div class="navbar-item">
                     {% if user.is_authenticated %}
-                    <a class="button is-outlined is-dark" href="#"><span>Messages</span></a>
-                    <a class="button is-dark ml-3" href="{% url 'accounts:logout' %}"><span>Log Out</span></a>
+                        <a class="button is-outlined is-dark" href="#"><span>Messages</span></a>
+                        <a class="button is-dark ml-3" href="{% url 'accounts:logout' %}"><span>Log Out</span></a>
                     {% else %}
-                    <a class="button is-outlined is-dark" href="{% url 'accounts:login' %}"><span>Log In</span></a>
-                    <a class="button is-dark ml-3" href="{% url 'accounts:register' %}"><span>Sign Up</span></a>
+                        <a class="button is-outlined is-dark" href="{% url 'accounts:login' %}"><span>Log In</span></a>
+                        <a class="button is-dark ml-3" href="{% url 'accounts:register' %}"><span>Sign Up</span></a>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
 </header>
-
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         // Get all "navbar-burger" elements

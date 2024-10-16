@@ -25,7 +25,9 @@ urlpatterns = [
     path("", include("django.contrib.auth.urls")),
     path("accounts/", include("accounts.urls", namespace="accounts")),
     path("recipient_dashboard/", include("recipient_dashboard.urls")),
+    path("donor_dashboard/", include("donor_dashboard.urls")),
     # Redirect the root URL to the login page
     path("", lambda request: redirect("accounts/landing")),
     path("database/", include("database.urls")),
+    path("organization/", include("donor_dashboard.urls", namespace="organization")),
 ]

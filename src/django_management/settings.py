@@ -86,6 +86,7 @@ TEMPLATES = [
                 "django.template.context_processors.request",
                 "django.contrib.auth.context_processors.auth",
                 "django.contrib.messages.context_processors.messages",
+                "accounts.context_processors.user_organizations",  # Enables header to access a user's organizations to avoid querying the database on every page # noqa
             ],
         },
     },
