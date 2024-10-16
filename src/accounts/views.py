@@ -97,6 +97,7 @@ def landing_view(request):
 
 @login_required
 def profile_view(request):
+    MyUser.objects.get_or_create(user_email=request.user.email)
     return redirect("/recipient_dashboard")
 
 
