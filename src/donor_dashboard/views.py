@@ -32,7 +32,7 @@ def get_org_list(request):
 
     for organization in organization_admin_list:
         organization_details = Organization.objects.get(
-            organization_id=organization.organization_id
+            organization_id=organization.organization_id.organization_id
         )
         org_list.append(
             {

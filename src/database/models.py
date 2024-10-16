@@ -56,7 +56,7 @@ class OrganizationAdmin(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.first_name} {self.user.last_name} - {self.organization.organization_name}"
+        return f"{self.user_email.first_name} {self.user_email.last_name} - {self.organization_id.organization_name}"
 
 
 class Donation(models.Model):
