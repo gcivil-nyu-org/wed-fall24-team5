@@ -25,6 +25,19 @@ def add_organization(request):
 @login_required
 def get_org_list(request):
 
+    if request.method == "POST":
+        form = AddOrganizationForm(request.POST)
+        if form.is_valid():
+            organization = form.save()
+            org_user = User.objects.get(user_email=request.user.email)
+            OrganizationAdmin.objects.create(
+                user_email=org_user, organization_id=organization
+            )
+            messages.success(request, "Organization successfully added.")
+            return redirect("/donor_dashboard")
+    else:
+        form = AddOrganizationForm()
+
     user_email = request.user.email
     organization_admin_list = OrganizationAdmin.objects.filter(user_email=user_email)
 
@@ -46,4 +59,6 @@ def get_org_list(request):
             }
         )
 
-    return render(request, "donor_dashboard/list.html", {"org_list": org_list})
+    return render(
+        request, "donor_dashboard/list.html", {"org_list": org_list, "form": form}
+    )
