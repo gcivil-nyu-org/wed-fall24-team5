@@ -4,8 +4,8 @@ from django.db import migrations
 
 
 def create_user_profiles(apps, schema_editor):
-    User = apps.get_model('auth', 'User')
-    UserProfile = apps.get_model('database', 'UserProfile')
+    User = apps.get_model("auth", "User")
+    UserProfile = apps.get_model("database", "UserProfile")
     for user in User.objects.all():
         UserProfile.objects.get_or_create(user=user)
 
@@ -17,7 +17,7 @@ def reverse_func(apps, schema_editor):
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('database', '0003_userprofile_remove_message_sender_id_and_more'),
+        ("database", "0003_userprofile_remove_message_sender_id_and_more"),
     ]
 
     operations = [
