@@ -2,6 +2,7 @@ from django.contrib.auth.models import User
 from django.db import models
 import uuid
 
+
 class Organization(models.Model):
     ORGANIZATION_TYPES = [
         ("restaurant", "Restaurant"),
@@ -28,6 +29,7 @@ class Organization(models.Model):
     def __str__(self):
         return self.organization_name
 
+
 class UserProfile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, primary_key=True)
     phone_number = models.CharField(max_length=20, blank=True, null=True)
@@ -37,6 +39,7 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return self.user.username
+
 
 class OrganizationAdmin(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -53,8 +56,7 @@ class OrganizationAdmin(models.Model):
 
 class Donation(models.Model):
     donation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    organization = models.ForeignKey(
-        Organization, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     food_item = models.CharField(max_length=255)
     quantity = models.IntegerField()
     pickup_by = models.DateField()
@@ -83,17 +85,55 @@ class UserReview(models.Model):
 # As it currently stands it is users sending eachother messages, which needs to change to users exchanging messages with organizations.
 class Message(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    sender_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='sent_messages', null=True, blank=True)
-    sender_organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='org_sent_messages', null=True, blank=True)
-    receiver_user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='received_messages', null=True, blank=True)
-    receiver_organization = models.ForeignKey(Organization, on_delete=models.CASCADE, related_name='org_received_messages', null=True, blank=True)
+    sender_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="sent_messages",
+        null=True,
+        blank=True,
+    )
+    sender_organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="org_sent_messages",
+        null=True,
+        blank=True,
+    )
+    receiver_user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="received_messages",
+        null=True,
+        blank=True,
+    )
+    receiver_organization = models.ForeignKey(
+        Organization,
+        on_delete=models.CASCADE,
+        related_name="org_received_messages",
+        null=True,
+        blank=True,
+    )
     message_body = models.TextField()
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        sender = self.sender_user.get_full_name() if self.sender_user else (self.sender_organization.name if self.sender_organization else "Unknown")
-        receiver = self.receiver_user.get_full_name() if self.receiver_user else (self.receiver_organization.name if self.receiver_organization else "Unknown")
+        sender = (
+            self.sender_user.get_full_name()
+            if self.sender_user
+            else (
+                self.sender_organization.name if self.sender_organization else "Unknown"
+            )
+        )
+        receiver = (
+            self.receiver_user.get_full_name()
+            if self.receiver_user
+            else (
+                self.receiver_organization.name
+                if self.receiver_organization
+                else "Unknown"
+            )
+        )
         return f"Message from {sender} to {receiver}"
 
 
@@ -106,8 +146,7 @@ class Order(models.Model):
 
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     donation = models.ForeignKey(Donation, on_delete=models.CASCADE)
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, null=True, blank=True)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     order_quantity = models.IntegerField()
     order_status = models.CharField(
         max_length=20, choices=ORDER_STATUS_CHOICES, default="pending"
@@ -117,4 +156,6 @@ class Order(models.Model):
     order_modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Order {self.id} - {self.user.get_full_name() if self.user else 'No User'}"
+        return (
+            f"Order {self.id} - {self.user.get_full_name() if self.user else 'No User'}"
+        )
