@@ -12,9 +12,7 @@ def add_organization(request):
         if form.is_valid():
             organization = form.save()
             org_user = User.objects.get(email=request.user.email)
-            OrganizationAdmin.objects.create(
-                user=org_user, organization=organization
-            )
+            OrganizationAdmin.objects.create(user=org_user, organization=organization)
             messages.success(request, "Organization successfully added.")
             return redirect("/")
     else:
@@ -30,9 +28,7 @@ def get_org_list(request):
         if form.is_valid():
             organization = form.save()
             org_user = User.objects.get(email=request.user.email)
-            OrganizationAdmin.objects.create(
-                user=org_user, organization=organization
-            )
+            OrganizationAdmin.objects.create(user=org_user, organization=organization)
             messages.success(request, "Organization successfully added.")
             return redirect("/donor_dashboard")
     else:
@@ -61,8 +57,13 @@ def get_org_list(request):
         request, "donor_dashboard/list.html", {"org_list": org_list, "form": form}
     )
 
+
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
 
-    return render(request, 'donor_dashboard/manage_organization.html', {'organization': organization})
+    return render(
+        request,
+        "donor_dashboard/manage_organization.html",
+        {"organization": organization},
+    )

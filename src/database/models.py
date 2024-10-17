@@ -132,7 +132,9 @@ class Message(models.Model):
             self.sender_user.get_full_name()
             if self.sender_user
             else (
-                self.sender_organization.organization_name if self.sender_organization else "Unknown"
+                self.sender_organization.organization_name
+                if self.sender_organization
+                else "Unknown"
             )
         )
         receiver = (
