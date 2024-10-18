@@ -11,6 +11,15 @@
     .subtitle {
         margin: 0; /* Remove extra margin if any */
     }
+
+    .manage-donation-button {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .delete-link {
+        color: red;
+    }
 </style>
 <script>
     function confirmDelete() {
@@ -54,9 +63,7 @@
                                     <div class="content">
                                         <div class="columns is-flex-direction-column-mobile">
                                             <div class="column is-two-thirds">
-                                                <a class="button is-link is-light is-fullwidth"
-                                                style="white-space: normal;
-                                                        word-wrap: break-word"
+                                                <a class="button is-link is-light is-fullwidth manage-donation-button"
                                                 href="#"
                                                 target="_blank"
                                                 rel="noopener noreferrer">
@@ -72,7 +79,7 @@
                                     </div>
                                 </div>
                                 <footer class="card-footer">
-                                    <a href="#" class="card-footer-item" style="color: red;">Delete</a>
+                                    <a href="#" class="card-footer-item delete-link">Delete</a>
                                 </footer>
                             </div>
                         </div>
