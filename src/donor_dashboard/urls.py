@@ -7,8 +7,9 @@ urlpatterns = [
     path("", views.get_org_list, name="org_list"),
     path("add-organization/", views.add_organization, name="add_organization"),
     path(
-        "manage-organization/<uuid:organization_id>/",
+        "manage_organization/<uuid:organization_id>/",
         views.manage_organization,
         name="manage_organization",
     ),
+    path('delete_organization/<uuid:organization_id>/', views.delete_organization, name='delete_organization'),
 ]
