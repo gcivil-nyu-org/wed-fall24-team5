@@ -11,10 +11,8 @@ def add_organization(request):
         form = AddOrganizationForm(request.POST)
         if form.is_valid():
             organization = form.save()
-            org_user = User.objects.get(user_email=request.user.email)
-            OrganizationAdmin.objects.create(
-                user_email=org_user, organization_id=organization
-            )
+            org_user = User.objects.get(email=request.user.email)
+            OrganizationAdmin.objects.create(user=org_user, organization=organization)
             messages.success(request, "Organization successfully added.")
             return redirect("/")
     else:
@@ -29,36 +27,27 @@ def get_org_list(request):
         form = AddOrganizationForm(request.POST)
         if form.is_valid():
             organization = form.save()
-            org_user = User.objects.get(user_email=request.user.email)
-            OrganizationAdmin.objects.create(
-                user_email=org_user, organization_id=organization
-            )
+            org_user = User.objects.get(email=request.user.email)
+            OrganizationAdmin.objects.create(user=org_user, organization=organization)
             messages.success(request, "Organization successfully added.")
             return redirect("/donor_dashboard")
     else:
         form = AddOrganizationForm()
 
-    user_email = request.user.email
-    organization_admin_list = OrganizationAdmin.objects.filter(user_email=user_email)
-
-    org_list = []
-
-    for organization in organization_admin_list:
-        organization_details = Organization.objects.get(
-            organization_id=organization.organization_id.organization_id
-        )
-        org_list.append(
-            {
-                "org_name": organization_details.organization_name,
-                "org_type": organization_details.type,
-                "org_address": organization_details.address,
-                "org_zipcode": organization_details.zipcode,
-                "org_email": organization_details.email,
-                "org_website": organization_details.website,
-                "org_contact_number": organization_details.contact_number,
-            }
-        )
+    org_user = User.objects.get(email=request.user.email)
+    organizations = Organization.objects.filter(organizationadmin__user=org_user.id)
 
     return render(
-        request, "donor_dashboard/list.html", {"org_list": org_list, "form": form}
+        request, "donor_dashboard/list.html", {"org_list": organizations, "form": form}
+    )
+
+
+def manage_organization(request, organization_id):
+    # Fetch the organization using the organization_id
+    organization = Organization.objects.get(id=organization_id)
+
+    return render(
+        request,
+        "donor_dashboard/manage_organization.html",
+        {"organization": organization},
     )
