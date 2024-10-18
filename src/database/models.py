@@ -79,9 +79,7 @@ class Donation(models.Model):
 
 
 class UserReview(models.Model):
-    review_id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )
+    review_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     rating = models.IntegerField()
