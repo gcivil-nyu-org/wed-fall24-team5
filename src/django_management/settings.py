@@ -31,6 +31,9 @@ DEBUG = True
 
 ALLOWED_HOSTS = [
     "food-donation-swe-dev.us-east-1.elasticbeanstalk.com",
+    "food-donation-swe-prod.us-east-1.elasticbeanstalk.com",
+    "fooddonation-dev.com",
+    "fooddonation-prod.com",
     "172.31.30.180",  # PostGres
     "34.202.22.62",  # PostGres
     "127.0.0.1",
@@ -201,3 +204,13 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
+### HTTPS Setups ###
+# Redirect HTTP to HTTPS
+SECURE_SSL_REDIRECT = True
+# Enforce HTTP Strict Transport Security (HSTS) for 1 year
+SECURE_HSTS_SECONDS = 31536000
+# Allow site to be included in browsers' HSTS preload lists
+SECURE_HSTS_PRELOAD = True
+# Apply HSTS to all subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True
