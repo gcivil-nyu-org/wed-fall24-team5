@@ -35,7 +35,7 @@ def get_org_list(request):
         form = AddOrganizationForm()
 
     org_user = User.objects.get(email=request.user.email)
-    organizations = Organization.objects.filter(organizationadmin__user=org_user.id);
+    organizations = Organization.objects.filter(organizationadmin__user=org_user.id)
 
     return render(
         request, "donor_dashboard/list.html", {"org_list": organizations, "form": form}
