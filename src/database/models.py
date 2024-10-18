@@ -132,7 +132,7 @@ class Message(models.Model):
             self.sender_user.get_full_name()
             if self.sender_user
             else (
-                self.sender_organization.organizatino_name
+                self.sender_organization.organization_name
                 if self.sender_organization
                 else "Unknown"
             )
@@ -141,7 +141,7 @@ class Message(models.Model):
             self.receiver_user.get_full_name()
             if self.receiver_user
             else (
-                self.receiver_organization.organization_namename
+                self.receiver_organization.organization_name
                 if self.receiver_organization
                 else "Unknown"
             )
