@@ -79,7 +79,9 @@ class Donation(models.Model):
 
 
 class UserReview(models.Model):
-    userreview_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    userreview_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     rating = models.IntegerField()
@@ -132,7 +134,9 @@ class Message(models.Model):
             self.sender_user.get_full_name()
             if self.sender_user
             else (
-                self.sender_organization.organizatino_name if self.sender_organization else "Unknown"
+                self.sender_organization.organizatino_name
+                if self.sender_organization
+                else "Unknown"
             )
         )
         receiver = (
