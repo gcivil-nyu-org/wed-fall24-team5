@@ -11,5 +11,9 @@ urlpatterns = [
         views.manage_organization,
         name="manage_organization",
     ),
-    path('delete_organization/<uuid:organization_id>/', views.delete_organization, name='delete_organization'),
+    path(
+        "delete_organization/<uuid:organization_id>/",
+        views.delete_organization,
+        name="delete_organization",
+    ),
 ]

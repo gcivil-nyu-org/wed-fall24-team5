@@ -67,10 +67,9 @@ def manage_organization(request, organization_id):
     return render(
         request,
         "donor_dashboard/manage_organization.html",
-        {"organization": organization,
-         "donations": donations
-        },
+        {"organization": organization, "donations": donations},
     )
+
 
 @login_required
 def delete_organization(request, organization_id):

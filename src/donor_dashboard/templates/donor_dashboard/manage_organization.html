@@ -28,8 +28,8 @@
                 <a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}" class="button is-info">
                     Manage Organization
                 </a>
-                
-                <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="POST">
+
+                <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
                     {% csrf_token %}
                     <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
                 </form>
