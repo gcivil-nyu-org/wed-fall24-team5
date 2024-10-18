@@ -9,3 +9,10 @@ def recipient_dashboard(request):
     return render(
         request, "recipient_dashboard/dashboard.html", {"donations": donations}
     )
+
+
+def search_donation(request, keyword):
+    donations = Donation.objects.filter(food_item__icontains=keyword)
+    return render(
+        request, "recipient_dashboard/dashboard.html", {"donations": donations}
+    )
