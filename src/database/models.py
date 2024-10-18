@@ -61,7 +61,7 @@ class OrganizationAdmin(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.user.get_full_name() if self.user else 'No User'} - {self.organization.name}"
+        return f"{self.user.get_full_name() if self.user else 'No User'} - {self.organization.organization_name}"
 
 
 class Donation(models.Model):
@@ -89,7 +89,7 @@ class UserReview(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Review by {self.user.get_full_name() if self.user else 'Anonymous'} for {self.organization.name}"
+        return f"Review by {self.user.get_full_name() if self.user else 'Anonymous'} for {self.organization.organization_name}"
 
 
 # As it currently stands it is users sending eachother messages, which needs to change to users exchanging messages with organizations.
@@ -132,14 +132,14 @@ class Message(models.Model):
             self.sender_user.get_full_name()
             if self.sender_user
             else (
-                self.sender_organization.name if self.sender_organization else "Unknown"
+                self.sender_organization.organizatino_name if self.sender_organization else "Unknown"
             )
         )
         receiver = (
             self.receiver_user.get_full_name()
             if self.receiver_user
             else (
-                self.receiver_organization.name
+                self.receiver_organization.organization_namename
                 if self.receiver_organization
                 else "Unknown"
             )
