@@ -1,5 +1,92 @@
 {% extends "_base.html" %}
+
 {% block content %}
-<h1>Hi</h1>
-    <h2>{{ organization.organization_name }}</h2>
+<style>
+    .flex-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .subtitle {
+        margin: 0; /* Remove extra margin if any */
+    }
+
+    .manage-donation-button {
+        white-space: normal;
+        word-wrap: break-word;
+    }
+
+    .delete-link {
+        color: red;
+    }
+</style>
+<script>
+    function confirmDelete() {
+        if (confirm("Are you sure you want to delete this organization?")) {
+            document.getElementById("delete-form").submit();
+        }
+    }
+</script>
+    <div class="container">
+        <div class="flex-container">
+            <h2 class="subtitle mt-5">
+                <strong>{{ organization.organization_name }}</strong>
+            </h2>
+            <div class="buttons">
+                <a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}" class="button is-info">
+                    Manage Organization
+                </a>
+
+                <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
+                </form>
+            </div>
+        </div>
+        
+        <h2 class="subtitle mt-3">List of Donations:</h2>
+            {% if donations %}
+                <div class="columns is-multiline is-variable is-4">
+                    {% for donation in donations %}
+                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                            <div class="card mb-5">
+                                <div class="card-content">
+                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                        <div class="media-content">
+                                            <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                                        </div>
+                                        <div class="media-right mt-2-mobile">
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }} Available</span>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="columns is-flex-direction-column-mobile">
+                                            <div class="column is-two-thirds">
+                                                <a class="button is-link is-light is-fullwidth manage-donation-button"
+                                                href="#"
+                                                target="_blank"
+                                                rel="noopener noreferrer">
+                                                {{ donation.organization_id.organization_name }}
+                                                Manage Donation
+                                                </a>
+                                            </div>
+                                            <div class="column is-one-third has-text-centered">
+                                                <strong>Pickup by:</strong>
+                                                <p>{{ donation.pickup_by }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <footer class="card-footer">
+                                    <a href="#" class="card-footer-item delete-link">Delete</a>
+                                </footer>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="box">No donations available at the moment.</p>
+            {% endif %}
+    </div>
 {% endblock content %}
