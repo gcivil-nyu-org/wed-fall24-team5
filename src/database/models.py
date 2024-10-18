@@ -52,7 +52,7 @@ def create_or_update_user_profile(sender, instance, created, **kwargs):
 
 
 class OrganizationAdmin(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    admin_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     access_level = models.CharField(max_length=50)
@@ -79,7 +79,7 @@ class Donation(models.Model):
 
 
 class UserReview(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    review_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     rating = models.IntegerField()
@@ -94,7 +94,7 @@ class UserReview(models.Model):
 
 # As it currently stands it is users sending eachother messages, which needs to change to users exchanging messages with organizations.
 class Message(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sender_user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -156,7 +156,7 @@ class Order(models.Model):
         ("pending", "Pending"),
     ]
 
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    order_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     donation = models.ForeignKey(Donation, on_delete=models.CASCADE)
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     order_quantity = models.IntegerField()
