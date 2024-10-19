@@ -2,8 +2,8 @@ from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
 from database.models import Donation, Organization, Order
-from django.utils import timezone # for pickup date being tomorrow in tests
-from datetime import timedelta # for pickup date being tomorrow in tests
+from django.utils import timezone  # for pickup date being tomorrow in tests
+from datetime import timedelta  # for pickup date being tomorrow in tests
 from django.contrib.messages import get_messages  # to capture messages
 from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
@@ -83,6 +83,7 @@ from allauth.socialaccount.models import SocialApp
 #             "Pasta", donation_items
 #         )  # Checking if a non-listed item is checked or not
 
+
 class ReserveDonationTest(TestCase):
 
     def setUp(self):
@@ -92,7 +93,7 @@ class ReserveDonationTest(TestCase):
 
         # Logging in the user
         self.client.login(username="testuser", password="testpass")
-        
+
         # Create an organization
         self.organization = Organization.objects.create(
             organization_name="Test Organization",
@@ -101,38 +102,42 @@ class ReserveDonationTest(TestCase):
             zipcode=12345,
             contact_number="1234567890",
             email="test@example.com",
-            active=True
+            active=True,
         )
-        
+
         # Create a donation
         self.donation = Donation.objects.create(
             organization=self.organization,
             food_item="Test Food",
             quantity=5,
             pickup_by=timezone.now() + timedelta(days=1),
-            active=True
+            active=True,
         )
 
         # Set up SocialApp for allauth (required for login redirection)
         site = Site.objects.get_current()
         self.social_app = SocialApp.objects.create(
-            provider='google',  # or 'facebook', depending on your setup
-            name='Test Google App',
-            client_id='test-client-id',
-            secret='test-secret',
+            provider="google",  # or 'facebook', depending on your setup
+            name="Test Google App",
+            client_id="test-client-id",
+            secret="test-secret",
         )
         self.social_app.sites.add(site)
 
     def test_reserve_donation_success(self):
         """Test a successful donation reservation."""
-        response = self.client.get(reverse('reserve_donation', args=[self.donation.donation_id]))
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation.donation_id])
+        )
 
         # Check if the reservation was successful
         self.assertEqual(response.status_code, 302)  # Redirect after success
-        self.assertRedirects(response, reverse('recipient_dashboard'))
+        self.assertRedirects(response, reverse("recipient_dashboard"))
 
         # Check if the order was created
-        order = Order.objects.filter(user=self.user, donation=self.donation, order_status='pending').first()
+        order = Order.objects.filter(
+            user=self.user, donation=self.donation, order_status="pending"
+        ).first()
         self.assertIsNotNone(order)
         self.assertEqual(order.order_quantity, 1)
 
@@ -150,11 +155,13 @@ class ReserveDonationTest(TestCase):
         self.donation.quantity = 0
         self.donation.save()
 
-        response = self.client.get(reverse('reserve_donation', args=[self.donation.donation_id]))
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation.donation_id])
+        )
 
         # Check if it redirects back
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse('recipient_dashboard'))
+        self.assertRedirects(response, reverse("recipient_dashboard"))
 
         # Ensure no order was created
         order = Order.objects.filter(user=self.user, donation=self.donation).first()
@@ -168,8 +175,13 @@ class ReserveDonationTest(TestCase):
     def test_reserve_donation_not_logged_in(self):
         """Test that a user must be logged in to reserve a donation."""
         self.client.logout()
-        response = self.client.get(reverse('reserve_donation', args=[self.donation.donation_id]))
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation.donation_id])
+        )
 
         # Ensure user is redirected to the login page
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, f'/accounts/login/?next=/recipient_dashboard/reserve/{self.donation.donation_id}/')
+        self.assertRedirects(
+            response,
+            f"/accounts/login/?next=/recipient_dashboard/reserve/{self.donation.donation_id}/",
+        )
