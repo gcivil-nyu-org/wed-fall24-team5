@@ -15,7 +15,7 @@ def recipient_dashboard(request):
 def reserve_donation(request, donation_id):
     donation = get_object_or_404(Donation, pk=donation_id, active=True)
     if donation.quantity <= 0:
-        messages.error(request, "This donation is no longer available.")
+        messages.warning(request, "This donation is no longer available.")
         return redirect('recipient_dashboard')
     
     # Create new order
