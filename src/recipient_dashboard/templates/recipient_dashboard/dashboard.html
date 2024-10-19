@@ -26,12 +26,12 @@
                                             <a class="button is-link is-light is-fullwidth"
                                                style="white-space: normal;
                                                       word-wrap: break-word"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization_id.address|urlencode }}"
+                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
                                                target="_blank"
                                                rel="noopener noreferrer">
-                                                {{ donation.organization_id.organization_name }}
+                                                {{ donation.organization.organization_name }}
                                                 <br>
-                                                {{ donation.organization_id.address }}
+                                                {{ donation.organization.address }}
                                             </a>
                                         </div>
                                         <div class="column is-one-third has-text-centered">
