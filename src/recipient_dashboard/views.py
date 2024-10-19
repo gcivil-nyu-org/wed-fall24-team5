@@ -19,20 +19,29 @@ def reserve_donation(request, donation_id):
             messages.warning(request, "This donation is no longer available.")
             return redirect('recipient_dashboard')
         
-        # Create new order
-        order = Order.objects.create(
-            donation=donation,
-            user=request.user,
-            order_quantity=1,  # In future : allow user to select quantity
-            order_status="pending"
-        )
-
+        # Check if the user has already reserved this donation
+        existing_order = Order.objects.filter(donation=donation, user=request.user, active=True, order_status='pending').first()
+        
+        if existing_order:
+            # Increment order quantity if an order exists
+            existing_order.order_quantity += 1
+            existing_order.save()
+            messages.success(request, "Donation reserved successfully.")
+        else:
+            # Create a new order if no existing order is found
+            Order.objects.create(
+                donation=donation,
+                user=request.user,
+                order_quantity=1,  # In the future: allow user to select quantity
+                order_status='pending'
+            )
+            messages.success(request, "Donation reserved successfully.")
+        
         # Reduce donation quantity
         donation.quantity -= 1
         donation.save()
 
-        messages.success(request, "Donation reserved successfully.")
         return redirect('recipient_dashboard')
-    except:
+    except Exception as e:
         messages.warning(request, 'Unable to reserve donation. Try again later.')
         return redirect('recipient_dashboard')
