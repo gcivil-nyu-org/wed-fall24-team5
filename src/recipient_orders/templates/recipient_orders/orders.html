@@ -1,0 +1,58 @@
+{% extends "_base.html" %}
+{% block title %}
+    My Orders
+{% endblock title %}
+{% block content %}
+<div class="container">
+    <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
+    <h2 class="subtitle mt-3">Your reservations:</h2>
+    {% if orders %}
+        <div class="columns is-multiline is-variable is-4">
+            {% for order in orders %}
+                <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                    <div class="card mb-5">
+                        <div class="card-content">
+                            <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                <div class="media-content">
+                                    <p class="title is-4 is-clipped">{{ order.donation.food_item }}</p>
+                                </div>
+                                <div class="media-right mt-2-mobile">
+                                    <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
+                                </div>
+                            </div>
+                            <div class="content">
+                                <div class="columns is-flex-direction-column-mobile">
+                                    <div class="column is-two-thirds">
+                                        <a class="button is-link is-light is-fullwidth"
+                                           style="white-space: normal;
+                                                  word-wrap: break-word"
+                                           href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization_id.address|urlencode }}"
+                                           target="_blank"
+                                           rel="noopener noreferrer">
+                                            {{ order.donation.organization.organization_name }}
+                                            <br>
+                                            {{ order.donation.organization.address }}
+                                        </a>
+                                    </div>
+                                    <div class="column is-one-third has-text-centered">
+                                        <strong>Pickup by:</strong>
+                                        <p>{{ order.donation.pickup_by }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <footer class="card-footer">
+                            <a href="#" class="card-footer-item">Modify</a>
+                            <a href="#" class="card-footer-item">Cancel</a>
+                        </footer>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% else %}
+    <div class="box">
+        <p>You haven't reserved any donations yet.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock content %}
