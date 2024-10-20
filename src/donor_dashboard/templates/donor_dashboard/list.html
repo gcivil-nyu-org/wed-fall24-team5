@@ -57,10 +57,10 @@
                         <div class="card-content is-flex-grow-1">
                             <div class="media is-flex is-justify-content-space-between">
                                 <div class="media-content">
-                                    <p class="title is-4 is-clipped">{{ org.org_name }}</p>
+                                    <p class="title is-4 is-clipped">{{ org.organization_name }}</p>
                                 </div>
                                 <div class="media-right">
-                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.type }}</span>
                                 </div>
                             </div>
                             <div class="content">
@@ -70,14 +70,14 @@
                                         <div class="button is-link is-light has-text-centered"
                                              style="white-space: normal;
                                                     word-wrap: break-word;
-                                                    overflow-wrap: break-word">{{ org.org_address }}</div>
+                                                    overflow-wrap: break-word">{{ org.address }}</div>
                                     </div>
                                     <div class="column is-full-mobile is-half-tablet has-text-centered">
-                                        <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
-                                        <p>{{ org.org_contact_number }}</p>
-                                        <a href="{{ org.org_website }}"
+                                        <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.email }}</p>
+                                        <p>{{ org.contact_number }}</p>
+                                        <a href="{{ org.website }}"
                                            style="word-wrap: break-word;
-                                                  overflow-wrap: break-word">{{ org.org_website }}</a>
+                                                  overflow-wrap: break-word">{{ org.website }}</a>
                                         <!-- djlint:on -->
                                     </div>
                                 </div>
