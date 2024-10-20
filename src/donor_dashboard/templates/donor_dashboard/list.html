@@ -4,6 +4,21 @@
 {% endblock title %}
 {% block content %}
     <div class="container">
+                
+        <!-- Notification -->
+        {% if messages %}
+        <!-- djlint:off --> 
+            <div id="notification-area" style="position: absolute; top: 5px; right: 5px; z-index: 1000;">
+                {% for message in messages %}
+                    <div class="notification is-{{ message.tags }}" style="width: auto; padding-right: 2.5rem;">
+                        <button class="delete" style="position: absolute; right: 10px;"></button>
+                    <!-- djlint:on -->
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-4">
             <strong>Add a new Organization</strong>
@@ -51,44 +66,67 @@
             <strong>Your organizations</strong>
         </h2>
         <div class="columns is-multiline is-variable is-4">
-            {% for org in org_list %}
-                <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                    <div class="card mb-5 is-flex is-flex-direction-column">
-                        <div class="card-content is-flex-grow-1">
-                            <div class="media is-flex is-justify-content-space-between">
-                                <div class="media-content">
-                                    <p class="title is-4 is-clipped">{{ org.org_name }}</p>
-                                </div>
-                                <div class="media-right">
-                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <div class="columns">
-                                    <div class="column is-full-mobile is-half-tablet">
-                                        <!-- djlint:off -->
-                                        <div class="button is-link is-light has-text-centered"
-                                             style="white-space: normal;
-                                                    word-wrap: break-word;
-                                                    overflow-wrap: break-word">{{ org.org_address }}</div>
+            {% if org_list %}
+                {% for org in org_list %}
+                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                        <div class="card mb-5 is-flex is-flex-direction-column">
+                            <div class="card-content is-flex-grow-1">
+                                <div class="media is-flex is-justify-content-space-between">
+                                    <div class="media-content">
+                                        <p class="title is-4 is-clipped">{{ org.org_name }}</p>
                                     </div>
-                                    <div class="column is-full-mobile is-half-tablet has-text-centered">
-                                        <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
-                                        <p>{{ org.org_contact_number }}</p>
-                                        <a href="{{ org.org_website }}"
-                                           style="word-wrap: break-word;
-                                                  overflow-wrap: break-word">{{ org.org_website }}</a>
-                                        <!-- djlint:on -->
+                                    <div class="media-right">
+                                        <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
                                     </div>
                                 </div>
+                                <div class="content">
+                                    <div class="columns">
+                                        <div class="column is-full-mobile is-half-tablet">
+                                            <!-- djlint:off -->
+                                            <div class="button is-link is-light has-text-centered"
+                                                style="white-space: normal;
+                                                        word-wrap: break-word;
+                                                        overflow-wrap: break-word">{{ org.org_address }}</div>
+                                        </div>
+                                        <div class="column is-full-mobile is-half-tablet has-text-centered">
+                                            <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
+                                            <p>{{ org.org_contact_number }}</p>
+                                            <a href="{{ org.org_website }}"
+                                            style="word-wrap: break-word;
+                                                    overflow-wrap: break-word">{{ org.org_website }}</a>
+                                            <!-- djlint:on -->
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
+                            <footer class="card-footer mt-auto">
+                                <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}" class="card-footer-item">Manage Organization</a>
+                            </footer>
                         </div>
-                        <footer class="card-footer mt-auto">
-                            <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}" class="card-footer-item">Manage Organization</a>
-                        </footer>
                     </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <p class="box">You are not a part of any organizations yet!!</p>
+            {% endif %}
         </div>
     </div>
+    <script>
+        // Auto-dismiss notification after 10 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 10000);
+            });
+
+            // Enable close button on notification
+            const closeButtons = document.querySelectorAll('.delete');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.parentElement.style.display = 'none';
+                });
+            });
+        });
+    </script>
 {% endblock content %}
