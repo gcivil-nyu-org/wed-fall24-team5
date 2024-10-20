@@ -14,7 +14,7 @@ jobs:
         - black --check ./src
         - flake8 ./src
         - djlint src/ --lint
-        - coverage run --source='src' src/manage.py test
+        - coverage run --source='src' src/manage.py test src
         - coverage report
         - coveralls
 
@@ -24,7 +24,7 @@ jobs:
         - black --check ./src
         - flake8 ./src
         - djlint src/ --lint        
-        - coverage run --source='src' src/manage.py test
+        - coverage run --source='src' src/manage.py test src
         - coverage report
         - python src/manage.py makemigrations
         - python src/manage.py migrate
@@ -48,7 +48,7 @@ jobs:
         - black --check ./src
         - flake8 ./src
         - djlint src/ --lint
-        - coverage run --source='src' src/manage.py test
+        - coverage run --source='src' src/manage.py test src
         - coverage report
         - python src/manage.py makemigrations
         - python src/manage.py migrate
