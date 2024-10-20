@@ -27,10 +27,13 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv("DJANGO_SECRET_KEY")
 
 # Load DEBUG from environment variables, default to False if not set
-DEBUG = True
+DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = [
     "food-donation-swe-dev.us-east-1.elasticbeanstalk.com",
+    "food-donation-swe-prod.us-east-1.elasticbeanstalk.com",
+    "fooddonation-dev.com",
+    "fooddonation-prod.com",
     "172.31.30.180",  # PostGres
     "34.202.22.62",  # PostGres
     "127.0.0.1",
@@ -52,6 +55,7 @@ INSTALLED_APPS = [
     # Other apps (custom or third-party apps go here)
     "donor_dashboard",  # Custom app for Donor dashboard
     "recipient_dashboard",  # Custom app for recipient_dashboard
+    "recipient_orders",  # View orders placed by a recipient
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
     "compressor",  # Compresses linked and inline JavaScript or CSS into a single cached file # noqa
@@ -201,3 +205,14 @@ ACCOUNT_AUTHENTICATION_METHOD = "email"
 ACCOUNT_EMAIL_REQUIRED = True
 ACCOUNT_USERNAME_REQUIRED = False
 ACCOUNT_EMAIL_VERIFICATION = "none"
+
+# ******** HTTPS Setups ********#
+# Redirect HTTP to HTTPS
+# To allow local development to not redirect to HTTPS. Default to HTTPS
+SECURE_SSL_REDIRECT = os.getenv("SSL_REDIRECT", "True") == "True"
+# Enforce HTTP Strict Transport Security (HSTS) for 1 year
+SECURE_HSTS_SECONDS = 31536000
+# Allow site to be included in browsers' HSTS preload lists
+SECURE_HSTS_PRELOAD = True
+# Apply HSTS to all subdomains
+SECURE_HSTS_INCLUDE_SUBDOMAINS = True

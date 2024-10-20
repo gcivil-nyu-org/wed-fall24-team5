@@ -197,5 +197,5 @@ coverage run --source='src' src/manage.py test
 
 - This application is set up for deployment using AWS Elastic Beanstalk.
 - Deployment is handled using Travis CI. Deployments are automatic on pushes to the `main` branch or the `develop` branch
-- The `develop` branch deploys [here](http://food-donation-swe-dev.us-east-1.elasticbeanstalk.com).
-- The `main` branch is currently undeployed.
+- The `develop` branch deploys [here](fooddonation-dev.com).
+- The `main` branch deploys [here](fooddonation-prod.com).

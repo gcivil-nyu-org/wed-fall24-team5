@@ -4,6 +4,21 @@
 {% endblock title %}
 {% block content %}
     <div class="container">
+
+        <!-- Notification -->
+        {% if messages %}
+        <!-- djlint:off --> 
+            <div id="notification-area" style="position: absolute; top: 5px; right: 5px; z-index: 1000;">
+                {% for message in messages %}
+                    <div class="notification is-{{ message.tags }}" style="width: auto; padding-right: 2.5rem;">
+                        <button class="delete" style="position: absolute; right: 10px;"></button>
+                    <!-- djlint:on -->
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
+
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-3">List of Available Donations:</h2>
         {% if donations %}
@@ -26,7 +41,7 @@
                                             <a class="button is-link is-light is-fullwidth"
                                                style="white-space: normal;
                                                       word-wrap: break-word"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization_id.address|urlencode }}"
+                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
                                                target="_blank"
                                                rel="noopener noreferrer">
                                                 {{ donation.organization.organization_name }}
@@ -42,7 +57,8 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
-                                <a href="#" class="card-footer-item">Reserve</a>
+                                <a href="{% url 'reserve_donation' donation.donation_id %}"
+                                   class="card-footer-item">Reserve</a>
                             </footer>
                         </div>
                     </div>
@@ -52,4 +68,23 @@
             <p class="box">No donations available at the moment.</p>
         {% endif %}
     </div>
+    <script>
+        // Auto-dismiss notification after 10 seconds
+        document.addEventListener('DOMContentLoaded', () => {
+            const notifications = document.querySelectorAll('.notification');
+            notifications.forEach(notification => {
+                setTimeout(() => {
+                    notification.style.display = 'none';
+                }, 10000);
+            });
+
+            // Enable close button on notification
+            const closeButtons = document.querySelectorAll('.delete');
+            closeButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    button.parentElement.style.display = 'none';
+                });
+            });
+        });
+    </script>
 {% endblock content %}
