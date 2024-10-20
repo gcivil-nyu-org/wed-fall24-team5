@@ -67,10 +67,12 @@
 
     <div id="addDonationModal" class="modal">
         <div class="modal-content">
+            <!-- djlint:off -->
             <span class="close" name="modal-close" id="closeModal">&times;</span>
+            <!-- djlint:on -->
             <h2>Add a Donation</h2>
             <hr>
-            <form method="POST" action="{% url 'donor_dashboard:add_donation' %}">
+            <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
                 {% csrf_token %}
                 <!-- Donation Form Fields -->
                 <div class="field">

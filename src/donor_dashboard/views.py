@@ -82,18 +82,21 @@ def delete_organization(request, organization_id):
     #     return redirect('organization_list')
     # return HttpResponse(status=405)  # Method not allowed if it's not POST
 
+
 @login_required
 def add_donation(request):
-    if request.method == 'POST':
-        food_item = request.POST['food_item']
-        quantity = request.POST['quantity']
-        pickup_by = request.POST['pickup_by']
-        organization_id = request.POST['organization']
+    if request.method == "POST":
+        food_item = request.POST["food_item"]
+        quantity = request.POST["quantity"]
+        pickup_by = request.POST["pickup_by"]
+        organization_id = request.POST["organization"]
         Donation.objects.create(
             food_item=food_item,
             quantity=quantity,
             pickup_by=pickup_by,
-            organization_id=organization_id
+            organization_id=organization_id,
         )
-        return redirect('donor_dashboard:manage_organization', organization_id=organization_id)
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )
     return redirect("/")
