@@ -97,7 +97,6 @@ def add_donation(request):
             pickup_by=pickup_by,
             organization_id=organization_id,
         )
-        messages.success(request, f'Donation: "{food_item}" added successfully.')
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
