@@ -94,7 +94,6 @@ class UserReview(models.Model):
 
 # As it currently stands it is users sending eachother messages, which needs to change to users exchanging messages with organizations.
 class Message(models.Model):
-    id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     message_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     sender_user = models.ForeignKey(
         User,

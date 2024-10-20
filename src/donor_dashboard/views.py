@@ -54,9 +54,7 @@ def get_org_list(request):
         )
 
     return render(
-        request,
-        "donor_dashboard/manage_organization.html",
-        {"organization": organization},
+        request, "donor_dashboard/list.html", {"org_list": org_list, "form": form}
     )
 
 
