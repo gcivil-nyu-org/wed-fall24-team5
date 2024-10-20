@@ -77,7 +77,9 @@ def delete_organization(request, organization_id):
         organization = Organization.objects.get(organization_id=organization_id)
         organization_name = organization.organization_name
         organization.delete()
-        messages.success(request, f'Organization "{organization_name}" deleted successfully.')
+        messages.success(
+            request, f'Organization "{organization_name}" deleted successfully.'
+        )
         return redirect("donor_dashboard:org_list")
     return redirect("donor_dashboard:org_list")
 
