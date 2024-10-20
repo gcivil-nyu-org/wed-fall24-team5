@@ -1,39 +1,15 @@
 {% extends "_base.html" %}
-
+{% load static %}
 {% block content %}
-<style>
-    .flex-container {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-    }
-
-    .subtitle {
-        margin: 0; /* Remove extra margin if any */
-    }
-
-    .manage-donation-button {
-        white-space: normal;
-        word-wrap: break-word;
-    }
-
-    .delete-link {
-        color: red;
-    }
-</style>
-<script>
-    function confirmDelete() {
-        if (confirm("Are you sure you want to delete this organization?")) {
-            document.getElementById("delete-form").submit();
-        }
-    }
-</script>
+<link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
+<script src="{% static 'js/manage_organization.js' %}"></script>
     <div class="container">
         <div class="flex-container">
             <h2 class="subtitle mt-5">
                 <strong>{{ organization.organization_name }}</strong>
             </h2>
             <div class="buttons">
+                <button id="add-donation-button" class="button is-dark">Add Donation</button>
                 <a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}" class="button is-info">
                     Manage Organization
                 </a>
@@ -65,7 +41,6 @@
                                             <div class="column is-two-thirds">
                                                 <a class="button is-link is-light is-fullwidth manage-donation-button"
                                                 href="#"
-                                                target="_blank"
                                                 rel="noopener noreferrer">
                                                 {{ donation.organization_id.organization_name }}
                                                 Manage Donation
@@ -88,5 +63,52 @@
             {% else %}
                 <p class="box">No donations available at the moment.</p>
             {% endif %}
+    </div>
+
+    <div id="addDonationModal" class="modal">
+        <div class="modal-content">
+            <!-- djlint:off -->
+            <span class="close" name="modal-close" id="closeModal">&times;</span>
+            <!-- djlint:on -->
+            <h2>Add a Donation</h2>
+            <hr>
+            <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
+                {% csrf_token %}
+                <!-- Donation Form Fields -->
+                <div class="field">
+                    <label class="label">Food Item</label>
+                    <div class="control">
+                        <input class="input" type="text" name="food_item" placeholder="Food item">
+                    </div>
+                </div>
+    
+                <div class="field">
+                    <label class="label">Quantity</label>
+                    <div class="control">
+                        <input class="input" type="number" name="quantity" placeholder="Quantity">
+                    </div>
+                </div>
+    
+                <div class="field">
+                    <label class="label">Pickup By</label>
+                    <div class="control">
+                        <input class="input" type="date" name="pickup_by">
+                    </div>
+                </div>
+    
+                <div class="field" hidden>
+                    <label class="label">Organization</label>
+                    <div class="control">
+                        <input type="hidden" name="organization" value="{{ organization.organization_id }}">
+                    </div>
+                </div>
+    
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
     </div>
 {% endblock content %}
