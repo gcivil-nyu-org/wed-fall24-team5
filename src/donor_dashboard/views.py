@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect  # noqa
+from django.shortcuts import render, redirect, get_object_or_404  # noqa
 from database.models import Organization, OrganizationAdmin, User, Donation
 from django.contrib import messages
 from donor_dashboard.forms import AddOrganizationForm
@@ -22,7 +22,6 @@ def add_organization(request):
 
 @login_required
 def get_org_list(request):
-
     if request.method == "POST":
         form = AddOrganizationForm(request.POST)
         if form.is_valid():
@@ -99,4 +98,25 @@ def add_donation(request):
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
+    return redirect("/")
+
+def modify_donation(request, donation_id):
+    donation = get_object_or_404(Donation, id=donation_id)
+    
+    if request.method == 'POST':
+        food_item = request.POST["food_item"]
+        quantity = request.POST["quantity"]
+        pickup_by = request.POST["pickup_by"]
+        organization_id = request.POST["organization"]
+        
+        donation.food_item = food_item
+        donation.quantity = quantity
+        donation.pickup_by = pickup_by
+        
+        donation.save()
+        
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )
+
     return redirect("/")

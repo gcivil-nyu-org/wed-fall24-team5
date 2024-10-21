@@ -28,4 +28,17 @@ document.addEventListener("DOMContentLoaded", function() {
             modal.style.display = "none";
         }
     };
+
+    function openEditModal(donationId, foodItem, quantity, pickupBy, organizationId) {
+        document.querySelector('input[name="food_item"]').value = foodItem;
+        document.querySelector('input[name="quantity"]').value = quantity;
+        document.querySelector('input[name="pickup_by"]').value = pickupBy;
+        document.querySelector('input[name="organization"]').value = organizationId;
+    
+        const modalForm = document.querySelector('#addDonationModal form');
+        modalForm.action = `{% url 'donor_dashboard:modify_donation' donationId %}`;
+    
+        const modal = document.getElementById('addDonationModal');
+        modal.style.display = 'block';
+    }
 });
