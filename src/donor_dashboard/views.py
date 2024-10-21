@@ -1,7 +1,7 @@
 from django.shortcuts import render, redirect  # noqa
-from database.models import Organization, OrganizationAdmin, User
+from database.models import Organization, OrganizationAdmin, User, Donation
 from django.contrib import messages
-from .forms import AddOrganizationForm
+from donor_dashboard.forms import AddOrganizationForm
 from django.contrib.auth.decorators import login_required
 
 
@@ -58,12 +58,45 @@ def get_org_list(request):
     )
 
 
+@login_required
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
+    donations = Donation.objects.filter(organization=organization)
 
     return render(
         request,
         "donor_dashboard/manage_organization.html",
-        {"organization": organization},
+        {"organization": organization, "donations": donations},
     )
+
+
+@login_required
+def delete_organization(request, organization_id):
+    return redirect("donor_dashboard:org_list")
+    # if request.method == "POST":
+    #     organization = get_object_or_404(Organization, id=organization_id)
+    #     organization_name = organization.organization_name
+    #     organization.delete()
+    #     messages.success(request, f'Organization "{organization_name}" deleted successfully.')
+    #     return redirect('organization_list')
+    # return HttpResponse(status=405)  # Method not allowed if it's not POST
+
+
+@login_required
+def add_donation(request):
+    if request.method == "POST":
+        food_item = request.POST["food_item"]
+        quantity = request.POST["quantity"]
+        pickup_by = request.POST["pickup_by"]
+        organization_id = request.POST["organization"]
+        Donation.objects.create(
+            food_item=food_item,
+            quantity=quantity,
+            pickup_by=pickup_by,
+            organization_id=organization_id,
+        )
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )
+    return redirect("/")
