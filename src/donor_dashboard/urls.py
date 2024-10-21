@@ -16,5 +16,10 @@ urlpatterns = [
         views.delete_organization,
         name="delete_organization",
     ),
+    path(
+        "organization_details/<uuid:organization_id>/",
+        views.organization_details,
+        name="organization_details",
+    ),
     path("add_donation/", views.add_donation, name="add_donation"),
 ]
