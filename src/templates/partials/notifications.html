@@ -1,0 +1,13 @@
+<!-- Notification -->
+{% if messages %}
+<!-- djlint:off -->
+<div id="notification-area" style="position: absolute; top: 5px; right: 5px; z-index: 1000;">
+    {% for message in messages %}
+    <div class="notification is-{{ message.tags }}" style="width: auto; padding-right: 2.5rem;">
+        <button class="delete" style="position: absolute; right: 10px;"></button>
+        <!-- djlint:on -->
+        {{ message }}
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
