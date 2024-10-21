@@ -7,12 +7,15 @@ from django.db.models import Q
 
 @login_required
 def recipient_dashboard(request):
-    donations = Donation.objects.filter(Q(active=True) & Q(quantity__gt=0)).order_by("created_at")
+    donations = Donation.objects.filter(Q(active=True) & Q(quantity__gt=0)).order_by(
+        "created_at"
+    )
     categories = Organization.objects.values_list("type", flat=True).distinct()
     if request.method == "GET":
         keyword = request.GET.get("keyword")
         category = request.GET.get("category")
         type = request.GET.get("type")
+        quantity = request.GET.get("quantity")
         filter_food = Q(food_item__icontains=keyword)
         filter_org = Q(organization_id__organization_name__icontains=keyword)
         if keyword:
@@ -24,6 +27,8 @@ def recipient_dashboard(request):
                 donations = donations.filter(filter_food | filter_org)
         if category:
             donations = donations.filter(organization_id__type=category)
+        if quantity:
+            donations = donations.filter(quantity__gte=quantity)
 
     context = {
         "donations": donations,
@@ -31,6 +36,7 @@ def recipient_dashboard(request):
         "keyword": keyword,
         "category": category,
         "type": type,
+        "quantity": quantity,
     }
     return render(request, "recipient_dashboard/dashboard.html", context)
 
