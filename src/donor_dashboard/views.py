@@ -43,28 +43,22 @@ def get_org_list(request):
     for organization_admin in organization_admin_list:
         organization = organization_admin.organization
         obj = {
-            "org_id": organization.organization_id,
-            "org_name": organization.organization_name,
-            "org_type": organization.type,
-            "org_address": organization.address,
-            "org_zipcode": organization.zipcode,
-            "org_email": organization.email,
-            "org_website": organization.website,
-            "org_contact_number": organization.contact_number,
-        }
+                "org_id": organization.organization_id,
+                "org_name": organization.organization_name,
+                "org_type": organization.type,
+                "org_address": organization.address,
+                "org_zipcode": organization.zipcode,
+                "org_email": organization.email,
+                "org_website": organization.website,
+                "org_contact_number": organization.contact_number,
+                }
         if organization.active:
             active_org_list.append(obj)
         else:
             inactive_org_list.append(obj)
 
     return render(
-        request,
-        "donor_dashboard/list.html",
-        {
-            "active_org_list": active_org_list,
-            "inactive_org_list": inactive_org_list,
-            "form": form,
-        },
+        request, "donor_dashboard/list.html", {"active_org_list": active_org_list, "inactive_org_list":inactive_org_list, "form": form}
     )
 
 
@@ -112,18 +106,18 @@ def delete_organization(request, organization_id):
         # Set the active field in Donations to False for soft delete
         donations = Donation.objects.filter(organization=organization)
         for donation in donations:
-
+            
             # Set the active field in Orders to False for soft delete
             orders = Order.objects.filter(donation=donation)
             for order in orders:
                 order.active = False
                 order.save()
-
+            
             donation.active = False
             donation.save()
-
+        
         # Set the active field in Organization to False for soft delete
-        organization.active = False
+        organization.active = False  
         organization.save()
 
         organization_name = organization.organization_name
