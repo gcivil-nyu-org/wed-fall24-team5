@@ -11,7 +11,6 @@ def recipient_dashboard(request):
         request, "recipient_dashboard/dashboard.html", {"donations": donations}
     )
 
-
 @login_required
 def reserve_donation(request, donation_id):
     donation = get_object_or_404(Donation, pk=donation_id, active=True)
@@ -33,3 +32,47 @@ def reserve_donation(request, donation_id):
 
     messages.success(request, "Donation reserved successfully.")
     return redirect("recipient_dashboard")
+
+def search_donation(request, keyword):
+    donations = Donation.objects.filter(food_item__icontains=keyword)
+    return render(
+        request, "recipient_dashboard/dashboard.html", {"donations": donations}
+    )
+
+
+@login_required
+def reserve_donation(request, donation_id):
+    try:
+        donation = get_object_or_404(Donation, pk=donation_id, active=True)
+        if donation.quantity <= 0:
+            messages.warning(request, "This donation is no longer available.")
+            return redirect("recipient_dashboard")
+
+        # Check if the user has already reserved this donation
+        existing_order = Order.objects.filter(
+            donation=donation, user=request.user, active=True, order_status="pending"
+        ).first()
+
+        if existing_order:
+            # Increment order quantity if an order exists
+            existing_order.order_quantity += 1
+            existing_order.save()
+            messages.success(request, "Donation reserved successfully.")
+        else:
+            # Create a new order if no existing order is found
+            Order.objects.create(
+                donation=donation,
+                user=request.user,
+                order_quantity=1,  # In the future: allow user to select quantity
+                order_status="pending",
+            )
+            messages.success(request, "Donation reserved successfully.")
+
+        # Reduce donation quantity
+        donation.quantity -= 1
+        donation.save()
+
+        return redirect("recipient_dashboard")
+    except Exception:
+        messages.warning(request, "Unable to reserve donation. Try again later.")
+        return redirect("recipient_dashboard")
