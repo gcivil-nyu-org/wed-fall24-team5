@@ -4,37 +4,32 @@ os: linux
 python:
   - "3.11"
 
-# Ensure Travis CI only builds for pull requests, pushes to specific branches, and CRON jobs
-branches:
-  only:
-    - main
-    - develop
-
 install:
   - pip install -r requirements.txt
 
 services:
   - postgresql
-  
-before_script:
-  - psql -c 'create database test_db;' -U postgres
-  - python src/manage.py makemigrations
-  - python src/manage.py migrate
-script:
-  - black --check ./src
-  - flake8 ./src
-  - djlint src/ --lint        
-  - coverage run --source='src' src/manage.py test src --noinput
-  - coverage report
-  - coveralls
-  - python src/manage.py collectstatic --noinput
 
 # Add a new job that handles the CRON job (merging develop into main)
 jobs:
   include:
     - stage: merge-develop-into-main
       if: type = cron
+      branches:
+        only:
+          - main
+      before_script:
+        - psql -c 'create database test_db;' -U postgres
+        - python src/manage.py makemigrations
+        - python src/manage.py migrate
       script:
+        - black --check ./src
+        - flake8 ./src
+        - djlint src/ --lint        
+        - coverage run --source='src' src/manage.py test src --noinput
+        - coverage report
+        - coveralls
+        - python src/manage.py collectstatic --noinput
         - git config --global user.name "travis-ci"
         - git config --global user.email "travis-cron@travis-ci.com"
         - git remote set-url origin https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git
@@ -42,27 +37,43 @@ jobs:
         - git checkout main
         - git merge origin/develop
         - git push origin main
-  
-deploy:
-  - provider: elasticbeanstalk
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    region: "us-east-1"
-    app: "wed-fall24-team5"
-    env: "food-donation-swe-dev"
-    bucket_name: "elasticbeanstalk-us-east-1-149536460878"
-    on:
-      repo: gcivil-nyu-org/wed-fall24-team5
-      branch: develop
+      deploy:
+        - provider: elasticbeanstalk
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: "us-east-1"
+          app: "wed-fall24-team5"
+          env: "food-donation-swe-prod"
+          bucket_name: "elasticbeanstalk-us-east-1-149536460878"
+          on:
+            repo: gcivil-nyu-org/wed-fall24-team5
+            branch: main
+    - stage: test-and-send-to-dev
+      branches:
+        only:
+          - develop
+      before_script:
+        - psql -c 'create database test_db;' -U postgres
+        - python src/manage.py makemigrations
+        - python src/manage.py migrate
+      script:
+        - black --check ./src
+        - flake8 ./src
+        - djlint src/ --lint        
+        - coverage run --source='src' src/manage.py test src --noinput
+        - coverage report
+        - coveralls
+        - python src/manage.py collectstatic --noinput
+      deploy:
+        - provider: elasticbeanstalk
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: "us-east-1"
+          app: "wed-fall24-team5"
+          env: "food-donation-swe-dev"
+          bucket_name: "elasticbeanstalk-us-east-1-149536460878"
+          on:
+            repo: gcivil-nyu-org/wed-fall24-team5
+            branch: develop
     
-deploy:
-  - provider: elasticbeanstalk
-    access_key_id: $AWS_ACCESS_KEY_ID
-    secret_access_key: $AWS_SECRET_ACCESS_KEY
-    region: "us-east-1"
-    app: "wed-fall24-team5"
-    env: "food-donation-swe-prod"
-    bucket_name: "elasticbeanstalk-us-east-1-149536460878"
-    on:
-      repo: gcivil-nyu-org/wed-fall24-team5
-      branch: main
+
