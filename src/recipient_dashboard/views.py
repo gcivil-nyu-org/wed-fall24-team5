@@ -7,24 +7,21 @@ from django.db.models import Q
 
 @login_required
 def recipient_dashboard(request):
-    donations = Donation.objects.filter(active=True).order_by("created_at")
+    donations = Donation.objects.filter(Q(active=True) & Q(quantity__gt=0)).order_by("created_at")
     categories = Organization.objects.values_list("type", flat=True).distinct()
     if request.method == "GET":
         keyword = request.GET.get("keyword")
         category = request.GET.get("category")
         type = request.GET.get("type")
+        filter_food = Q(food_item__icontains=keyword)
+        filter_org = Q(organization_id__organization_name__icontains=keyword)
         if keyword:
             if type == "food":
-                donations = donations.filter(food_item__icontains=keyword)
+                donations = donations.filter(filter_food)
             elif type == "org":
-                donations = donations.filter(
-                    organization_id__organization_name__icontains=keyword
-                )
+                donations = donations.filter(filter_org)
             else:
-                donations = donations.filter(
-                    Q(food_item__icontains=keyword)
-                    | Q(organization_id__organization_name__icontains=keyword)
-                )
+                donations = donations.filter(filter_food | filter_org)
         if category:
             donations = donations.filter(organization_id__type=category)
 
