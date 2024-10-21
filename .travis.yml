@@ -15,10 +15,11 @@ install:
 
 services:
   - postgresql
+  
 before_script:
   - psql -c 'create database test_db;' -U postgres
+  - python src/manage.py makemigrations
   - python src/manage.py migrate
-
 script:
   - black --check ./src
   - flake8 ./src
@@ -26,8 +27,6 @@ script:
   - coverage run --source='src' src/manage.py test src --noinput
   - coverage report
   - coveralls
-  - python src/manage.py makemigrations
-  - python src/manage.py migrate
   - python src/manage.py collectstatic --noinput
   
 deploy:
