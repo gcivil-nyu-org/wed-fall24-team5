@@ -73,14 +73,15 @@ def manage_organization(request, organization_id):
 
 @login_required
 def delete_organization(request, organization_id):
+    if request.method == "POST":
+        organization = Organization.objects.get(organization_id=organization_id)
+        organization_name = organization.organization_name
+        organization.delete()
+        messages.success(
+            request, f'Organization "{organization_name}" deleted successfully.'
+        )
+        return redirect("donor_dashboard:org_list")
     return redirect("donor_dashboard:org_list")
-    # if request.method == "POST":
-    #     organization = get_object_or_404(Organization, id=organization_id)
-    #     organization_name = organization.organization_name
-    #     organization.delete()
-    #     messages.success(request, f'Organization "{organization_name}" deleted successfully.')
-    #     return redirect('organization_list')
-    # return HttpResponse(status=405)  # Method not allowed if it's not POST
 
 
 def add_donation(request):
