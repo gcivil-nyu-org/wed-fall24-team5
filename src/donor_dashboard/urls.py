@@ -21,7 +21,8 @@ urlpatterns = [
         views.organization_details,
         name="organization_details",
     ),
-    path("add_donation/",
+    path(
+        "add_donation/",
         views.add_donation,
         name="add_donation",
     ),
