@@ -1,8 +1,10 @@
-from django.shortcuts import render, redirect  # noqa
+from django.shortcuts import render, redirect, get_object_or_404  # noqa
 from database.models import Organization, OrganizationAdmin, User, Donation
 from django.contrib import messages
 from donor_dashboard.forms import AddOrganizationForm
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from .helpers import validate_donation
 
 
 @login_required
@@ -22,7 +24,6 @@ def add_organization(request):
 
 @login_required
 def get_org_list(request):
-
     if request.method == "POST":
         form = AddOrganizationForm(request.POST)
         if form.is_valid():
@@ -63,7 +64,6 @@ def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
     donations = Donation.objects.filter(organization=organization)
-
     return render(
         request,
         "donor_dashboard/manage_organization.html",
@@ -83,20 +83,67 @@ def delete_organization(request, organization_id):
     # return HttpResponse(status=405)  # Method not allowed if it's not POST
 
 
-@login_required
 def add_donation(request):
     if request.method == "POST":
         food_item = request.POST["food_item"]
-        quantity = request.POST["quantity"]
-        pickup_by = request.POST["pickup_by"]
-        organization_id = request.POST["organization"]
+        quantity = request.POST.get("quantity")
+        pickup_by = request.POST.get("pickup_by")
+        organization_id = request.POST.get("organization")
+
+        # Validate Donation
+        errors = validate_donation(food_item, quantity, pickup_by, organization_id)
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return redirect(
+                "donor_dashboard:manage_organization", organization_id=organization_id
+            )
+
+        # Create new donation if all validations pass
         Donation.objects.create(
             food_item=food_item,
-            quantity=quantity,
-            pickup_by=pickup_by,
+            quantity=int(quantity),
+            pickup_by=timezone.datetime.strptime(pickup_by, "%Y-%m-%d").date(),
             organization_id=organization_id,
         )
+
+        messages.success(request, f"Donation: {food_item} added successfully!")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
+
+    return redirect("/")
+
+
+def modify_donation(request, donation_id):
+    donation = get_object_or_404(Donation, donation_id=donation_id)
+    if request.method == "POST":
+        food_item = request.POST["food_item"]
+        quantity = request.POST.get("quantity")
+        pickup_by = request.POST.get("pickup_by")
+        organization_id = request.POST.get("organization")
+
+        # Use the validation function
+        errors = validate_donation(food_item, quantity, pickup_by, organization_id)
+
+        if errors:
+            for error in errors:
+                messages.error(request, error)
+            return redirect(
+                "donor_dashboard:manage_organization", organization_id=organization_id
+            )
+
+        # Update donation if all validations pass
+        donation.food_item = food_item
+        donation.quantity = int(quantity)  # Convert to integer before saving
+        donation.pickup_by = timezone.datetime.strptime(pickup_by, "%Y-%m-%d").date()
+        donation.organization_id = organization_id
+        donation.save()
+
+        messages.success(request, f"Donation: {food_item} modified successfully!")
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )
+
     return redirect("/")
