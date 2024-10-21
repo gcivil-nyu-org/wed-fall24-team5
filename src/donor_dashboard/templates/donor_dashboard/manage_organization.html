@@ -21,8 +21,9 @@
             <h2 class="subtitle mt-5">
                 <strong>{{ organization.organization_name }}</strong>
             </h2>
+            <div id="organization-id" hidden>{{ organization.organization_id }}</div>
             <div class="buttons">
-                <button id="add-donation-button" class="button is-dark">Add Donation</button>
+                <button id="add-donation-button" class="button is-dark" data-organization-id="{{ donation.organization.organization_id }}">Add Donation</button>
                 <a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}" class="button is-info">
                     Manage Organization
                 </a>

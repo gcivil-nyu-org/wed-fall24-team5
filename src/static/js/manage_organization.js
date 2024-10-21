@@ -10,10 +10,11 @@ document.addEventListener("DOMContentLoaded", function() {
         addDonationButton.onclick = function() {
             const modalHeader = document.getElementById('modal-header');
             modalHeader.textContent = 'Add a Donation'; 
+            const organizationId =  document.getElementById('organization-id').innerHTML;
             document.querySelector('input[name="food_item"]').value = "";
             document.querySelector('input[name="quantity"]').value = "";
             document.querySelector('input[name="pickup_by"]').value = "";
-            document.querySelector('input[name="organization"]').value = "";
+            document.querySelector('input[name="organization"]').value = organizationId;
 
             const modalForm = document.querySelector('#addDonationModal form');
             modalForm.action = `/donor_dashboard/add_donation/`;
@@ -30,7 +31,7 @@ document.addEventListener("DOMContentLoaded", function() {
             const foodItem = this.getAttribute('data-food-item');
             const quantity = this.getAttribute('data-quantity');
             const pickupBy = this.getAttribute('data-pickup-by');
-            const organizationId = this.getAttribute('data-organization-id');
+            const organizationId =  document.getElementById('organization-id').innerHTML;
 
             document.querySelector('input[name="food_item"]').value = foodItem;
             document.querySelector('input[name="quantity"]').value = quantity;
