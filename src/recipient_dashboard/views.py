@@ -1,19 +1,50 @@
-from database.models import Donation, Order
+from database.models import Donation, Order, Organization
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
+from django.db.models import Q
 
 
 @login_required
 def recipient_dashboard(request):
     donations = Donation.objects.filter(active=True).order_by("created_at")
+    categories = Organization.objects.values_list("type", flat=True).distinct()
+    if request.method == "GET":
+        keyword = request.GET.get("keyword")
+        category = request.GET.get("category")
+        type = request.GET.get("type")
+        if keyword:
+            if type == "food":
+                donations = donations.filter(food_item__icontains=keyword)
+            elif type == "org":
+                donations = donations.filter(organization_id__organization_name__icontains=keyword)
+            else:
+                donations = donations.filter(
+                    Q(food_item__icontains=keyword) |
+                    Q(organization_id__organization_name__icontains=keyword)
+                )
+        if category:
+            donations = donations.filter(organization_id__type=category)
+    
+    context = {
+        "donations": donations,
+        "categories": categories,
+        "keyword": keyword,
+        "category": category,
+        "type": type,
+    }
     return render(
-        request, "recipient_dashboard/dashboard.html", {"donations": donations}
+        request, "recipient_dashboard/dashboard.html", context
     )
 
 
-def search_donation(request, keyword):
+@login_required
+def search_donation(request):
     donations = Donation.objects.filter(food_item__icontains=keyword)
+    if request.method == "GET":
+        keyword = request.GET.get("keyword")
+        if keyword:
+            donations = donations.filter()
     return render(
         request, "recipient_dashboard/dashboard.html", {"donations": donations}
     )
