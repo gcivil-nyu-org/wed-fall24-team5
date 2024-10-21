@@ -62,7 +62,6 @@ def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
     donations = Donation.objects.filter(organization=organization)
-
     return render(
         request,
         "donor_dashboard/manage_organization.html",
@@ -95,28 +94,27 @@ def add_donation(request):
             pickup_by=pickup_by,
             organization_id=organization_id,
         )
+        messages.success(request, f"Donation: {food_item} added successfully!")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
     return redirect("/")
 
+
+@login_required
 def modify_donation(request, donation_id):
-    donation = get_object_or_404(Donation, id=donation_id)
-    
-    if request.method == 'POST':
+    donation = get_object_or_404(Donation, donation_id=donation_id)
+    if request.method == "POST":
         food_item = request.POST["food_item"]
         quantity = request.POST["quantity"]
         pickup_by = request.POST["pickup_by"]
         organization_id = request.POST["organization"]
-        
         donation.food_item = food_item
         donation.quantity = quantity
         donation.pickup_by = pickup_by
-        
         donation.save()
-        
+        messages.success(request, f"Donation: {food_item} modified successfully!")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
-
     return redirect("/")

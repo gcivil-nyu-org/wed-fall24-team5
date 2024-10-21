@@ -4,6 +4,19 @@
 <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
 <script src="{% static 'js/manage_organization.js' %}"></script>
     <div class="container">
+        <!-- Notification -->
+        {% if messages %}
+        <!-- djlint:off --> 
+            <div id="notification-area" style="position: absolute; top: 5px; right: 5px; z-index: 1000;">
+                {% for message in messages %}
+                    <div class="notification is-{{ message.tags }}" style="width: auto; padding-right: 2.5rem;">
+                        <button class="delete" style="position: absolute; right: 10px;"></button>
+                    <!-- djlint:on -->
+                        {{ message }}
+                    </div>
+                {% endfor %}
+            </div>
+        {% endif %}
         <div class="flex-container">
             <h2 class="subtitle mt-5">
                 <strong>{{ organization.organization_name }}</strong>
@@ -38,14 +51,6 @@
                                     </div>
                                     <div class="content">
                                         <div class="columns is-flex-direction-column-mobile">
-                                            <div class="column is-two-thirds">
-                                                <a class="button is-link is-light is-fullwidth manage-donation-button"
-                                                href="#"
-                                                rel="noopener noreferrer">
-                                                {{ donation.organization_id.organization_name }}
-                                                Manage Donation
-                                                </a>
-                                            </div>
                                             <div class="column is-one-third has-text-centered">
                                                 <strong>Pickup by:</strong>
                                                 <p>{{ donation.pickup_by }}</p>
@@ -54,6 +59,14 @@
                                     </div>
                                 </div>
                                 <footer class="card-footer">
+                                    <a href="#" class="card-footer-item edit-link" 
+                                       data-id="{{ donation.donation_id }}" 
+                                       data-food-item="{{ donation.food_item }}" 
+                                       data-quantity="{{ donation.quantity }}" 
+                                       data-pickup-by="{{ donation.pickup_by|date:'Y-m-d' }}"
+                                       data-organization-id="{{ donation.organization.organization_id }}">
+                                       Modify
+                                    </a>
                                     <a href="#" class="card-footer-item delete-link">Delete</a>
                                 </footer>
                             </div>
@@ -70,7 +83,7 @@
             <!-- djlint:off -->
             <span class="close" name="modal-close" id="closeModal">&times;</span>
             <!-- djlint:on -->
-            <h2>Add a Donation</h2>
+            <h2 id="modal-header">Add a Donation</h2>
             <hr>
             <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
                 {% csrf_token %}
