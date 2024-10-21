@@ -12,6 +12,13 @@ def recipient_dashboard(request):
     )
 
 
+def search_donation(request, keyword):
+    donations = Donation.objects.filter(food_item__icontains=keyword)
+    return render(
+        request, "recipient_dashboard/dashboard.html", {"donations": donations}
+    )
+
+
 @login_required
 def reserve_donation(request, donation_id):
     try:
