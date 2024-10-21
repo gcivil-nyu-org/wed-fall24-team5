@@ -3,13 +3,15 @@ from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
+from django.utils import timezone
 
 
 @login_required
 def recipient_dashboard(request):
-    donations = Donation.objects.filter(Q(active=True) & Q(quantity__gt=0)).order_by(
-        "created_at"
-    )
+    currdate = timezone.now().date()
+    donations = Donation.objects.filter(
+        Q(active=True) & Q(quantity__gt=0) & Q(pickup_by__gte=currdate)
+    ).order_by("created_at")
     categories = Organization.objects.values_list("type", flat=True).distinct()
     if request.method == "GET":
         keyword = request.GET.get("keyword")
