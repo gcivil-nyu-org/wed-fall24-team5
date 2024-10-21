@@ -70,6 +70,7 @@ def manage_organization(request, organization_id):
         {"organization": organization, "donations": donations},
     )
 
+
 @login_required
 def organization_details(request, organization_id):
 
@@ -87,7 +88,9 @@ def organization_details(request, organization_id):
         form = AddOrganizationForm(instance=organization)
 
     return render(
-        request, "donor_dashboard/organization_details.html", {"organization": organization, "form": form}
+        request,
+        "donor_dashboard/organization_details.html",
+        {"organization": organization, "form": form},
     )
 
 
