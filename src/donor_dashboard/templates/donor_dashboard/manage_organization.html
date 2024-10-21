@@ -1,31 +1,22 @@
 {% extends "_base.html" %}
+{% block title %}
+    Manage Organization
+{% endblock title %}
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
 <script src="{% static 'js/manage_organization.js' %}"></script>
     <div class="container">
-        <!-- Notification -->
-        {% if messages %}
-        <!-- djlint:off --> 
-            <div id="notification-area" style="position: absolute; top: 5px; right: 5px; z-index: 1000;">
-                {% for message in messages %}
-                    <div class="notification is-{{ message.tags }}" style="width: auto; padding-right: 2.5rem;">
-                        <button class="delete" style="position: absolute; right: 10px;"></button>
-                    <!-- djlint:on -->
-                        {{ message }}
-                    </div>
-                {% endfor %}
-            </div>
-        {% endif %}
+        {% include "partials/notifications.html" %}
         <div class="flex-container">
             <h2 class="subtitle mt-5">
                 <strong>{{ organization.organization_name }}</strong>
             </h2>
             <div id="organization-id" hidden>{{ organization.organization_id }}</div>
             <div class="buttons">
-                <button id="add-donation-button" class="button is-dark" data-organization-id="{{ donation.organization.organization_id }}">Add Donation</button>
-                <a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}" class="button is-info">
-                    Manage Organization
+                <button id="add-donation-button" class="button is-dark">Add Donation</button>
+                <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}" class="button is-info">
+                    Organization Details
                 </a>
 
                 <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">

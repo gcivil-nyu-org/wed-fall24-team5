@@ -72,6 +72,29 @@ def manage_organization(request, organization_id):
 
 
 @login_required
+def organization_details(request, organization_id):
+
+    organization = Organization.objects.get(organization_id=organization_id)
+
+    if request.method == "POST":
+        form = AddOrganizationForm(request.POST, instance=organization)
+        if form.is_valid():
+            organization = form.save()
+            messages.success(request, "Organization Details Updated Succesfully.")
+            return redirect(
+                "donor_dashboard:manage_organization", organization_id=organization_id
+            )
+    else:
+        form = AddOrganizationForm(instance=organization)
+
+    return render(
+        request,
+        "donor_dashboard/organization_details.html",
+        {"organization": organization, "form": form},
+    )
+
+
+@login_required
 def delete_organization(request, organization_id):
     if request.method == "POST":
         organization = Organization.objects.get(organization_id=organization_id)
