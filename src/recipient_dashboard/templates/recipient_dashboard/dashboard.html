@@ -1,90 +1,112 @@
 {% extends "_base.html" %}
 {% block title %}
-    Donation Dashboard
+Donation Dashboard
 {% endblock title %}
 {% block content %}
-    <div class="container">
-
-        <!-- Notification -->
-        {% if messages %}
-        <!-- djlint:off --> 
-            <div id="notification-area" style="position: absolute; top: 5px; right: 5px; z-index: 1000;">
-                {% for message in messages %}
-                    <div class="notification is-{{ message.tags }}" style="width: auto; padding-right: 2.5rem;">
-                        <button class="delete" style="position: absolute; right: 10px;"></button>
-                    <!-- djlint:on -->
-                        {{ message }}
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+    <h2 class="subtitle mt-3">List of Available Donations:</h2>
+    <form method="get" class="box">
+        <div class="columns">
+            <div class="column is-two-thirds">
+                <div class="field has-addons">
+                    <div class="control">
+                        <span class="select">
+                            <select name="type">
+                                <option value="">General</option>
+                                <option value="food" {% if type == "food" %}selected{% endif %}>Food Item</option>
+                                <option value="org" {% if type == "org" %}selected{% endif %}>Organization</option>
+                            </select>
+                        </span>
                     </div>
-                {% endfor %}
+                    <div class="control is-expanded">
+                        <input class="input" type="text" name="keyword" {% if keyword %} value="{{ keyword }}" {% else
+                            %} placeholder="Search donations" {% endif %}>
+                    </div>
+                    <!-- </div> -->
+                    <!-- </div> -->
+                    <!-- <div class="column"> -->
+                    <!-- <div class="field"> -->
+                    <div class="control">
+                        <span class="select">
+                            <select name="category">
+                                <option value="">All Categories</option>
+                                {% for cat in categories %}
+                                <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </span>
+                    </div>
+                </div>
             </div>
-        {% endif %}
-
-        <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <h2 class="subtitle mt-3">List of Available Donations:</h2>
-        {% if donations %}
-            <div class="columns is-multiline is-variable is-4">
-                {% for donation in donations %}
-                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                        <div class="card mb-5">
-                            <div class="card-content">
-                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                    <div class="media-content">
-                                        <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
-                                    </div>
-                                    <div class="media-right mt-2-mobile">
-                                        <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }} Available</span>
-                                    </div>
-                                </div>
-                                <div class="content">
-                                    <div class="columns is-flex-direction-column-mobile">
-                                        <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth"
-                                               style="white-space: normal;
-                                                      word-wrap: break-word"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                {{ donation.organization.organization_name }}
-                                                <br>
-                                                {{ donation.organization.address }}
-                                            </a>
-                                        </div>
-                                        <div class="column is-one-third has-text-centered">
-                                            <strong>Pickup by:</strong>
-                                            <p>{{ donation.pickup_by }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <footer class="card-footer">
-                                <a href="{% url 'reserve_donation' donation.donation_id %}"
-                                   class="card-footer-item">Reserve</a>
-                            </footer>
+            <div class="column">
+                <div class="field">
+                    <div class="control">
+                        <input class="input" type="number" name="quantity" {% if quantity %} value="{{ quantity }}" {%
+                            else %} placeholder="Min Quantity" {% endif %}">
+                    </div>
+                </div>
+            </div>
+            <div class="column">
+                <div class="field is-grouped">
+                    <div class="control">
+                        <button class="button is-info" type="submit">
+                            Search
+                        </button>
+                    </div>
+                    <div class="control">
+                        <a href="{% url 'recipient_dashboard' %}" class="button is-danger">
+                            Clear all
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+    {% if donations %}
+    <div class="columns is-multiline is-variable is-4">
+        {% for donation in donations %}
+        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+            <div class="card mb-5">
+                <div class="card-content">
+                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                        <div class="media-content">
+                            <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                        </div>
+                        <div class="media-right mt-2-mobile">
+                            <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
+                                Available</span>
                         </div>
                     </div>
-                {% endfor %}
+                    <div class="content">
+                        <div class="columns is-flex-direction-column-mobile">
+                            <div class="column is-two-thirds">
+                                <a class="button is-link is-light is-fullwidth" style="white-space: normal;
+                                                      word-wrap: break-word"
+                                    href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
+                                    target="_blank" rel="noopener noreferrer">
+                                    {{ donation.organization.organization_name }}
+                                    <br>
+                                    {{ donation.organization.address }}
+                                </a>
+                            </div>
+                            <div class="column is-one-third has-text-centered">
+                                <strong>Pickup by:</strong>
+                                <p>{{ donation.pickup_by }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <a href="{% url 'reserve_donation' donation.donation_id %}" class="card-footer-item">Reserve</a>
+                </footer>
             </div>
-        {% else %}
-            <p class="box">No donations available at the moment.</p>
-        {% endif %}
+        </div>
+        {% endfor %}
     </div>
-    <script>
-        // Auto-dismiss notification after 10 seconds
-        document.addEventListener('DOMContentLoaded', () => {
-            const notifications = document.querySelectorAll('.notification');
-            notifications.forEach(notification => {
-                setTimeout(() => {
-                    notification.style.display = 'none';
-                }, 10000);
-            });
-
-            // Enable close button on notification
-            const closeButtons = document.querySelectorAll('.delete');
-            closeButtons.forEach(button => {
-                button.addEventListener('click', () => {
-                    button.parentElement.style.display = 'none';
-                });
-            });
-        });
-    </script>
+    {% else %}
+    <p class="box">No donations available at the moment.</p>
+    {% endif %}
+</div>
 {% endblock content %}
