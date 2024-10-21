@@ -4,7 +4,11 @@ os: linux
 python:
   - "3.11"
 
-if: type IN (push, pull_request, api, cron)
+# Ensure Travis CI only builds for pull requests, pushes to specific branches, and CRON jobs
+branches:
+  only:
+    - main
+    - develop
 
 install:
   - pip install -r requirements.txt
