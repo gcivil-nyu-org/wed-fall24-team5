@@ -8,6 +8,7 @@ from django.contrib.messages import get_messages  # to capture messages
 from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
 
+
 class RecipientDashboardViewTests(TestCase):
     def setUp(self):
         # Creating a dummy user for testing
@@ -82,6 +83,7 @@ class RecipientDashboardViewTests(TestCase):
         self.assertNotIn(
             "Pasta", donation_items
         )  # Checking if a non-listed item is checked or not
+
 
 class ReserveDonationTest(TestCase):
 

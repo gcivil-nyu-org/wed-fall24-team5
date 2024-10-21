@@ -11,27 +11,6 @@ def recipient_dashboard(request):
         request, "recipient_dashboard/dashboard.html", {"donations": donations}
     )
 
-@login_required
-def reserve_donation(request, donation_id):
-    donation = get_object_or_404(Donation, pk=donation_id, active=True)
-    if donation.quantity <= 0:
-        messages.error(request, "This donation is no longer available.")
-        return redirect("recipient_dashboard")
-
-    # Create new order
-    Order.objects.create(
-        donation=donation,
-        user=request.user,
-        order_quantity=1,  # In future : allow user to select quantity
-        order_status="pending",
-    )
-
-    # Reduce donation quantity
-    donation.quantity -= 1
-    donation.save()
-
-    messages.success(request, "Donation reserved successfully.")
-    return redirect("recipient_dashboard")
 
 def search_donation(request, keyword):
     donations = Donation.objects.filter(food_item__icontains=keyword)
