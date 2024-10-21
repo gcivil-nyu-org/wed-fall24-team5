@@ -29,8 +29,8 @@ Donation Dashboard
                         <span class="select">
                             <select name="type">
                                 <option value="">General</option>
-                                <option value="food" {% if type=="food" %}selected{% endif %}>Food Item</option>
-                                <option value="org" {% if type=="org" %}selected{% endif %}>Organization</option>
+                                <option value="food" {% if type == "food" %}selected{% endif %}>Food Item</option>
+                                <option value="org" {% if type == "org" %}selected{% endif %}>Organization</option>
                             </select>
                         </span>
                     </div>
@@ -47,7 +47,7 @@ Donation Dashboard
                             <select name="category">
                                 <option value="">All Categories</option>
                                 {% for cat in categories %}
-                                <option value="{{ cat }}" {% if category==cat %}selected{% endif %}>{{ cat }}</option>
+                                <option value="{{ cat }}" {% if category == cat %}selected{% endif %}>{{ cat }}</option>
                                 {% endfor %}
                             </select>
                         </span>

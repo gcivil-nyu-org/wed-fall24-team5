@@ -17,15 +17,17 @@ def recipient_dashboard(request):
             if type == "food":
                 donations = donations.filter(food_item__icontains=keyword)
             elif type == "org":
-                donations = donations.filter(organization_id__organization_name__icontains=keyword)
+                donations = donations.filter(
+                    organization_id__organization_name__icontains=keyword
+                )
             else:
                 donations = donations.filter(
-                    Q(food_item__icontains=keyword) |
-                    Q(organization_id__organization_name__icontains=keyword)
+                    Q(food_item__icontains=keyword)
+                    | Q(organization_id__organization_name__icontains=keyword)
                 )
         if category:
             donations = donations.filter(organization_id__type=category)
-    
+
     context = {
         "donations": donations,
         "categories": categories,
@@ -33,21 +35,7 @@ def recipient_dashboard(request):
         "category": category,
         "type": type,
     }
-    return render(
-        request, "recipient_dashboard/dashboard.html", context
-    )
-
-
-@login_required
-def search_donation(request):
-    donations = Donation.objects.filter(food_item__icontains=keyword)
-    if request.method == "GET":
-        keyword = request.GET.get("keyword")
-        if keyword:
-            donations = donations.filter()
-    return render(
-        request, "recipient_dashboard/dashboard.html", {"donations": donations}
-    )
+    return render(request, "recipient_dashboard/dashboard.html", context)
 
 
 @login_required
