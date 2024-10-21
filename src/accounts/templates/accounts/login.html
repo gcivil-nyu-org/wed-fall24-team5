@@ -2,16 +2,6 @@
 {% block title %}
     Log in
 {% endblock title %}
-{% block extra_head %}
-    <script>
-    function dismissMessage() {
-        const banner = document.getElementById('message-banner');
-        if (banner) {
-            banner.style.display = 'none';
-        }
-    }
-    </script>
-{% endblock extra_head %}
 {% block content %}
     <div class="container">
         <!-- djlint:off -->
@@ -60,19 +50,6 @@
             Don't have an account? <a href="{% url 'accounts:register' %}" class="has-text-link">Sign up.</a>
         </p>
     </div>
-    {% if messages %}
-        <!-- djlint:off -->
-                <div id="message-banner"
-                        class="notification is-danger is-light mt-4"
-                        style="max-width: 500px;
-                            margin: 0 auto">
-        <!-- djlint:on -->
-        <button class="delete" onclick="dismissMessage()"></button>
-        {% for message in messages %}
-            {{ message }}
-            {% if not forloop.last %}<br>{% endif %}
-        {% endfor %}
-    </div>
-{% endif %}
+    {% include "partials/notifications.html" %}
 </div>
 {% endblock content %}
