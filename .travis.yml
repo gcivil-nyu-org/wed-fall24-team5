@@ -28,6 +28,20 @@ script:
   - coverage report
   - coveralls
   - python src/manage.py collectstatic --noinput
+
+# Add a new job that handles the CRON job (merging develop into main)
+jobs:
+  include:
+    - stage: merge-develop-into-main
+      if: type = cron
+      script:
+        - git config --global user.name "travis-ci"
+        - git config --global user.email "travis-cron@travis-ci.com"
+        - git remote set-url origin https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git
+        - git fetch origin develop
+        - git checkout main
+        - git merge origin/develop
+        - git push origin main
   
 deploy:
   - provider: elasticbeanstalk
