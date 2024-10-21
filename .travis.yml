@@ -11,7 +11,7 @@ script:
   - black --check ./src
   - flake8 ./src
   - djlint src/ --lint        
-  - coverage run --source='src' src/manage.py test src
+  - coverage run --source='src' src/manage.py test src --noinput
   - coverage report
   - coveralls
   - python src/manage.py makemigrations
