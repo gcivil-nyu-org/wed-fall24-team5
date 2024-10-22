@@ -4,6 +4,13 @@ function confirmDelete() {
     }
 }
 
+function submitDeleteForm(donationId) {
+    const form = document.getElementById(`delete-form-${donationId}`);
+    if (confirm("Are you sure you want to delete this donation? All existing reservations for this donation will still exist!")) {
+        form.submit();
+    }
+}
+
 document.addEventListener("DOMContentLoaded", function() {
     var addDonationButton = document.getElementById("add-donation-button");
     if (addDonationButton) {
