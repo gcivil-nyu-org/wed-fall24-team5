@@ -310,7 +310,7 @@ class DonationTests(TestCase):
                 "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
             ),
             {
-                "food_item": "Updated Test Food",
+                "food_item": "Random Test Food",
                 "quantity": 15,
                 "pickup_by": (timezone.now() + timezone.timedelta(days=8)).strftime(
                     "%Y-%m-%d"
