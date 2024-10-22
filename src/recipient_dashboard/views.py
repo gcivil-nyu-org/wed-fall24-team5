@@ -1,46 +1,47 @@
-from database.models import Donation, Order, Organization
+from database.models import Donation, Order
 from django.shortcuts import get_object_or_404, render, redirect
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
+from .forms import SearchDonationForm
 
 
 @login_required
 def recipient_dashboard(request):
     currdate = timezone.now().date()
+    form = SearchDonationForm(request.GET)
     donations = Donation.objects.filter(
         Q(active=True) & Q(quantity__gt=0) & Q(pickup_by__gte=currdate)
     ).order_by("created_at")
-    categories = Organization.objects.values_list("type", flat=True).distinct()
-    if request.method == "GET":
-        keyword = request.GET.get("keyword")
-        category = request.GET.get("category")
-        type = request.GET.get("type")
-        quantity = request.GET.get("quantity")
-        filter_food = Q(food_item__icontains=keyword)
-        filter_org = Q(organization_id__organization_name__icontains=keyword)
+
+    if form.is_valid():
+        keyword = form.cleaned_data.get("keyword")
+        category = form.cleaned_data.get("category")
+        type = form.cleaned_data.get("type")
+        min_quantity = form.cleaned_data.get("min_quantity")
         if keyword:
             if type == "food":
-                donations = donations.filter(filter_food)
+                donations = donations.filter(food_item__icontains=keyword)
             elif type == "org":
-                donations = donations.filter(filter_org)
+                donations = donations.filter(
+                    organization_id__organization_name__icontains=keyword
+                )
             else:
-                donations = donations.filter(filter_food | filter_org)
+                donations = donations.filter(
+                    Q(food_item__icontains=keyword)
+                    | Q(organization_id__organization_name__icontains=keyword)
+                )
         if category:
             donations = donations.filter(organization_id__type=category)
-        if quantity:
-            donations = donations.filter(quantity__gte=quantity)
+        if min_quantity:
+            donations = donations.filter(quantity__gte=min_quantity)
 
-    context = {
-        "donations": donations,
-        "categories": categories,
-        "keyword": keyword,
-        "category": category,
-        "type": type,
-        "quantity": quantity,
-    }
-    return render(request, "recipient_dashboard/dashboard.html", context)
+    return render(
+        request,
+        "recipient_dashboard/dashboard.html",
+        {"form": form, "donations": donations},
+    )
 
 
 @login_required
