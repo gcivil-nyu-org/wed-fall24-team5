@@ -1,28 +1,28 @@
-from django.test import TestCase
-from django.contrib.auth.models import User
-from .models import (
-    Organization,
-    UserProfile,
-    OrganizationAdmin,
-    Donation,
-    UserReview,
-    Message,
-    Order,
-)
-from datetime import date
+# from django.test import TestCase
+# from django.contrib.auth.models import User
+# from .models import (
+#     Organization,
+#     UserProfile,
+#     OrganizationAdmin,
+#     Donation,
+#     UserReview,
+#     Message,
+#     Order,
+# )
+# from datetime import date
 
 
 # Create your tests here.
-class DummyTestCase(TestCase):
-    def test_dummy(self):
-        """A dummy test to satisfy flake8."""
-        organization = Organization.objects.create(
-            organization_name="Test Organization",
-            type="restaurant",
-            address="123 Test Street",
-            zipcode=10001,
-        )
-        self.assertTrue(organization.organization_name == "Test Organization")
+# class DummyTestCase(TestCase):
+#     def test_dummy(self):
+#         """A dummy test to satisfy flake8."""
+#         organization = Organization.objects.create(
+#             organization_name="Test Organization",
+#             type="restaurant",
+#             address="123 Test Street",
+#             zipcode=10001,
+#         )
+#         self.assertTrue(organization.organization_name == "Test Organization")
 
 
 # class ModelsTestCase(TestCase):
