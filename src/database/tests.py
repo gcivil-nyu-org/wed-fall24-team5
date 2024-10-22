@@ -1,10 +1,16 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import (
-    Organization, UserProfile, OrganizationAdmin,
-    Donation, UserReview, Message, Order
-    )
+    Organization,
+    UserProfile,
+    OrganizationAdmin,
+    Donation,
+    UserReview,
+    Message,
+    Order,
+)
 from datetime import date
+
 
 # Create your tests here.
 class DummyTestCase(TestCase):
@@ -22,7 +28,9 @@ class DummyTestCase(TestCase):
 class ModelsTestCase(TestCase):
 
     def setUp(self):
-        # For clean up track what needs to be deleted later during tear down (I am reseraching if this is actually needed, since Django already tears down things automatically)
+        # For clean up track what needs to be deleted
+        # later during tear down (I am reseraching if this is actually needed,
+        # since Django already tears down things automatically)
         self.created_users = []
         self.created_organizations = []
         self.created_profiles = []
@@ -34,14 +42,10 @@ class ModelsTestCase(TestCase):
 
         # Create Users
         user = User.objects.create_user(
-            username='testuser',
-            email='testuser@example.com',
-            password='password123'
+            username="testuser", email="testuser@example.com", password="password123"
         )
         user2 = User.objects.create_user(
-            username='testuser2',
-            email='testuser2@example.com',
-            password='password123'
+            username="testuser2", email="testuser2@example.com", password="password123"
         )
         self.created_users.extend([user, user2])
 
@@ -53,15 +57,13 @@ class ModelsTestCase(TestCase):
             zipcode=12345,
             contact_number="555-1234",
             email="contact@example.com",
-            website="https://example.com"
+            website="https://example.com",
         )
         self.created_organizations.append(organization)
 
         # Create a UserProfile
         profile = UserProfile.objects.create(
-            user=user,
-            phone_number="555-5678",
-            active=True
+            user=user, phone_number="555-5678", active=True
         )
         self.created_profiles.append(profile)
 
@@ -94,7 +96,7 @@ class ModelsTestCase(TestCase):
         admin = OrganizationAdmin.objects.create(
             organization=self.created_organizations[0],
             user=self.created_users[0],
-            access_level="Owner"
+            access_level="Owner",
         )
         self.created_admins.append(admin)
         self.assertEqual(admin.access_level, "Owner")
@@ -104,7 +106,7 @@ class ModelsTestCase(TestCase):
             organization=self.created_organizations[0],
             food_item="Canned Beans",
             quantity=100,
-            pickup_by=date.today()
+            pickup_by=date.today(),
         )
         self.created_donations.append(donation)
         self.assertEqual(donation.food_item, "Canned Beans")
@@ -114,7 +116,7 @@ class ModelsTestCase(TestCase):
             organization=self.created_organizations[0],
             user=self.created_users[0],
             rating=5,
-            comment="Great organization!"
+            comment="Great organization!",
         )
         self.created_reviews.append(review)
         self.assertEqual(review.rating, 5)
@@ -123,7 +125,7 @@ class ModelsTestCase(TestCase):
         message = Message.objects.create(
             sender_user=self.created_users[0],
             receiver_user=self.created_users[1],
-            message_body="Hello, this is a test message!"
+            message_body="Hello, this is a test message!",
         )
         self.created_messages.append(message)
         self.assertEqual(message.message_body, "Hello, this is a test message!")
@@ -133,7 +135,7 @@ class ModelsTestCase(TestCase):
             organization=self.created_organizations[0],
             food_item="Canned Beans",
             quantity=100,
-            pickup_by=date.today()
+            pickup_by=date.today(),
         )
         self.created_donations.append(donation)
 
@@ -141,7 +143,7 @@ class ModelsTestCase(TestCase):
             donation=donation,
             user=self.created_users[0],
             order_quantity=10,
-            order_status="pending"
+            order_status="pending",
         )
         self.created_orders.append(order)
         self.assertEqual(order.order_quantity, 10)
