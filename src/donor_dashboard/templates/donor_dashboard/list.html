@@ -4,52 +4,68 @@
 {% endblock title %}
 {% load static %}
 {% block content %}
+    <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
     <script src="{% static 'js/org_list_tabs.js' %}"></script>
+    <script src="{% static 'js/add_org.js' %}"></script>
     <div class="container">   
         {% include "partials/notifications.html" %}
-        <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <h2 class="subtitle mt-4">
-            <strong>Add a new Organization</strong>
-        </h2>
-        <form method="post">
-            {% csrf_token %}
-            <div class="card">
-                <div class="card-content">
-                    <div class="columns is-multiline">
-                        <div class="column is-full-mobile is-two-thirds-tablet">
-                            <div class="field">{{ form.organization_name }}</div>
-                        </div>
-                        <div class="column is-full-mobile is-one-third-tablet">
-                            <div class="field">
-                                <div class="control">
-                                    <div class="tag is-medium is-light is-fullwidth">{{ form.type }}</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="columns is-multiline">
-                        <div class="column is-two-thirds-tablet is-full-mobile">
-                            <div class="field">
-                                <div class="control">
-                                    <div class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
-                                </div>
-                            </div>
-                            <div class="field">{{ form.zipcode }}</div>
-                        </div>
-                        <div class="column is-one-third-tablet is-full-mobile">
-                            <div class="field">{{ form.email }}</div>
-                            <div class="field">{{ form.contact_number }}</div>
-                            <div class="field">{{ form.website }}</div>
-                        </div>
-                    </div>
-                </div>
-                <footer class="card-footer">
-                    <button id="submit-btn" type="submit" class="card-footer-item">
-                        <strong>Add</strong>
-                    </button>
-                </footer>
+        <div class="flex-container">
+            <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+            
+            <!-- Button to open the modal -->
+            <div class="buttons">
+                <button class="button  is-dark" id="open-modal">Add Organization</button>
             </div>
-        </form>
+        </div>
+
+        <!-- Modal structure -->
+        <div class="modal" id="org-modal">
+            <div class="modal-background" id="modal-background"></div>
+            <div class="modal-card" style="min-width: 80%;">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Add a New Organization</p>
+                </header>
+                <form method="post">
+                    {% csrf_token %}
+                    <section class="modal-card-body">
+                        <div class="card-content">
+                            <div class="columns is-multiline">
+                                <div class="column is-full-mobile is-two-thirds-tablet">
+                                    <div class="field">{{ form.organization_name }}</div>
+                                </div>
+                                <div class="column is-full-mobile is-one-third-tablet">
+                                    <div class="field">
+                                        <div class="control">
+                                            <div class="tag is-medium is-light is-fullwidth">{{ form.type }}</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="columns is-multiline">
+                                <div class="column is-two-thirds-tablet is-full-mobile">
+                                    <div class="field">
+                                        <div class="control">
+                                            <div class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
+                                        </div>
+                                    </div>
+                                    <div class="field">{{ form.zipcode }}</div>
+                                </div>
+                                <div class="column is-one-third-tablet is-full-mobile">
+                                    <div class="field">{{ form.email }}</div>
+                                    <div class="field">{{ form.contact_number }}</div>
+                                    <div class="field">{{ form.website }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                        <button type="submit" class="button is-link">Add</button>
+                        <button class="button" id="close-modal-footer">Cancel</button>
+                    </footer>
+                </form>
+            </div>
+        </div>
+
         <h2 class="subtitle mt-5">
             <strong>Your organizations</strong>
         </h2>
@@ -70,11 +86,10 @@
             </ul>
         </div>
 
-        <div id="active-tab"  class="org-list">
-
-        <div class="columns is-multiline is-variable is-4">
-            {% if active_org_list %}
-                {% for org in active_org_list %}
+        <div id="active-tab" class="org-list">
+            <div class="columns is-multiline is-variable is-4">
+                {% if active_org_list %}
+                    {% for org in active_org_list %}
                         <div class="column is-full-mobile is-half-tablet is-half-desktop">
                             <div class="card mb-5 is-flex is-flex-direction-column">
                                 <div class="card-content is-flex-grow-1">
@@ -89,19 +104,15 @@
                                     <div class="content">
                                         <div class="columns">
                                             <div class="column is-full-mobile is-half-tablet">
-                                                <!-- djlint:off -->
                                                 <div class="button is-link is-light has-text-centered"
-                                                    style="white-space: normal;
-                                                            word-wrap: break-word;
-                                                            overflow-wrap: break-word">{{ org.org_address }}</div>
+                                                    style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                                    {{ org.org_address }}
+                                                </div>
                                             </div>
                                             <div class="column is-full-mobile is-half-tablet has-text-centered">
                                                 <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
                                                 <p>{{ org.org_contact_number }}</p>
-                                                <a href="{{ org.org_website }}"
-                                                style="word-wrap: break-word;
-                                                        overflow-wrap: break-word">{{ org.org_website }}</a>
-                                                <!-- djlint:on -->
+                                                <a href="{{ org.org_website }}" style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_website }}</a>
                                             </div>
                                         </div>
                                     </div>
@@ -111,18 +122,17 @@
                                 </footer>
                             </div>
                         </div>
-                {% endfor %}
-            {% else %}
-                <p class="box">You are not a part of any organizations yet!!</p>
-            {% endif %}
-        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="box">You are not a part of any organizations yet!!</p>
+                {% endif %}
+            </div>
         </div>
 
-        <div id="in-active-tab"  class="org-list is-hidden">
-
-        <div class="columns is-multiline is-variable is-4">
-            {% if inactive_org_list %}
-                {% for org in inactive_org_list %}
+        <div id="in-active-tab" class="org-list is-hidden">
+            <div class="columns is-multiline is-variable is-4">
+                {% if inactive_org_list %}
+                    {% for org in inactive_org_list %}
                         <div class="column is-full-mobile is-half-tablet is-half-desktop">
                             <div class="card mb-5 is-flex is-flex-direction-column">
                                 <div class="card-content is-flex-grow-1">
@@ -140,19 +150,15 @@
                                     <div class="content">
                                         <div class="columns">
                                             <div class="column is-full-mobile is-half-tablet">
-                                                <!-- djlint:off -->
                                                 <div class="button is-link is-light has-text-centered"
-                                                    style="white-space: normal;
-                                                            word-wrap: break-word;
-                                                            overflow-wrap: break-word">{{ org.org_address }}</div>
+                                                    style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                                    {{ org.org_address }}
+                                                </div>
                                             </div>
                                             <div class="column is-full-mobile is-half-tablet has-text-centered">
                                                 <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
                                                 <p>{{ org.org_contact_number }}</p>
-                                                <a href="{{ org.org_website }}"
-                                                style="word-wrap: break-word;
-                                                        overflow-wrap: break-word">{{ org.org_website }}</a>
-                                                <!-- djlint:on -->
+                                                <a href="{{ org.org_website }}" style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_website }}</a>
                                             </div>
                                         </div>
                                     </div>
@@ -162,11 +168,11 @@
                                 </footer>
                             </div>
                         </div>
-                {% endfor %}
-            {% else %}
-                <p class="box">No In Active Organizations!!</p>
-            {% endif %}
-        </div>
+                    {% endfor %}
+                {% else %}
+                    <p class="box">No In Active Organizations!!</p>
+                {% endif %}
+            </div>
         </div>
     </div>
 {% endblock content %}
