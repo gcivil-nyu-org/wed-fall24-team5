@@ -21,14 +21,14 @@ class ModelsTestCase(TestCase):
             email="testuser@example.com",
             password="password123",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
         cls.user2 = User.objects.create_user(
             username="testuser2",
             email="testuser2@example.com",
             password="password123",
             first_name="Test",
-            last_name="User2"
+            last_name="User2",
         )
 
         # Create test organization
@@ -46,16 +46,12 @@ class ModelsTestCase(TestCase):
             organization_name="Test Organization 2",
             type="food_pantry",
             address="456 Test Ave",
-            zipcode=12346
+            zipcode=12346,
         )
 
         # Handle UserProfile creation
         cls.profile, _ = UserProfile.objects.get_or_create(
-            user=cls.user,
-            defaults={
-                'phone_number': "555-5678",
-                'active': True
-            }
+            user=cls.user, defaults={"phone_number": "555-5678", "active": True}
         )
 
     def test_organization_creation(self):
@@ -76,11 +72,9 @@ class ModelsTestCase(TestCase):
     def test_user_profile_signal(self):
         """Test that UserProfile is automatically created when User is created"""
         new_user = User.objects.create_user(
-            username="signaltest",
-            email="signal@test.com",
-            password="password123"
+            username="signaltest", email="signal@test.com", password="password123"
         )
-        self.assertTrue(hasattr(new_user, 'userprofile'))
+        self.assertTrue(hasattr(new_user, "userprofile"))
         self.assertIsNotNone(new_user.userprofile)
 
     def test_user_profile_update(self):
@@ -135,14 +129,12 @@ class ModelsTestCase(TestCase):
         self.assertTrue(order.active)
         # Test the format of the string representation
         order_str = str(order)
-        self.assertRegex(order_str, r'^Order .+ - Test User$')
+        self.assertRegex(order_str, r"^Order .+ - Test User$")
         self.assertTrue(isinstance(order.order_id, uuid.UUID))
 
         # Test order without user
         order_no_user = Order.objects.create(
-            donation=donation,
-            order_quantity=5,
-            order_status="pending"
+            donation=donation, order_quantity=5, order_status="pending"
         )
         self.assertIn("No User", str(order_no_user))
 
