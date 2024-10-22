@@ -219,3 +219,4 @@ class ModelsTestCase(TestCase):
         order.order_status = "canceled"
         order.save()
         self.assertEqual(order.order_status, "canceled")
+
