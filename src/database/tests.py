@@ -33,14 +33,10 @@ class ModelsTestCase(TestCase):
         """
         # Create test users
         cls.user = User.objects.create_user(
-            username="testuser",
-            email="testuser@example.com",
-            password="password123"
+            username="testuser", email="testuser@example.com", password="password123"
         )
         cls.user2 = User.objects.create_user(
-            username="testuser2",
-            email="testuser2@example.com",
-            password="password123"
+            username="testuser2", email="testuser2@example.com", password="password123"
         )
 
         # Create test organization
@@ -56,9 +52,7 @@ class ModelsTestCase(TestCase):
 
         # Create test user profile
         cls.profile = UserProfile.objects.create(
-            user=cls.user,
-            phone_number="555-5678",
-            active=True
+            user=cls.user, phone_number="555-5678", active=True
         )
 
     def test_organization_creation(self):
