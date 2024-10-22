@@ -395,7 +395,7 @@ class SearchFilterDonationTests(TestCase):
 
     def test_search_keyword_quantity(self):
         """Test searching donations by type, keyword and category."""
-        params = {"type": "food", "keyword": "pizza", "quantity": "10"}
+        params = {"type": "food", "keyword": "pizza", "min_quantity": "10"}
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
         response = self.client.get(url)
         donation_items = [
@@ -417,7 +417,7 @@ class SearchFilterDonationTests(TestCase):
             "type": "food",
             "keyword": "pizza",
             "category": "restaurant",
-            "quantity": "5",
+            "min_quantity": "5",
         }
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
         response = self.client.get(url)
