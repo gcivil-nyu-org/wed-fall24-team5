@@ -135,6 +135,7 @@ def delete_organization(request, organization_id):
     return redirect("donor_dashboard:org_list")
 
 
+@login_required
 def add_donation(request):
     if request.method == "POST":
         food_item = request.POST["food_item"]
@@ -147,7 +148,7 @@ def add_donation(request):
 
         if errors:
             for error in errors:
-                messages.error(request, error)
+                messages.warning(request, error)
             return redirect(
                 "donor_dashboard:manage_organization", organization_id=organization_id
             )
@@ -165,9 +166,11 @@ def add_donation(request):
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
 
+    messages.warning(request, "Invalid Add Donation Request!")
     return redirect("/")
 
 
+@login_required
 def modify_donation(request, donation_id):
     donation = get_object_or_404(Donation, donation_id=donation_id)
     if request.method == "POST":
@@ -181,7 +184,7 @@ def modify_donation(request, donation_id):
 
         if errors:
             for error in errors:
-                messages.error(request, error)
+                messages.warning(request, error)
             return redirect(
                 "donor_dashboard:manage_organization", organization_id=organization_id
             )
@@ -198,4 +201,28 @@ def modify_donation(request, donation_id):
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
 
-    return redirect("/")
+    messages.warning(request, "Invalid Modify Donation Request!")
+    return redirect(
+        "donor_dashboard:manage_organization", organization_id=donation.organization_id
+    )
+
+
+@login_required
+def delete_donation(request, donation_id):
+    donation = get_object_or_404(Donation, donation_id=donation_id, active=True)
+    if request.method == "POST":
+        donation.active = False  # Set the active field to False for soft delete
+        donation.save()
+
+        messages.success(
+            request, f"Donation '{donation.food_item}' has been deleted successfully!"
+        )
+        return redirect(
+            "donor_dashboard:manage_organization",
+            organization_id=donation.organization_id,
+        )
+
+    messages.error(request, "Invalid Delete Donation Request!")
+    return redirect(
+        "donor_dashboard:manage_organization", organization_id=donation.organization_id
+    )
