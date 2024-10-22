@@ -72,7 +72,9 @@ def get_org_list(request):
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(organization=organization)
+    donations = Donation.objects.filter(
+        organization_id=organization.organization_id, active=True
+    )
     status = organization.active
     return render(
         request,
@@ -142,6 +144,7 @@ def add_donation(request):
         quantity = request.POST.get("quantity")
         pickup_by = request.POST.get("pickup_by")
         organization_id = request.POST.get("organization")
+        organization_id = organization_id.strip()
 
         # Validate Donation
         errors = validate_donation(food_item, quantity, pickup_by, organization_id)
@@ -178,10 +181,10 @@ def modify_donation(request, donation_id):
         quantity = request.POST.get("quantity")
         pickup_by = request.POST.get("pickup_by")
         organization_id = request.POST.get("organization")
+        organization_id = organization_id.strip()
 
         # Use the validation function
         errors = validate_donation(food_item, quantity, pickup_by, organization_id)
-
         if errors:
             for error in errors:
                 messages.warning(request, error)
@@ -212,6 +215,7 @@ def delete_donation(request, donation_id):
     donation = get_object_or_404(Donation, donation_id=donation_id, active=True)
     if request.method == "POST":
         donation.active = False  # Set the active field to False for soft delete
+        donation.quantity = 0
         donation.save()
 
         messages.success(
