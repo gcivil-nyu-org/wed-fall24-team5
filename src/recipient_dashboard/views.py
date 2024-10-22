@@ -19,7 +19,10 @@ def recipient_dashboard(request):
         keyword = form.cleaned_data.get("keyword")
         category = form.cleaned_data.get("category")
         type = form.cleaned_data.get("type")
+        date = form.cleaned_data.get("date")
         min_quantity = form.cleaned_data.get("min_quantity")
+        address = form.cleaned_data.get("address")
+
         if keyword:
             if type == "food":
                 donations = donations.filter(food_item__icontains=keyword)
@@ -34,8 +37,12 @@ def recipient_dashboard(request):
                 )
         if category:
             donations = donations.filter(organization_id__type=category)
+        if date:
+            donations = donations.filter(pickup_by__gte=date)
         if min_quantity:
             donations = donations.filter(quantity__gte=min_quantity)
+        if address:
+            donations = donations.filter(organization_id__address__icontains=address)
 
     return render(
         request,
