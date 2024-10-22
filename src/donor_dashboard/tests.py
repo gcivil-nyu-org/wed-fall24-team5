@@ -122,9 +122,9 @@ class DonationTests(TestCase):
         User = get_user_model()
         # Create test user and log them in
         self.user = User.objects.create_user(
-            username="testuser", password="testpassword"
+            username="testdonationuser@gmail.com", password="testpassword"
         )
-        self.client.login(username="testuser", password="testpassword")
+        self.client.login(username="testdonationuser@gmail.com", password="testpassword")
 
         # Create test organization
         self.organization = Organization.objects.create(
