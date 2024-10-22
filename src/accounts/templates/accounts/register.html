@@ -1,12 +1,6 @@
 {% extends "_base.html" %}
 {% block extra_head %}
     <script>
-    function dismissMessage() {
-        const banner = document.getElementById('message-banner');
-        if (banner) {
-            banner.style.display = 'none';
-        }
-    }
     document.addEventListener('DOMContentLoaded', () => {
         const passwordInput = document.getElementById('id_password1');
         const passwordConfirmInput = document.getElementById('id_password2');
@@ -166,19 +160,6 @@
             Already registered? <a href="{% url 'accounts:login' %}" class="has-text-link">Log in.</a>
         </p>
     </div>
-    {% if messages %}
-        <!-- djlint:off -->
-                                        <div id="message-banner"
-                                                class="notification is-danger mt-4"
-                                                style="max-width: 600px;
-                                                    margin: 0 auto">
-        <!-- djlint:on -->
-        <button class="delete" onclick="dismissMessage()"></button>
-        {% for message in messages %}
-            {{ message }}
-            {% if not forloop.last %}<br>{% endif %}
-        {% endfor %}
-    </div>
-{% endif %}
+    {% include "partials/notifications.html" %}
 </div>
 {% endblock content %}

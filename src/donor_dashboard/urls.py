@@ -16,5 +16,24 @@ urlpatterns = [
         views.delete_organization,
         name="delete_organization",
     ),
-    path("add_donation/", views.add_donation, name="add_donation"),
+    path(
+        "organization_details/<uuid:organization_id>/",
+        views.organization_details,
+        name="organization_details",
+    ),
+    path(
+        "add_donation/",
+        views.add_donation,
+        name="add_donation",
+    ),
+    path(
+        "modify_donation/<uuid:donation_id>/",
+        views.modify_donation,
+        name="modify_donation",
+    ),
+    path(
+        "delete_donation/<uuid:donation_id>/",
+        views.delete_donation,
+        name="delete_donation",
+    ),
 ]

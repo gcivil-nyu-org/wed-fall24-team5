@@ -1,0 +1,52 @@
+{% extends "_base.html" %}
+{% block title %}
+    Organization Details
+{% endblock title %}
+{% block content %}
+    <div class="container">
+
+        <h2 class="subtitle mt-4">
+            <strong>Edit Organization Detials</strong>
+        </h2>
+
+        <form method="post">
+            {% csrf_token %}
+            <div class="card">
+                <div class="card-content">
+                    <div class="columns is-multiline">
+                        <div class="column is-full-mobile is-two-thirds-tablet">
+                            <div class="field">{{ form.organization_name }}</div>
+                        </div>
+                        <div class="column is-full-mobile is-one-third-tablet">
+                            <div class="field">
+                                <div class="control">
+                                    <div class="tag is-medium is-light is-fullwidth">{{ form.type }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="columns is-multiline">
+                        <div class="column is-two-thirds-tablet is-full-mobile">
+                            <div class="field">
+                                <div class="control">
+                                    <div class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
+                                </div>
+                            </div>
+                            <div class="field">{{ form.zipcode }}</div>
+                        </div>
+                        <div class="column is-one-third-tablet is-full-mobile">
+                            <div class="field">{{ form.email }}</div>
+                            <div class="field">{{ form.contact_number }}</div>
+                            <div class="field">{{ form.website }}</div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="card-footer">
+                    <button id="submit-btn" type="submit" class="card-footer-item">
+                        <strong>Update</strong>
+                    </button>
+                </footer>
+            </div>
+        </form>
+    </div>
+{% endblock content %}

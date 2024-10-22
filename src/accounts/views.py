@@ -50,7 +50,7 @@ def register_view(request):
 
         # Check if the email is already in use
         if User.objects.filter(email=email).exists():
-            messages.error(request, "This email is already registered.")
+            messages.warning(request, "This email is already registered.")
             return render(request, "accounts/register.html", {"form": form})
 
         if form.is_valid():  # pylint: disable=no-else-return
@@ -60,7 +60,7 @@ def register_view(request):
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("accounts:profile")
         else:
-            messages.error(
+            messages.warning(
                 request, "Registration Failed!! Password mismatch or too generic"
             )  # noqa
             form = MyUserCreationForm()
@@ -79,7 +79,7 @@ def login_view(request):
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("accounts:profile")
         else:
-            messages.error(request, "Incorrect email or password. Please try again.")
+            messages.warning(request, "Incorrect email or password. Please try again.")
             form = MyAuthenticationForm()
             return render(request, "accounts/login.html", {"form": form})
     else:

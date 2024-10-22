@@ -2,8 +2,11 @@
 {% block title %}
     Organizations Dashboard
 {% endblock title %}
+{% load static %}
 {% block content %}
-    <div class="container">
+    <script src="{% static 'js/org_list_tabs.js' %}"></script>
+    <div class="container">   
+        {% include "partials/notifications.html" %}
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-4">
             <strong>Add a new Organization</strong>
@@ -50,45 +53,120 @@
         <h2 class="subtitle mt-5">
             <strong>Your organizations</strong>
         </h2>
+
+        <!--Tab Navigation Bar-->
+        <div class="tabs is-centered is-toggle is-fullwidth">
+            <ul>
+                <li class="is-active" id="active-tab">
+                    <a>
+                        <span>Active</span>
+                    </a>
+                </li>
+                <li id="in-active-tab">
+                    <a>
+                        <span>In Active</span>
+                    </a>
+                </li>
+            </ul>
+        </div>
+
+        <div id="active-tab"  class="org-list">
+
         <div class="columns is-multiline is-variable is-4">
-            {% for org in org_list %}
-                <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                    <div class="card mb-5 is-flex is-flex-direction-column">
-                        <div class="card-content is-flex-grow-1">
-                            <div class="media is-flex is-justify-content-space-between">
-                                <div class="media-content">
-                                    <p class="title is-4 is-clipped">{{ org.organization_name }}</p>
-                                </div>
-                                <div class="media-right">
-                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.type }}</span>
-                                </div>
-                            </div>
-                            <div class="content">
-                                <div class="columns">
-                                    <div class="column is-full-mobile is-half-tablet">
-                                        <!-- djlint:off -->
-                                        <div class="button is-link is-light has-text-centered"
-                                             style="white-space: normal;
-                                                    word-wrap: break-word;
-                                                    overflow-wrap: break-word">{{ org.address }}</div>
+            {% if active_org_list %}
+                {% for org in active_org_list %}
+                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                            <div class="card mb-5 is-flex is-flex-direction-column">
+                                <div class="card-content is-flex-grow-1">
+                                    <div class="media is-flex is-justify-content-space-between">
+                                        <div class="media-content">
+                                            <p class="title is-4 is-clipped">{{ org.org_name }}</p>
+                                        </div>
+                                        <div class="media-right">
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                        </div>
                                     </div>
-                                    <div class="column is-full-mobile is-half-tablet has-text-centered">
-                                        <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.email }}</p>
-                                        <p>{{ org.contact_number }}</p>
-                                        <a href="{{ org.website }}"
-                                           style="word-wrap: break-word;
-                                                  overflow-wrap: break-word">{{ org.website }}</a>
-                                        <!-- djlint:on -->
+                                    <div class="content">
+                                        <div class="columns">
+                                            <div class="column is-full-mobile is-half-tablet">
+                                                <!-- djlint:off -->
+                                                <div class="button is-link is-light has-text-centered"
+                                                    style="white-space: normal;
+                                                            word-wrap: break-word;
+                                                            overflow-wrap: break-word">{{ org.org_address }}</div>
+                                            </div>
+                                            <div class="column is-full-mobile is-half-tablet has-text-centered">
+                                                <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
+                                                <p>{{ org.org_contact_number }}</p>
+                                                <a href="{{ org.org_website }}"
+                                                style="word-wrap: break-word;
+                                                        overflow-wrap: break-word">{{ org.org_website }}</a>
+                                                <!-- djlint:on -->
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
+                                <footer class="card-footer mt-auto">
+                                    <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}" class="card-footer-item">Manage Organization</a>
+                                </footer>
                             </div>
                         </div>
-                        <footer class="card-footer mt-auto">
-                            <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}" class="card-footer-item">Manage Organization</a>
-                        </footer>
-                    </div>
-                </div>
-            {% endfor %}
+                {% endfor %}
+            {% else %}
+                <p class="box">You are not a part of any organizations yet!!</p>
+            {% endif %}
+        </div>
+        </div>
+
+        <div id="in-active-tab"  class="org-list is-hidden">
+
+        <div class="columns is-multiline is-variable is-4">
+            {% if inactive_org_list %}
+                {% for org in inactive_org_list %}
+                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                            <div class="card mb-5 is-flex is-flex-direction-column">
+                                <div class="card-content is-flex-grow-1">
+                                    <div class="media is-flex is-justify-content-space-between">
+                                        <div class="media-content">
+                                            <p class="title is-4 is-clipped">{{ org.org_name }}</p>
+                                        </div>
+                                        <div class="media-right">
+                                            <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                                        </div>
+                                        <div class="media-right">
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="columns">
+                                            <div class="column is-full-mobile is-half-tablet">
+                                                <!-- djlint:off -->
+                                                <div class="button is-link is-light has-text-centered"
+                                                    style="white-space: normal;
+                                                            word-wrap: break-word;
+                                                            overflow-wrap: break-word">{{ org.org_address }}</div>
+                                            </div>
+                                            <div class="column is-full-mobile is-half-tablet has-text-centered">
+                                                <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
+                                                <p>{{ org.org_contact_number }}</p>
+                                                <a href="{{ org.org_website }}"
+                                                style="word-wrap: break-word;
+                                                        overflow-wrap: break-word">{{ org.org_website }}</a>
+                                                <!-- djlint:on -->
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <footer class="card-footer mt-auto">
+                                    <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}" class="card-footer-item">Manage Organization</a>
+                                </footer>
+                            </div>
+                        </div>
+                {% endfor %}
+            {% else %}
+                <p class="box">No In Active Organizations!!</p>
+            {% endif %}
+        </div>
         </div>
     </div>
 {% endblock content %}
