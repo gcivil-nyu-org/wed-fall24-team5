@@ -289,7 +289,7 @@ class SearchFilterDonationTests(TestCase):
         self.organization2 = Organization.objects.create(
             organization_name="Test Organization Pizza",
             type="grocery_store",
-            address="123 Test St",
+            address="123 Test Ave",
             zipcode=12345,
             contact_number="1234567890",
             email="test@example.com",
@@ -309,7 +309,7 @@ class SearchFilterDonationTests(TestCase):
             organization=self.organization2,
             food_item="Apples",
             quantity=10,
-            pickup_by=timezone.now() + timedelta(days=1),
+            pickup_by=timezone.now() + timedelta(days=4),
             active=True,
         )
 
@@ -317,7 +317,7 @@ class SearchFilterDonationTests(TestCase):
             organization=self.organization1,
             food_item="Pesto Pizza",
             quantity=50,
-            pickup_by=timezone.now() + timedelta(days=1),
+            pickup_by=timezone.now() + timedelta(days=3),
             active=True,
         )
 
@@ -325,7 +325,7 @@ class SearchFilterDonationTests(TestCase):
             organization=self.organization1,
             food_item="Pepperoni Pizza",
             quantity=0,
-            pickup_by=timezone.now() + timedelta(days=1),
+            pickup_by=timezone.now() + timedelta(days=5),
             active=True,
         )
 
@@ -339,7 +339,7 @@ class SearchFilterDonationTests(TestCase):
         )
         self.social_app.sites.add(site)
 
-    def test_search_keyword_success(self):
+    def test_search_keyword(self):
         """Test searching donations by keyword in both food and organization."""
         params = {"keyword": "pizza"}
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
@@ -395,7 +395,7 @@ class SearchFilterDonationTests(TestCase):
 
     def test_search_keyword_quantity(self):
         """Test searching donations by type, keyword and category."""
-        params = {"type": "food", "keyword": "pizza", "quantity": "10"}
+        params = {"type": "food", "keyword": "pizza", "min_quantity": "10"}
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
         response = self.client.get(url)
         donation_items = [
@@ -410,6 +410,44 @@ class SearchFilterDonationTests(TestCase):
         self.assertIn("Pesto Pizza", donation_items)
         self.assertNotIn("Apples", donation_items)
         self.assertNotIn("Pepperoni Pizza", donation_items)
+    
+    def test_search_date(self):
+        """Test searching donations by date."""
+        params = {"date": (timezone.now() + timezone.timedelta(days=3)).strftime(
+                    "%Y-%m-%d"
+                )}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that the correct number of items are returned
+        self.assertEqual(len(response.context["donations"]), 2)
+
+        # Check that the correct items are returned
+        self.assertNotIn("Pizza", donation_items)
+        self.assertIn("Pesto Pizza", donation_items)
+        self.assertIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
+    
+    def test_search_keyword(self):
+        """Test searching donations by address."""
+        params = {"address": "ave"}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that the correct number of items are returned
+        self.assertEqual(len(response.context["donations"]), 1)
+
+        # Check that the correct items are returned
+        self.assertNotIn("Pizza", donation_items)
+        self.assertNotIn("Pesto Pizza", donation_items)
+        self.assertIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
 
     def test_search_all_fields(self):
         """Test searching donations by all fields: type, keyword, category, and quantity."""
@@ -417,7 +455,7 @@ class SearchFilterDonationTests(TestCase):
             "type": "food",
             "keyword": "pizza",
             "category": "restaurant",
-            "quantity": "5",
+            "min_quantity": "5",
         }
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
         response = self.client.get(url)
