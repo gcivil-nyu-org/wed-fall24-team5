@@ -228,3 +228,105 @@ class DonationTests(TestCase):
                 args=[self.organization.organization_id],
             ),
         )
+
+    def test_modify_donation_success(self):
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
+            ),
+            {
+                "food_item": "Updated Test Food",
+                "quantity": 15,
+                "pickup_by": timezone.now().date(),
+                "organization": str(self.organization.organization_id),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        updated_donation = Donation.objects.get(donation_id=self.donation.donation_id)
+        self.assertEqual(updated_donation.food_item, "Updated Test Food")
+        self.assertEqual(updated_donation.quantity, 15)
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+    def test_modify_donation_missing_fields(self):
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
+            ),
+            {
+                "food_item": "",
+                "quantity": 15,
+                "pickup_by": timezone.now().date(),
+                "organization": str(self.organization.organization_id),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        updated_donation = Donation.objects.get(donation_id=self.donation.donation_id)
+        self.assertEqual(updated_donation.food_item, "Test Food")
+        self.assertEqual(updated_donation.quantity, 10)
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+    def test_modify_donation_invalid_quantity(self):
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
+            ),
+            {
+                "food_item": "Updated Test Food",
+                "quantity": -15,
+                "pickup_by": timezone.now().date(),
+                "organization": str(self.organization.organization_id),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        updated_donation = Donation.objects.get(donation_id=self.donation.donation_id)
+        self.assertEqual(updated_donation.food_item, "Test Food")
+        self.assertEqual(updated_donation.quantity, 10)
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+    def test_modify_donation_invalid_date(self):
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
+            ),
+            {
+                "food_item": "Updated Test Food",
+                "quantity": 15,
+                "pickup_by": (timezone.now() + timezone.timedelta(days=8)).strftime(
+                    "%Y-%m-%d"
+                ),  # date after 7 day period
+                "organization": str(self.organization.organization_id),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        updated_donation = Donation.objects.get(donation_id=self.donation.donation_id)
+        self.assertEqual(updated_donation.food_item, "Test Food")
+        self.assertEqual(updated_donation.quantity, 10)
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            ),
+        )
