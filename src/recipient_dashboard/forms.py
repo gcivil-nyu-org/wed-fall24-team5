@@ -59,6 +59,23 @@ class SearchDonationForm(forms.Form):
         ),
     )
 
+    date = forms.DateField(
+        required=False,
+        label="Pickup Date",
+        widget=forms.DateInput(
+            attrs={
+                "class": "input",
+                "type": "date",
+                "placeholder": "Select date",
+                "style": """
+                background-color: transparent;
+                border-color: #CCC;
+                border-radius: 6px;
+            """,
+            }
+        ),
+    )
+
     min_quantity = forms.IntegerField(
         required=False,
         label="Quantity Available",
@@ -72,5 +89,20 @@ class SearchDonationForm(forms.Form):
                 border-radius: 6px;
             """,
             },
+        ),
+    )
+
+    address = forms.CharField(
+        required=False,
+        widget=forms.TextInput(
+            attrs={
+                "class": "input",
+                "placeholder": "Address",
+                "style": """
+                background-color: transparent;
+                border-color: #CCC;
+                border-radius: 6px;
+            """,
+            }
         ),
     )
