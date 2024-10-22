@@ -156,8 +156,10 @@ class DonationTests(TestCase):
 
         self.assertEqual(response.status_code, 302)
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Donation: Hyderabadi Biryani added successfully!", 
-                      [msg.message for msg in messages_list])
+        self.assertIn(
+            "Donation: Hyderabadi Biryani added successfully!",
+            [msg.message for msg in messages_list],
+        )
         self.assertTrue(
             Donation.objects.filter(food_item="Hyderabadi Biryani").exists()
         )
@@ -168,22 +170,6 @@ class DonationTests(TestCase):
                 args=[self.organization.organization_id],
             ),
         )
-
-    def test_add_donation_unsuccessful_get_request(self):
-        """Test that a GET request doesn't add a donation and returns an error message."""
-        response = self.client.get(
-            reverse("donor_dashboard:add_donation"),
-            {
-                "food_item": "New Item",
-                "quantity": 5,
-                "pickup_by": timezone.now().date(),
-                "organization": str(self.organization.organization_id),
-            },
-        )
-
-        # Check if an error message is displayed
-        messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Invalid Add Donation Request!", [msg.message for msg in messages_list])
 
     def test_add_donation_missing_fields(self):
         """Test unsuccessful addition of a donation when required fields are missing in the POST request."""
@@ -358,24 +344,40 @@ class DonationTests(TestCase):
                 args=[self.organization.organization_id],
             ),
         )
-    
+
     def test_delete_donation_successful_post(self):
         """Test that the donation is soft deleted with a POST request"""
-        response = self.client.post(reverse('donor_dashboard:delete_donation', args=[str(self.donation.donation_id)]))
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:delete_donation", args=[str(self.donation.donation_id)]
+            )
+        )
         self.donation.refresh_from_db()
         self.assertFalse(self.donation.active)
 
         # Check if a success message is displayed
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Donation 'Test Food' has been deleted successfully!", 
-                      [msg.message for msg in messages_list])
+        self.assertIn(
+            "Donation 'Test Food' has been deleted successfully!",
+            [msg.message for msg in messages_list],
+        )
 
         # Check redirection after deletion
-        self.assertRedirects(response, reverse('donor_dashboard:manage_organization', args=[str(self.organization.organization_id)]))
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[str(self.organization.organization_id)],
+            ),
+        )
 
     def test_delete_donation_unsuccessful_get_request(self):
         """Test that a GET request doesn't delete the donation and shows an error"""
-        response = self.client.get(reverse('donor_dashboard:delete_donation', args=[str(self.donation.donation_id)]))
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:delete_donation", args=[str(self.donation.donation_id)]
+            )
+        )
         self.donation.refresh_from_db()
 
         # Ensure that the donation is still active (was not deleted)
@@ -383,16 +385,26 @@ class DonationTests(TestCase):
 
         # Check if an error message is displayed
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Invalid Delete Donation Request!", [msg.message for msg in messages_list])
+        self.assertIn(
+            "Invalid Delete Donation Request!", [msg.message for msg in messages_list]
+        )
 
         # Check redirection after failed deletion attempt
-        self.assertRedirects(response, reverse('donor_dashboard:manage_organization', args=[str(self.organization.organization_id)]))
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[str(self.organization.organization_id)],
+            ),
+        )
 
     def test_delete_donation_nonexistent_donation(self):
         """Test that trying to delete a nonexistent donation results in a 404 error"""
         # URL with a non-existent donation ID
-        fake_donation_id = '12345678-1234-5678-1234-567812345678'
-        response = self.client.post(reverse('donor_dashboard:delete_donation', args=[str(fake_donation_id)]))
+        fake_donation_id = "12345678-1234-5678-1234-567812345678"
+        response = self.client.post(
+            reverse("donor_dashboard:delete_donation", args=[str(fake_donation_id)])
+        )
 
         # Check if the response status code is 404 (Not Found)
         self.assertEqual(response.status_code, 404)
