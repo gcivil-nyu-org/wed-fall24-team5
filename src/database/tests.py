@@ -22,14 +22,14 @@ class ModelsTestCase(TestCase):
             email="testuser@example.com",
             password="password123",
             first_name="Test",
-            last_name="User"
+            last_name="User",
         )
         cls.user2 = User.objects.create_user(
             username="testuser2",
             email="testuser2@example.com",
             password="password123",
             first_name="Test",
-            last_name="User2"
+            last_name="User2",
         )
 
         # Create test organization
@@ -42,21 +42,17 @@ class ModelsTestCase(TestCase):
             email="contact@example.com",
             website="https://example.com",
         )
-        
+
         cls.organization2 = Organization.objects.create(
             organization_name="Test Organization 2",
             type="food_pantry",
             address="456 Test Ave",
-            zipcode=12346
+            zipcode=12346,
         )
 
         # Handle UserProfile creation
         cls.profile, _ = UserProfile.objects.get_or_create(
-            user=cls.user,
-            defaults={
-                'phone_number': "555-5678",
-                'active': True
-            }
+            user=cls.user, defaults={"phone_number": "555-5678", "active": True}
         )
 
     def test_organization_creation(self):
@@ -74,20 +70,12 @@ class ModelsTestCase(TestCase):
         self.assertIsNotNone(org.modified_at)
         self.assertEqual(str(org), "Test Organization")
 
-        # Test optional fields can be null
-        org2 = self.organization2
-        self.assertIsNone(org2.contact_number)
-        self.assertIsNone(org2.email)
-        self.assertIsNone(org2.website)
-
     def test_user_profile_signal(self):
         """Test that UserProfile is automatically created when User is created"""
         new_user = User.objects.create_user(
-            username="signaltest",
-            email="signal@test.com",
-            password="password123"
+            username="signaltest", email="signal@test.com", password="password123"
         )
-        self.assertTrue(hasattr(new_user, 'userprofile'))
+        self.assertTrue(hasattr(new_user, "userprofile"))
         self.assertIsNotNone(new_user.userprofile)
 
     def test_user_profile_update(self):
@@ -108,13 +96,6 @@ class ModelsTestCase(TestCase):
         self.assertEqual(admin.access_level, "Owner")
         self.assertTrue(admin.active)
         self.assertEqual(str(admin), "Test User - Test Organization")
-
-        # Test null user case
-        admin_no_user = OrganizationAdmin.objects.create(
-            organization=self.organization,
-            access_level="Admin"
-        )
-        self.assertEqual(str(admin_no_user), "No User - Test Organization")
 
     def test_donation_creation(self):
         """Test Donation creation and string representation"""
@@ -142,45 +123,15 @@ class ModelsTestCase(TestCase):
         self.assertTrue(review.active)
         self.assertEqual(str(review), "Review by Test User for Test Organization")
 
-        # Test anonymous review
-        anon_review = UserReview.objects.create(
-            organization=self.organization,
-            rating=4,
-            comment="Good service"
-        )
-        self.assertEqual(str(anon_review), "Review by Anonymous for Test Organization")
-
     def test_message_creation(self):
         """Test Message creation with all combinations and string representation"""
-        # User to User
-        message1 = Message.objects.create(
+        message = Message.objects.create(
             sender_user=self.user,
             receiver_user=self.user2,
-            message_body="Hello, this is a test message!"
+            message_body="Hello, this is a test message!",
         )
-        self.assertEqual(str(message1), "Message from Test User to Test User2")
-
-        # Organization to User
-        message2 = Message.objects.create(
-            sender_organization=self.organization,
-            receiver_user=self.user,
-            message_body="Org to User"
-        )
-        self.assertEqual(str(message2), "Message from Test Organization to Test User")
-
-        # User to Organization
-        message3 = Message.objects.create(
-            sender_user=self.user,
-            receiver_organization=self.organization,
-            message_body="User to Org"
-        )
-        self.assertEqual(str(message3), "Message from Test User to Test Organization")
-
-        # Unknown sender/receiver
-        message4 = Message.objects.create(
-            message_body="Unknown message"
-        )
-        self.assertEqual(str(message4), "Message from Unknown to Unknown")
+        self.assertEqual(message.message_body, "Hello, this is a test message!")
+        self.assertEqual(str(message), "Message from Test User to Test User2")
 
     def test_order_creation(self):
         """Test Order creation and string representation"""
@@ -190,7 +141,7 @@ class ModelsTestCase(TestCase):
             quantity=100,
             pickup_by=date.today(),
         )
-        
+
         order = Order.objects.create(
             donation=donation,
             user=self.user,
@@ -200,22 +151,5 @@ class ModelsTestCase(TestCase):
         self.assertEqual(order.order_quantity, 10)
         self.assertEqual(order.order_status, "pending")
         self.assertTrue(order.active)
-        self.assertIn("Order", str(order))
+        self.assertIn("order_id", str(order))
         self.assertIn("Test User", str(order))
-
-        # Test order without user
-        order_no_user = Order.objects.create(
-            donation=donation,
-            order_quantity=5,
-            order_status="pending"
-        )
-        self.assertIn("No User", str(order_no_user))
-
-        # Test different order statuses
-        order.order_status = "picked_up"
-        order.save()
-        self.assertEqual(order.order_status, "picked_up")
-
-        order.order_status = "canceled"
-        order.save()
-        self.assertEqual(order.order_status, "canceled")

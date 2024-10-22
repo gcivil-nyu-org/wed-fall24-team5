@@ -167,6 +167,4 @@ class Order(models.Model):
     order_modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return (
-            f"Order {self.id} - {self.user.get_full_name() if self.user else 'No User'}"
-        )
+        return f"Order {self.order_id} - {self.user.get_full_name() if self.user else 'No User'}"
