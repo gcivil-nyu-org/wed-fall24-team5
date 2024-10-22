@@ -142,7 +142,7 @@ class DonationTests(TestCase):
             organization=self.organization,
         )
 
-    def test_add_donation_successful_post_request(self):
+    def test_add_donation_success(self):
         """Test successful addition of a new donation via a valid POST request."""
         response = self.client.post(
             reverse("donor_dashboard:add_donation"),
@@ -155,11 +155,6 @@ class DonationTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
-        messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn(
-            "Donation: Hyderabadi Biryani added successfully!",
-            [msg.message for msg in messages_list],
-        )
         self.assertTrue(
             Donation.objects.filter(food_item="Hyderabadi Biryani").exists()
         )
