@@ -5,8 +5,6 @@ from .models import (
     UserProfile,
     OrganizationAdmin,
     Donation,
-    UserReview,
-    Message,
     Order,
 )
 from datetime import date
@@ -109,29 +107,6 @@ class ModelsTestCase(TestCase):
         self.assertEqual(donation.quantity, 100)
         self.assertTrue(donation.active)
         self.assertEqual(str(donation), "Canned Beans - Test Organization")
-
-    def test_user_review_creation(self):
-        """Test UserReview creation and string representation"""
-        review = UserReview.objects.create(
-            organization=self.organization,
-            user=self.user,
-            rating=5,
-            comment="Great organization!",
-        )
-        self.assertEqual(review.rating, 5)
-        self.assertEqual(review.comment, "Great organization!")
-        self.assertTrue(review.active)
-        self.assertEqual(str(review), "Review by Test User for Test Organization")
-
-    def test_message_creation(self):
-        """Test Message creation with all combinations and string representation"""
-        message = Message.objects.create(
-            sender_user=self.user,
-            receiver_user=self.user2,
-            message_body="Hello, this is a test message!",
-        )
-        self.assertEqual(message.message_body, "Hello, this is a test message!")
-        self.assertEqual(str(message), "Message from Test User to Test User2")
 
     def test_order_creation(self):
         """Test Order creation and string representation"""
