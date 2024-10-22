@@ -7,6 +7,7 @@ from datetime import timedelta  # for pickup date being tomorrow in tests
 from django.contrib.messages import get_messages  # to capture messages
 from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
+from urllib.parse import urlencode  # for encoding URLs with query parameters
 
 
 class RecipientDashboardViewTests(TestCase):
@@ -262,3 +263,182 @@ class ReserveDonationTest(TestCase):
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Donation reserved successfully.")
+
+
+class SearchFilterDonationTests(TestCase):
+
+    def setUp(self):
+        # Creating a dummy user for testing
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+
+        # Logging in the user
+        self.client.login(username="testuser", password="testpass")
+
+        # Create organizations
+        self.organization1 = Organization.objects.create(
+            organization_name="Test Organization",
+            type="restaurant",
+            address="123 Test St",
+            zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
+        )
+
+        self.organization2 = Organization.objects.create(
+            organization_name="Test Organization Pizza",
+            type="grocery_store",
+            address="123 Test St",
+            zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
+        )
+
+        # Create donations
+        self.donation1 = Donation.objects.create(
+            organization=self.organization1,
+            food_item="Pizza",
+            quantity=5,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        self.donation2 = Donation.objects.create(
+            organization=self.organization2,
+            food_item="Apples",
+            quantity=10,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        self.donation3 = Donation.objects.create(
+            organization=self.organization1,
+            food_item="Pesto Pizza",
+            quantity=50,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        self.donation4 = Donation.objects.create(
+            organization=self.organization1,
+            food_item="Pepperoni Pizza",
+            quantity=0,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        # Set up SocialApp for allauth (required for login redirection)
+        site = Site.objects.get_current()
+        self.social_app = SocialApp.objects.create(
+            provider="google",
+            name="Test Google App",
+            client_id="test-client-id",
+            secret="test-secret",
+        )
+        self.social_app.sites.add(site)
+
+    def test_search_keyword_success(self):
+        """Test searching donations by keyword in both food and organization."""
+        params = {"keyword": "pizza"}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that the correct number of items are returned
+        self.assertEqual(len(response.context["donations"]), 3)
+
+        # Check that the correct items are returned
+        self.assertIn("Pizza", donation_items)
+        self.assertIn("Pesto Pizza", donation_items)
+        self.assertIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
+
+    def test_search_keyword_type(self):
+        """Test searching donations by keyword and type."""
+        params = {"type": "food", "keyword": "pizza"}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that the correct number of items are returned
+        self.assertEqual(len(response.context["donations"]), 2)
+
+        # Check that the correct items are returned
+        self.assertIn("Pizza", donation_items)
+        self.assertIn("Pesto Pizza", donation_items)
+        self.assertNotIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
+
+    def test_search_keyword_category(self):
+        """Test searching donations by keyword and category."""
+        params = {"keyword": "pizza", "category": "grocery_store"}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that two items are in result
+        self.assertEqual(len(response.context["donations"]), 1)
+
+        # Check that the correct two items are displayed
+        self.assertNotIn("Pizza", donation_items)
+        self.assertNotIn("Pesto Pizza", donation_items)
+        self.assertIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
+
+    def test_search_keyword_quantity(self):
+        """Test searching donations by type, keyword and category."""
+        params = {"type": "food", "keyword": "pizza", "quantity": "10"}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that the correct number of items are returned
+        self.assertEqual(len(response.context["donations"]), 1)
+
+        # Check that the correct items are returned
+        self.assertNotIn("Pizza", donation_items)
+        self.assertIn("Pesto Pizza", donation_items)
+        self.assertNotIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
+
+    def test_search_all_fields(self):
+        """Test searching donations by all fields: type, keyword, category, and quantity."""
+        params = {
+            "type": "food",
+            "keyword": "pizza",
+            "category": "restaurant",
+            "quantity": "5",
+        }
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+        donation_items = [
+            donation.food_item for donation in response.context["donations"]
+        ]
+
+        # Check that the correct number of items are returned
+        self.assertEqual(len(response.context["donations"]), 2)
+
+        # Check that the correct items are returned
+        self.assertIn("Pizza", donation_items)
+        self.assertIn("Pesto Pizza", donation_items)
+        self.assertNotIn("Apples", donation_items)
+        self.assertNotIn("Pepperoni Pizza", donation_items)
+
+    def test_search_no_results(self):
+        """Test searching donations with no matches."""
+        params = {"type": "food", "keyword": "pepperoni"}
+        url = reverse("recipient_dashboard") + "?" + urlencode(params)
+        response = self.client.get(url)
+
+        # Check that no items are returned
+        self.assertEqual(len(response.context["donations"]), 0)
