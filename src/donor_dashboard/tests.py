@@ -143,6 +143,7 @@ class DonationTests(TestCase):
         )
 
     def test_add_donation_successful_post_request(self):
+        """Test successful addition of a new donation via a valid POST request."""
         response = self.client.post(
             reverse("donor_dashboard:add_donation"),
             {
@@ -169,7 +170,7 @@ class DonationTests(TestCase):
         )
 
     def test_add_donation_unsuccessful_get_request(self):
-        """Test that a GET request doesn't add the donation and shows an error"""
+        """Test that a GET request doesn't add a donation and returns an error message."""
         response = self.client.get(
             reverse("donor_dashboard:add_donation"),
             {
@@ -185,6 +186,7 @@ class DonationTests(TestCase):
         self.assertIn("Invalid Add Donation Request!", [msg.message for msg in messages_list])
 
     def test_add_donation_missing_fields(self):
+        """Test unsuccessful addition of a donation when required fields are missing in the POST request."""
         response = self.client.post(
             reverse("donor_dashboard:add_donation"),
             {
@@ -206,6 +208,7 @@ class DonationTests(TestCase):
         )
 
     def test_add_donation_invalid_quantity(self):
+        """Test unsuccessful addition of a donation with an invalid (negative) quantity."""
         response = self.client.post(
             reverse("donor_dashboard:add_donation"),
             {
@@ -227,6 +230,7 @@ class DonationTests(TestCase):
         )
 
     def test_add_donation_invalid_date(self):
+        """Test unsuccessful addition of a donation with a pickup date beyond the allowed range."""
         response = self.client.post(
             reverse("donor_dashboard:add_donation"),
             {
@@ -249,7 +253,8 @@ class DonationTests(TestCase):
             ),
         )
 
-    def test_modify_donation_success(self):
+    def test_modify_donation_successful_post(self):
+        """Test successful modification of a donation via a valid POST request."""
         response = self.client.post(
             reverse(
                 "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
@@ -275,6 +280,7 @@ class DonationTests(TestCase):
         )
 
     def test_modify_donation_missing_fields(self):
+        """Test unsuccessful donation modification when required fields are missing."""
         response = self.client.post(
             reverse(
                 "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
@@ -300,6 +306,7 @@ class DonationTests(TestCase):
         )
 
     def test_modify_donation_invalid_quantity(self):
+        """Test unsuccessful modification of a donation with an invalid (negative) quantity."""
         response = self.client.post(
             reverse(
                 "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
@@ -325,6 +332,7 @@ class DonationTests(TestCase):
         )
 
     def test_modify_donation_invalid_date(self):
+        """Test unsuccessful modification of a donation with a pickup date beyond the allowed range."""
         response = self.client.post(
             reverse(
                 "donor_dashboard:modify_donation", args=[str(self.donation.donation_id)]
