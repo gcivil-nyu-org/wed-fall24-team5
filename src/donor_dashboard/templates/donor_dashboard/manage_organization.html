@@ -65,7 +65,10 @@
                                        data-organization-id="{{ donation.organization.organization_id }}">
                                        Modify
                                     </a>
-                                    <a href="#" class="card-footer-item delete-link">Delete</a>
+                                    <form class="card-footer-item" method="post" action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}" id="delete-form-{{ donation.donation_id }}">
+                                        {% csrf_token %}
+                                        <a class="delete-link is-danger" onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
+                                    </form>
                                 </footer>
                             </div>
                         </div>

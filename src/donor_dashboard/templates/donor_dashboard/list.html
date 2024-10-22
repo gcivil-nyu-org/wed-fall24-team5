@@ -2,7 +2,9 @@
 {% block title %}
     Organizations Dashboard
 {% endblock title %}
+{% load static %}
 {% block content %}
+    <script src="{% static 'js/org_list_tabs.js' %}"></script>
     <div class="container">   
         {% include "partials/notifications.html" %}
         <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
