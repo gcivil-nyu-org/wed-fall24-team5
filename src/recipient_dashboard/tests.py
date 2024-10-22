@@ -410,12 +410,12 @@ class SearchFilterDonationTests(TestCase):
         self.assertIn("Pesto Pizza", donation_items)
         self.assertNotIn("Apples", donation_items)
         self.assertNotIn("Pepperoni Pizza", donation_items)
-    
+
     def test_search_date(self):
         """Test searching donations by date."""
-        params = {"date": (timezone.now() + timezone.timedelta(days=3)).strftime(
-                    "%Y-%m-%d"
-                )}
+        params = {
+            "date": (timezone.now() + timezone.timedelta(days=3)).strftime("%Y-%m-%d")
+        }
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
         response = self.client.get(url)
         donation_items = [
@@ -430,8 +430,8 @@ class SearchFilterDonationTests(TestCase):
         self.assertIn("Pesto Pizza", donation_items)
         self.assertIn("Apples", donation_items)
         self.assertNotIn("Pepperoni Pizza", donation_items)
-    
-    def test_search_keyword(self):
+
+    def test_search_address(self):
         """Test searching donations by address."""
         params = {"address": "ave"}
         url = reverse("recipient_dashboard") + "?" + urlencode(params)
