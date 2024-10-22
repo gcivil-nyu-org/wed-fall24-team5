@@ -73,7 +73,7 @@ class SearchDonationForm(forms.Form):
                 border-radius: 6px;
             """,
             }
-        )
+        ),
     )
 
     min_quantity = forms.IntegerField(
