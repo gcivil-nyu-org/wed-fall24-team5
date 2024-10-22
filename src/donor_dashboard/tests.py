@@ -120,18 +120,20 @@ class DonorDashboardViewsTests(TestCase):
 class DonationTests(TestCase):
     def setUp(self):
         User = get_user_model()
-        # Create test user and log them in
-        self.user = User.objects.create_user(
-            username="testdonationuser@gmail.com", password="testpassword"
-        )
-        self.client.login(username="testdonationuser@gmail.com", password="testpassword")
+        self.user = User.objects.create_user(username="testuser", password="testpass")
 
-        # Create test organization
+        # Log in the user
+        self.client.login(username="testuser", password="testpass")
+
+        # Create a test organization
         self.organization = Organization.objects.create(
             organization_name="Test Organization",
             type="restaurant",
             address="123 Test St",
             zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
         )
 
         # Create a donation
