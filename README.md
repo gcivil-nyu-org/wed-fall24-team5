@@ -1,9 +1,10 @@
 # Food Waste Reduction App
+
 - `develop` branch: [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5.svg?token=MTgnqHfTp8UjvtysZ5vw&branch=develop)](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5?branch=develop)
-[![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=develop)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=develop)
+  [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=develop)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=develop)
 
 - `main` branch: [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5.svg?token=MTgnqHfTp8UjvtysZ5vw&branch=main)](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5?branch=main)
-[![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=main)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=main)
+  [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=main)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=main)
 
 ## Project Overview
 
@@ -48,11 +49,14 @@ Our vision is to create a platform that fosters a strong community network by co
 ├── .github/               # GitHub workflows and settings
 ├── system_design_docs/    # System design documentation
 ├── src/                   # Django application root
-│ ├── manage.py            # Django management script
-│ ├── django_management/   # Main Django project folder
 │ ├── accounts/            # Sub-application for register / login / accounts
+│ ├── database/            # Database schemas
+│ ├── donor_dashboard/     # Sub-app for donor management
+│ ├── django_management/   # Main Django project folder
+│ ├── recipient_dashboard/ # Sub application for reserving donations
 │ ├── static/              # Static files (CSS, JS, images)
-│ └── templates/           # HTML templates for front-end
+│ ├── templates/           # HTML templates for front-end
+│ └── manage.py            # Django management script
 ├── README.md              # This file
 ├── requirements.txt       # Requirements to be installed with pip
 ├── .travis.yml            # Setup for Travis CI / CD
@@ -192,6 +196,7 @@ djlint src/ --lint
 ## Running tests and coverage
 
 To run coverage tests locally:
+
 ```bash
 coverage run --source='src' src/manage.py test
 ```
