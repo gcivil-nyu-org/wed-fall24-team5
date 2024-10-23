@@ -30,7 +30,7 @@ jobs:
       script:
         - black --check ./src
         - flake8 ./src
-        - djlint src/ --lint        
+        - djlint src/ --lint
         - coverage run --source='src' src/manage.py test src --noinput
         - coverage report
         - coveralls
@@ -38,10 +38,10 @@ jobs:
         - git config --global user.name "travis-ci"
         - git config --global user.email "travis-cron@travis-ci.com"
         - git remote set-url origin https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git
-        - git fetch origin develop
+        - git fetch origin develop:develop
         - git checkout main
-        - git merge origin/develop
-        - git push origin main
+        - git merge develop
+        - git push https://$GITHUB_TOKEN@github.com/$TRAVIS_REPO_SLUG.git main
       deploy:
         - provider: elasticbeanstalk
           access_key_id: $AWS_ACCESS_KEY_ID
@@ -64,7 +64,7 @@ jobs:
       script:
         - black --check ./src
         - flake8 ./src
-        - djlint src/ --lint        
+        - djlint src/ --lint
         - coverage run --source='src' src/manage.py test src --noinput
         - coverage report
         - coveralls
@@ -80,5 +80,3 @@ jobs:
           on:
             repo: gcivil-nyu-org/wed-fall24-team5
             branch: develop
-    
-
