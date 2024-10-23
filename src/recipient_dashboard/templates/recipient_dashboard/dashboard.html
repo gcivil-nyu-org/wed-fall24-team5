@@ -2,6 +2,7 @@
 {% block title %}
 Donation Dashboard
 {% endblock title %}
+{% load static %}
 {% block content %}
 <div class="container">
     {% include "partials/notifications.html" %}
@@ -10,8 +11,8 @@ Donation Dashboard
         {% csrf_token %}
         <div class="card">
             <div class="card-content">
-                <div class="columns is-multiline is-centered">
-                    <div class="column is-three-quarters">
+                <div class="columns is-centered">
+                    <div class="column is-four-fifths is-full-mobile">
                         <div class="field has-addons has-addons-centered">
                             <div class="control">
                                 {{ form.type }}
@@ -20,8 +21,12 @@ Donation Dashboard
                                 {{ form.keyword }}
                             </div>
                         </div>
+                        <button type="button" id="advanced-options-btn" class="button is-small is-ghost">
+                            <span class="caret-icon icon is-small"><i class="fa fa-caret-right"></i></span>
+                            <span>Advanced Options</span>
+                        </button>
                     </div>
-                    <div class="column is-one-quarter">
+                    <div class="column is-one-fifth">
                         <div class="field is-grouped is-grouped-centered">
                             <div class="control">
                                 <button class="button is-info" type="submit">
@@ -35,35 +40,39 @@ Donation Dashboard
                             </div>
                         </div>
                     </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Organization Type</label>
-                            <div class="control is-expanded">
-                                {{ form.category }}
+                </div>
+                <div id="advanced-options" class="is-hidden">
+                    <div class="columns">
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Organization Type</label>
+                                <div class="control is-expanded">
+                                    {{ form.category }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Pickup Date After</label>
-                            <div class="control">
-                                {{ form.date }}
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Pickup Date After</label>
+                                <div class="control">
+                                    {{ form.date }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Quantity Available</label>
-                            <div class="control">
-                                {{ form.min_quantity }}
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Quantity Available</label>
+                                <div class="control">
+                                    {{ form.min_quantity }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Address</label>
-                            <div class="control">
-                                {{ form.address }}
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Address</label>
+                                <div class="control">
+                                    {{ form.address }}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -117,4 +126,5 @@ Donation Dashboard
     <p class="box">No donations available at the moment.</p>
     {% endif %}
 </div>
+<script src="{% static 'js/search_options.js' %}"></script>
 {% endblock content %}
