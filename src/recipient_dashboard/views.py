@@ -22,7 +22,6 @@ def recipient_dashboard(request):
         date = form.cleaned_data.get("date")
         min_quantity = form.cleaned_data.get("min_quantity")
         address = form.cleaned_data.get("address")
-
         if keyword:
             if type == "food":
                 donations = donations.filter(food_item__icontains=keyword)
