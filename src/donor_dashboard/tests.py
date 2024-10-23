@@ -144,7 +144,7 @@ class DonationTests(TestCase):
             organization=self.organization,
         )
 
-    def test_add_donation_success(self):
+    def test_add_donation_successful_post_request(self):
         """Test successful addition of a new donation via a valid POST request."""
         response = self.client.post(
             reverse("donor_dashboard:add_donation"),
@@ -157,6 +157,11 @@ class DonationTests(TestCase):
         )
 
         self.assertEqual(response.status_code, 302)
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(
+            "Donation: Hyderabadi Biryani added successfully!",
+            [msg.message for msg in messages_list],
+        )
         self.assertTrue(
             Donation.objects.filter(food_item="Hyderabadi Biryani").exists()
         )
@@ -166,6 +171,24 @@ class DonationTests(TestCase):
                 "donor_dashboard:manage_organization",
                 args=[self.organization.organization_id],
             ),
+        )
+
+    def test_add_donation_unsuccessful_get_request(self):
+        """Test that a GET request doesn't add a donation and returns an error message."""
+        response = self.client.get(
+            reverse("donor_dashboard:add_donation"),
+            {
+                "food_item": "Pizza",
+                "quantity": 5,
+                "pickup_by": timezone.now().date(),
+                "organization": str(self.organization.organization_id),
+            },
+        )
+
+        # Check if an error message is displayed
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(
+            "Invalid Add Donation Request!", [msg.message for msg in messages_list]
         )
 
     def test_add_donation_missing_fields(self):
