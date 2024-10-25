@@ -75,11 +75,12 @@ def manage_organization(request, organization_id):
     donations = Donation.objects.filter(
         organization_id=organization.organization_id, active=True
     )
+    orders = Order.objects.filter(donation__organization=organization).prefetch_related("donation")
     status = organization.active
     return render(
         request,
         "donor_dashboard/manage_organization.html",
-        {"organization": organization, "donations": donations, "status": status},
+        {"organization": organization, "donations": donations, "status": status, "orders": orders},
     )
 
 
@@ -229,4 +230,17 @@ def delete_donation(request, donation_id):
     messages.error(request, "Invalid Delete Donation Request!")
     return redirect(
         "donor_dashboard:manage_organization", organization_id=donation.organization_id
+    )
+
+
+@login_required
+def manage_orders(request, organization_id):
+    # Fetch the organization using the organization_id
+    organization = Organization.objects.get(organization_id=organization_id)
+    orders = Order.objects.filter(donation__organization=organization).prefetch_related("donation")
+    status = organization.active
+    return render(
+        request,
+        "donor_dashboard/manage_orders.html",
+        {"organization": organization, "orders": orders, "status": status},
     )

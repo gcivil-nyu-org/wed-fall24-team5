@@ -9,7 +9,7 @@
     <div class="container">
         {% include "partials/notifications.html" %}
         <div class="flex-container">
-            <h2 class="subtitle mt-5">
+            <h1 class="title mt-5">
                 <strong>{{ organization.organization_name }}</strong>
             </h2>
             <div id="organization-id" hidden>{{ organization.organization_id }}</div>
@@ -32,7 +32,7 @@
                 {% endif %}
             </div>
         
-        <h2 class="subtitle mt-3">List of Donations:</h2>
+        <h2 class="subtitle mt-3"><strong>List of Donations</strong></h2>
             {% if donations %}
                 <div class="columns is-multiline is-variable is-4">
                     {% for donation in donations %}
@@ -76,6 +76,38 @@
                 </div>
             {% else %}
                 <p class="box">No donations available at the moment.</p>
+            {% endif %}
+            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+            {% if orders %}
+            <div class="table-container">
+            <table class="table order-table is-hoverable is-striped is-fullwidth" style="border-radius: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>User</th>
+                        <th>Quantity</th>
+                        <th>Pickup Date</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.donation.food_item }}</td>
+                        <td>{{ order.user }}</td>
+                        <td>{{ order.order_quantity }}</td>
+                        <td>{{ order.donation.pickup_by }}</td>
+                        <td>{{ organization.address }}</td>
+                        <td>{{ order.order_status }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            {% else %}
+                <p class="box">No orders to display.</p>
             {% endif %}
     </div>
 
