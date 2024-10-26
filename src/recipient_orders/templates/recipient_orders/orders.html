@@ -69,12 +69,13 @@
                                 <form class="card-footer-item" method="post" action="{% url 'cancel_order' order.order_id %}" id="cancel-form-{{ order.order_id }}">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="delete-link"
+                                            class="has-text-danger"
+                                            style="width: 100%; background: none; border: none; cursor: pointer; font-size: inherit;"
                                             onclick="return confirm('Are you sure you want to cancel this reservation?')">
                                         Cancel
                                     </button>
                                 </form>
-                            </footer>
+                            </footer>                            
                         </div>
                     </div>
                 {% endfor %}
