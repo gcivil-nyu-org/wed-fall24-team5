@@ -1,4 +1,10 @@
 {% extends "_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/orders.css' %}">
+{% endblock %}
+
 {% block title %}My Orders{% endblock title %}
 {% block content %}
 
@@ -43,8 +49,7 @@
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
                                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               class="button is-link is-light is-fullwidth"
-                                               style="white-space: normal; word-wrap: break-word"
+                                               class="button is-link is-light is-fullwidth address-link"
                                                target="_blank" 
                                                rel="noopener noreferrer">
                                                 {{ order.donation.organization.organization_name }}
@@ -62,11 +67,10 @@
                             
                             <footer class="card-footer">
                                 <a href="#" class="card-footer-item">Modify</a>
-                                <form method="POST" action="{% url 'cancel_order' order.order_id %}" style="width: 50%;">
+                                <form method="post" action="{% url 'cancel_order' order.order_id %}" class="cancel-form">
                                     {% csrf_token %}
                                     <button type="submit" 
-                                            class="card-footer-item has-text-danger" 
-                                            style="width: 100%; background: none; border: none; cursor: pointer; padding: 0.75rem;"
+                                            class="card-footer-item has-text-danger cancel-button"
                                             onclick="return confirm('Are you sure you want to cancel this reservation?')">
                                         Cancel
                                     </button>
@@ -104,8 +108,7 @@
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
                                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               class="button is-link is-light is-fullwidth"
-                                               style="white-space: normal; word-wrap: break-word"
+                                               class="button is-link is-light is-fullwidth address-link"
                                                target="_blank" 
                                                rel="noopener noreferrer">
                                                 {{ order.donation.organization.organization_name }}
@@ -122,7 +125,7 @@
                             </div>
                             
                             <footer class="card-footer">
-                                <div class="card-footer-item">Completed</div>
+                                <div class="card-footer-button">Completed</div>
                             </footer>
                         </div>
                     </div>
@@ -156,8 +159,7 @@
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
                                             <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               class="button is-link is-light is-fullwidth"
-                                               style="white-space: normal; word-wrap: break-word"
+                                               class="button is-link is-light is-fullwidth address-link"
                                                target="_blank" 
                                                rel="noopener noreferrer">
                                                 {{ order.donation.organization.organization_name }}
@@ -174,7 +176,7 @@
                             </div>
                             
                             <footer class="card-footer">
-                                <div class="card-footer-item">Canceled</div>
+                                <div class="card-footer-button">Canceled</div>
                             </footer>
                         </div>
                     </div>
@@ -188,26 +190,16 @@
     </div>
 </div>
 
-<!-- Add this JavaScript at the end of the template -->
 <script>
 document.addEventListener('DOMContentLoaded', () => {
-    // Get all tab items
     const tabs = document.querySelectorAll('.tabs li');
     const orderLists = document.querySelectorAll('.order-list');
 
-    // Add click event to each tab
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
-            // Remove active class from all tabs
             tabs.forEach(t => t.classList.remove('is-active'));
-            
-            // Add active class to clicked tab
             tab.classList.add('is-active');
-
-            // Hide all order lists
             orderLists.forEach(list => list.classList.add('is-hidden'));
-            
-            // Show the selected order list
             const targetId = tab.getAttribute('data-target');
             document.getElementById(targetId).classList.remove('is-hidden');
         });
