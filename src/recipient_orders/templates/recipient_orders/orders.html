@@ -64,6 +64,7 @@
                                     </div>
                                 </div>
                             </div>
+                            <!-- djlint: disable -->
                             <footer class="card-footer">
                                 <a href="#" class="card-footer-item">Modify</a>
                                 <form class="card-footer-item" method="post" action="{% url 'cancel_order' order.order_id %}" id="cancel-form-{{ order.order_id }}">
@@ -75,7 +76,8 @@
                                         Cancel
                                     </button>
                                 </form>
-                            </footer>                            
+                            </footer>  
+                            <!-- djlint: enable -->
                         </div>
                     </div>
                 {% endfor %}
