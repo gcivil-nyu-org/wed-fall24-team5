@@ -1,32 +1,28 @@
 {% extends "_base.html" %}
-{% block title %}
-    My Orders
-{% endblock title %}
+{% block title %}My Orders{% endblock title %}
 {% block content %}
+
 <div class="container">
+    {% include "partials/notifications.html" %}
+    
     <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
     <h2 class="subtitle mt-3">Your reservations:</h2>
-    <!--Tab Navigation Bar-->
+
     <div class="tabs is-centered is-toggle is-fullwidth">
         <ul>
-            <li class="is-active" id="pending-tab">
-                <a>
-                    <span>Pending</span>
-                </a>
+            <li class="is-active" data-target="pending-orders">
+                <a>Pending</a>
             </li>
-            <li id="picked-up-tab">
-                <a>
-                    <span>Picked Up</span>
-                </a>
+            <li data-target="picked-up-orders">
+                <a>Picked Up</a>
             </li>
-            <li id="canceled-tab">
-                <a>
-                    <span>Canceled</span>
-                </a>
+            <li data-target="canceled-orders">
+                <a>Canceled</a>
             </li>
         </ul>
     </div>
 
+    <!-- Pending Orders Section -->
     <div id="pending-orders" class="order-list">
         {% if pending_orders %}
             <div class="columns is-multiline is-variable is-4">
@@ -36,47 +32,58 @@
                             <div class="card-content">
                                 <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
                                     <div class="media-content">
-                                        <p class="title is-4 is-clipped">{{ order.donation.food_item }}</p>
+                                        <p class="title is-4">{{ order.donation.food_item }}</p>
                                     </div>
                                     <div class="media-right mt-2-mobile">
                                         <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
                                     </div>
                                 </div>
+
                                 <div class="content">
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth"
+                                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
+                                               class="button is-link is-light is-fullwidth"
                                                style="white-space: normal; word-wrap: break-word"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               target="_blank"
+                                               target="_blank" 
                                                rel="noopener noreferrer">
                                                 {{ order.donation.organization.organization_name }}
-                                                <br>
                                                 {{ order.donation.organization.address }}
                                             </a>
                                         </div>
                                         <div class="column is-one-third has-text-centered">
                                             <strong>Pickup by:</strong>
-                                            <p>{{ order.donation.pickup_by }}</p>
+                                            <br>
+                                            {{ order.donation.pickup_by }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
                             <footer class="card-footer">
                                 <a href="#" class="card-footer-item">Modify</a>
-                                <a href="#" class="card-footer-item">Cancel</a>
+                                <form method="POST" action="{% url 'cancel_order' order.order_id %}" style="width: 50%;">
+                                    {% csrf_token %}
+                                    <button type="submit" 
+                                            class="card-footer-item has-text-danger" 
+                                            style="width: 100%; background: none; border: none; cursor: pointer; padding: 0.75rem;"
+                                            onclick="return confirm('Are you sure you want to cancel this reservation?')">
+                                        Cancel
+                                    </button>
+                                </form>
                             </footer>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-        <div class="box">
-            <p>No pending orders.</p>
-        </div>
+            <div class="box">
+                No pending orders.
+            </div>
         {% endif %}
     </div>
 
+    <!-- Picked Up Orders Section -->
     <div id="picked-up-orders" class="order-list is-hidden">
         {% if picked_up_orders %}
             <div class="columns is-multiline is-variable is-4">
@@ -86,47 +93,49 @@
                             <div class="card-content">
                                 <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
                                     <div class="media-content">
-                                        <p class="title is-4 is-clipped">{{ order.donation.food_item }}</p>
+                                        <p class="title is-4">{{ order.donation.food_item }}</p>
                                     </div>
                                     <div class="media-right mt-2-mobile">
                                         <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
                                     </div>
                                 </div>
+
                                 <div class="content">
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth"
+                                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
+                                               class="button is-link is-light is-fullwidth"
                                                style="white-space: normal; word-wrap: break-word"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               target="_blank"
+                                               target="_blank" 
                                                rel="noopener noreferrer">
                                                 {{ order.donation.organization.organization_name }}
-                                                <br>
                                                 {{ order.donation.organization.address }}
                                             </a>
                                         </div>
                                         <div class="column is-one-third has-text-centered">
                                             <strong>Pickup by:</strong>
-                                            <p>{{ order.donation.pickup_by }}</p>
+                                            <br>
+                                            {{ order.donation.pickup_by }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
                             <footer class="card-footer">
-                                <a href="#" class="card-footer-item">Modify</a>
-                                <a href="#" class="card-footer-item">Cancel</a>
+                                <div class="card-footer-item">Completed</div>
                             </footer>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-        <div class="box">
-            <p>No picked up orders.</p>
-        </div>
+            <div class="box">
+                No picked up orders.
+            </div>
         {% endif %}
     </div>
 
+    <!-- Canceled Orders Section -->
     <div id="canceled-orders" class="order-list is-hidden">
         {% if canceled_orders %}
             <div class="columns is-multiline is-variable is-4">
@@ -136,63 +145,73 @@
                             <div class="card-content">
                                 <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
                                     <div class="media-content">
-                                        <p class="title is-4 is-clipped">{{ order.donation.food_item }}</p>
+                                        <p class="title is-4">{{ order.donation.food_item }}</p>
                                     </div>
                                     <div class="media-right mt-2-mobile">
                                         <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
                                     </div>
                                 </div>
+
                                 <div class="content">
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth"
+                                            <a href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
+                                               class="button is-link is-light is-fullwidth"
                                                style="white-space: normal; word-wrap: break-word"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               target="_blank"
+                                               target="_blank" 
                                                rel="noopener noreferrer">
                                                 {{ order.donation.organization.organization_name }}
-                                                <br>
                                                 {{ order.donation.organization.address }}
                                             </a>
                                         </div>
                                         <div class="column is-one-third has-text-centered">
                                             <strong>Pickup by:</strong>
-                                            <p>{{ order.donation.pickup_by }}</p>
+                                            <br>
+                                            {{ order.donation.pickup_by }}
                                         </div>
                                     </div>
                                 </div>
                             </div>
+                            
                             <footer class="card-footer">
-                                <a href="#" class="card-footer-item">Modify</a>
-                                <a href="#" class="card-footer-item">Cancel</a>
+                                <div class="card-footer-item">Canceled</div>
                             </footer>
                         </div>
                     </div>
                 {% endfor %}
             </div>
         {% else %}
-        <div class="box">
-            <p>No cancelled orders.</p>
-        </div>
+            <div class="box">
+                No cancelled orders.
+            </div>
         {% endif %}
     </div>
 </div>
 
+<!-- Add this JavaScript at the end of the template -->
 <script>
-    // JavaScript to handle tab switching
-    document.addEventListener('DOMContentLoaded', () => {
-        const tabs = document.querySelectorAll('.tabs ul li');
-        const orderLists = document.querySelectorAll('.order-list');
+document.addEventListener('DOMContentLoaded', () => {
+    // Get all tab items
+    const tabs = document.querySelectorAll('.tabs li');
+    const orderLists = document.querySelectorAll('.order-list');
 
-        tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('is-active'));
-                orderLists.forEach(list => list.classList.add('is-hidden'));
+    // Add click event to each tab
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs
+            tabs.forEach(t => t.classList.remove('is-active'));
+            
+            // Add active class to clicked tab
+            tab.classList.add('is-active');
 
-                tab.classList.add('is-active');
-                orderLists[index].classList.remove('is-hidden');
-            });
+            // Hide all order lists
+            orderLists.forEach(list => list.classList.add('is-hidden'));
+            
+            // Show the selected order list
+            const targetId = tab.getAttribute('data-target');
+            document.getElementById(targetId).classList.remove('is-hidden');
         });
     });
+});
 </script>
 {% endblock content %}

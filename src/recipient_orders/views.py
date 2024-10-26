@@ -1,5 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 from database.models import Order
 
 
@@ -30,3 +31,31 @@ def recipient_orders(request):
     }
 
     return render(request, "recipient_orders/orders.html", context)
+
+
+@login_required
+def cancel_order(request, order_id):
+    # Get the order or return 404 if not found
+    order = get_object_or_404(Order, order_id=order_id, user=request.user, active=True)
+
+    if request.method == "POST":
+        if order.order_status == "pending":
+            # Return the quantity back to the donation
+            donation = order.donation
+            donation.quantity += order.order_quantity
+            donation.save()
+
+            # Update order status to canceled
+            order.order_status = "canceled"
+            order.save()
+
+            messages.success(
+                request, "Your reservation has been cancelled successfully."
+            )
+        else:
+            messages.error(request, "Only pending orders can be cancelled.")
+
+        return redirect("recipient_orders")
+
+    messages.error(request, "Invalid request method.")
+    return redirect("recipient_orders")
