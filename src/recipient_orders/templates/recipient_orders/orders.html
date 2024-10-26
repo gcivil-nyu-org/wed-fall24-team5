@@ -10,6 +10,44 @@
 {% endblock title %}
 
 {% block content %}
+<!-- Modify Order Modal -->
+<div id="modifyOrderModal" class="modal">
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Modify Order</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <form method="post" action="{% url 'modify_order' %}" id="modify-order-form">
+            {% csrf_token %}
+            <section class="modal-card-body">
+                <input type="hidden" id="order_id" name="order_id">
+                <input type="hidden" id="current_quantity" name="current_quantity">
+                <input type="hidden" id="available_quantity" name="available_quantity">
+                
+                <div class="field">
+                    <label class="label">Food Item</label>
+                    <div class="control">
+                        <input class="input" type="text" id="food_item" readonly>
+                    </div>
+                </div>
+
+                <div class="field">
+                    <label class="label">New Quantity</label>
+                    <div class="control">
+                        <input class="input" type="number" name="new_quantity" id="new_quantity" min="1" required>
+                    </div>
+                    <p class="help">Maximum allowed: <span id="max_allowed">3</span></p>
+                </div>
+            </section>
+            <footer class="modal-card-foot">
+                <button type="submit" class="button is-info">Save Changes</button>
+                <button type="button" class="button" onclick="closeModifyModal()">Cancel</button>
+            </footer>
+        </form>
+    </div>
+</div>
+
 <div class="container">
     {% include "partials/notifications.html" %}
     <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
@@ -64,9 +102,15 @@
                                     </div>
                                 </div>
                             </div>
-                            <!-- djlint: disable -->
                             <footer class="card-footer">
-                                <a href="#" class="card-footer-item">Modify</a>
+                                <a href="#" 
+                                   class="card-footer-item"
+                                   onclick="openModifyModal('{{ order.order_id }}', 
+                                                         '{{ order.order_quantity }}',
+                                                         '{{ order.donation.quantity }}',
+                                                         '{{ order.donation.food_item }}')">
+                                    Modify
+                                </a>
                                 <form class="card-footer-item" method="post" action="{% url 'cancel_order' order.order_id %}" id="cancel-form-{{ order.order_id }}">
                                     {% csrf_token %}
                                     <button type="submit" 
@@ -76,8 +120,7 @@
                                         Cancel
                                     </button>
                                 </form>
-                            </footer>  
-                            <!-- djlint: enable -->
+                            </footer>
                         </div>
                     </div>
                 {% endfor %}
@@ -189,6 +232,7 @@
 </div>
 
 <script>
+    // Tab switching functionality
     document.addEventListener('DOMContentLoaded', () => {
         const tabs = document.querySelectorAll('.tabs ul li');
         const orderLists = document.querySelectorAll('.order-list');
@@ -202,6 +246,37 @@
                 orderLists[index].classList.remove('is-hidden');
             });
         });
+        
+        // Modal functionality
+        const modal = document.getElementById('modifyOrderModal');
+        const closeButtons = modal.querySelectorAll('.delete, .modal-background');
+        
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                closeModifyModal();
+            });
+        });
     });
+
+    // Modal functions
+    function openModifyModal(orderId, currentQuantity, availableQuantity, foodItem) {
+        const modal = document.getElementById('modifyOrderModal');
+        const maxAllowed = Math.min(3, parseInt(availableQuantity) + parseInt(currentQuantity));
+        
+        document.getElementById('order_id').value = orderId;
+        document.getElementById('current_quantity').value = currentQuantity;
+        document.getElementById('available_quantity').value = availableQuantity;
+        document.getElementById('food_item').value = foodItem;
+        document.getElementById('new_quantity').max = maxAllowed;
+        document.getElementById('max_allowed').textContent = maxAllowed;
+        document.getElementById('new_quantity').value = currentQuantity;
+
+        modal.classList.add('is-active');
+    }
+
+    function closeModifyModal() {
+        const modal = document.getElementById('modifyOrderModal');
+        modal.classList.remove('is-active');
+    }
 </script>
 {% endblock content %}
