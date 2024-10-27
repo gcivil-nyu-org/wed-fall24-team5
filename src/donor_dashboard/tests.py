@@ -27,7 +27,7 @@ class DonorDashboardViewsTests(TestCase):
             active=True,
         )
         self.org_admin = OrganizationAdmin.objects.create(
-            user=self.user, organization=self.organization
+            user=self.user, organization=self.organization, access_level="owner"
         )
         self.client.login(email="testuser@example.com", password="password")
 
@@ -134,6 +134,10 @@ class DonationTests(TestCase):
             contact_number="1234567890",
             email="test@example.com",
             active=True,
+        )
+
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user, organization=self.organization, access_level="owner"
         )
 
         # Create a donation

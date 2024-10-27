@@ -78,9 +78,10 @@ def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
     org_user = User.objects.get(email=request.user.email)
-    access_level = OrganizationAdmin.objects.get(
+    organization_admin = OrganizationAdmin.objects.get(
         user=org_user, organization=organization
-    ).access_level
+    )
+    access_level = organization_admin.access_level
     if access_level == "owner":
         owner_access = True
     else:
