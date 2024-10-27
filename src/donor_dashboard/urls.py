@@ -36,4 +36,20 @@ urlpatterns = [
         views.delete_donation,
         name="delete_donation",
     ),
+    path("add_org_admin/", views.add_org_admin, name="add_org_admin"),
+    path(
+        "make_as_admin/<uuid:organization_id>/<str:admin_email>",
+        views.make_as_admin,
+        name="make_as_admin",
+    ),
+    path(
+        "make_as_owner/<uuid:organization_id>/<str:admin_email>",
+        views.make_as_owner,
+        name="make_as_owner",
+    ),
+    path(
+        "remove_admin_owner/<uuid:organization_id>/<str:admin_email>",
+        views.remove_admin_owner,
+        name="remove_admin_owner",
+    ),
 ]
