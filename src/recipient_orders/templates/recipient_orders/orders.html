@@ -10,6 +10,7 @@
 {% endblock title %}
 
 {% block content %}
+{% include "partials/notifications.html" %}
 <!-- Modify Order Modal -->
 <div id="modifyOrderModal" class="modal">
     <div class="modal-background"></div>
@@ -103,6 +104,9 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
+                                <a href="{% url 'pickup_order' order.order_id %}" class="card-footer-item">Mark as Picked Up</a>
+                                <a href="#" class="card-footer-item">Modify</a>
+                                <a href="#" class="card-footer-item">Cancel</a>
                                 <a href="#" 
                                    class="card-footer-item"
                                    onclick="openModifyModal('{{ order.order_id }}', 
@@ -168,6 +172,9 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
+                                <a href="{% url 'mark_order_as_pending' order.order_id %}" class="card-footer-item">Mark as Pending</a>
+                                <a href="#" class="card-footer-item">Modify</a>
+                                <a href="#" class="card-footer-item">Cancel</a>
                                 <div class="card-footer-item has-text-grey">Completed</div>
                             </footer>
                         </div>
