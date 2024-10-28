@@ -1,6 +1,6 @@
-from django.shortcuts import render
+from django.shortcuts import redirect, render
 from django.contrib.auth.decorators import login_required
-from database.models import Order
+from database.models import Order, UserReview
 
 
 @login_required
@@ -30,3 +30,20 @@ def recipient_orders(request):
     }
 
     return render(request, "recipient_orders/orders.html", context)
+
+@login_required
+def submit_review(request):
+    if request.method == 'POST':
+        order_id = request.POST.get('order_id')
+        rating = request.POST.get('rating')
+        comment = request.POST.get('comment')
+        print(order_id)
+
+        order = Order.objects.get(pk=order_id)
+        UserReview.objects.create(
+            organization=order.donation.organization,
+            user=request.user,
+            rating=rating,
+            comment=comment
+        )
+        return redirect('/recipient_orders')

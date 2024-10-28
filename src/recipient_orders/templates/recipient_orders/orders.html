@@ -2,7 +2,9 @@
 {% block title %}
     My Orders
 {% endblock title %}
+{% load static %}
 {% block content %}
+{% include 'recipient_orders/review_modal.html' %}
 <div class="container">
     <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
     <h2 class="subtitle mt-3">Your reservations:</h2>
@@ -113,6 +115,7 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
+                                <a href="#" class="card-footer-item review-btn" data-order-id="{{ order.order_id }}">Review</a>
                                 <a href="#" class="card-footer-item">Modify</a>
                                 <a href="#" class="card-footer-item">Cancel</a>
                             </footer>
@@ -177,7 +180,6 @@
         {% endif %}
     </div>
 </div>
-
 <script>
     // JavaScript to handle tab switching
     document.addEventListener('DOMContentLoaded', () => {
@@ -195,4 +197,5 @@
         });
     });
 </script>
+<script src="{% static 'js/review_modal.js' %}"></script>
 {% endblock content %}
