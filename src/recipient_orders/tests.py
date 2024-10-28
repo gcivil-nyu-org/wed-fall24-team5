@@ -3,7 +3,7 @@ from django.test import TestCase
 from django.urls import reverse
 from database.models import Order, Donation, Organization, UserReview
 from django.utils import timezone
-from datetime import date, timedelta
+from datetime import timedelta
 from django.contrib.messages import get_messages
 
 
