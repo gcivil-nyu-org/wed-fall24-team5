@@ -14,17 +14,21 @@
             </h2>
             <div id="organization-id" hidden>{{ organization.organization_id }}</div>
                 {% if status %}
-                    <div class="buttons">
-                        <button id="add-donation-button" class="button is-dark">Add Donation</button>
-                        <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}" class="button is-info">
-                            Organization Details
-                        </a>
+                    
+                        <div class="buttons">
+                            <button id="add-donation-button" class="button is-dark">Add Donation</button>
+                            {% if owner_access %}
+                            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}" class="button is-info">
+                                Manage Organization
+                            </a>
 
-                        <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
-                            {% csrf_token %}
-                            <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
-                        </form>
-                    </div>
+                            <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
+                                {% csrf_token %}
+                                <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
+                            </form>
+                            {% endif %}
+                        </div>
+                    
                 {% else %}
                     <div class="media-right">
                         <span class="tag is-primary is-light is-medium mt-1">In Active</span>

@@ -14,7 +14,9 @@ def add_organization(request):
         if form.is_valid():
             organization = form.save()
             org_user = User.objects.get(email=request.user.email)
-            OrganizationAdmin.objects.create(user=org_user, organization=organization)
+            OrganizationAdmin.objects.create(
+                user=org_user, organization=organization, access_level="owner"
+            )
             messages.success(request, "Organization successfully added.")
             return redirect("/")
     else:
@@ -29,7 +31,9 @@ def get_org_list(request):
         if form.is_valid():
             organization = form.save()
             org_user = User.objects.get(email=request.user.email)
-            OrganizationAdmin.objects.create(user=org_user, organization=organization)
+            OrganizationAdmin.objects.create(
+                user=org_user, organization=organization, access_level="owner"
+            )
             messages.success(request, "Organization successfully added.")
             return redirect("/donor_dashboard")
     else:
@@ -51,6 +55,7 @@ def get_org_list(request):
             "org_email": organization.email,
             "org_website": organization.website,
             "org_contact_number": organization.contact_number,
+            "access_level": organization_admin.access_level,
         }
         if organization.active:
             active_org_list.append(obj)
@@ -72,6 +77,15 @@ def get_org_list(request):
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     organization = Organization.objects.get(organization_id=organization_id)
+    org_user = User.objects.get(email=request.user.email)
+    organization_admin = OrganizationAdmin.objects.get(
+        user=org_user, organization=organization
+    )
+    access_level = organization_admin.access_level
+    if access_level == "owner":
+        owner_access = True
+    else:
+        owner_access = False
     donations = Donation.objects.filter(
         organization_id=organization.organization_id, active=True
     )
@@ -79,7 +93,12 @@ def manage_organization(request, organization_id):
     return render(
         request,
         "donor_dashboard/manage_organization.html",
-        {"organization": organization, "donations": donations, "status": status},
+        {
+            "organization": organization,
+            "donations": donations,
+            "status": status,
+            "owner_access": owner_access,
+        },
     )
 
 
@@ -99,10 +118,25 @@ def organization_details(request, organization_id):
     else:
         form = AddOrganizationForm(instance=organization)
 
+    organization_admins = OrganizationAdmin.objects.filter(
+        organization_id=organization_id
+    )
+    admins = []
+    for organization_admin in organization_admins:
+        admins.append(
+            {
+                "name": organization_admin.user.first_name
+                + " "
+                + organization_admin.user.last_name,
+                "email": organization_admin.user.email,
+                "access_level": organization_admin.access_level,
+            }
+        )
+
     return render(
         request,
         "donor_dashboard/organization_details.html",
-        {"organization": organization, "form": form},
+        {"organization": organization, "form": form, "admins": admins},
     )
 
 
@@ -229,4 +263,81 @@ def delete_donation(request, donation_id):
     messages.error(request, "Invalid Delete Donation Request!")
     return redirect(
         "donor_dashboard:manage_organization", organization_id=donation.organization_id
+    )
+
+
+@login_required
+def add_org_admin(request):
+    if request.method == "POST":
+        organization_id = request.POST["organization_id"]
+        new_admin_email = request.POST.get("email")
+
+        organization = Organization.objects.get(organization_id=organization_id)
+        new_admin_user = User.objects.get(email=new_admin_email)
+        if (
+            len(
+                OrganizationAdmin.objects.filter(
+                    user=new_admin_user, organization=organization
+                )
+            )
+            == 0
+        ):
+
+            OrganizationAdmin.objects.create(
+                user=new_admin_user, organization=organization, access_level="admin"
+            )
+            messages.success(request, "Admin successfully added.")
+
+            return redirect(
+                "donor_dashboard:organization_details", organization_id=organization_id
+            )
+        else:
+            messages.success(request, "Admin already associated")
+            return redirect(
+                "donor_dashboard:organization_details", organization_id=organization_id
+            )
+
+
+@login_required
+def assign_organization_access_level(
+    request, organization_id, admin_email, current_access_level
+):
+    organization = Organization.objects.get(organization_id=organization_id)
+    admin_user = User.objects.get(email=admin_email)
+
+    organization_admin = OrganizationAdmin.objects.get(
+        user=admin_user, organization=organization
+    )
+    if current_access_level == "owner":
+        organization_admin.access_level = "admin"
+    elif current_access_level == "admin":
+        organization_admin.access_level = "owner"
+
+    organization_admin.save()
+
+    messages.success(
+        request,
+        f"Succesfully made user with email: {admin_email} as {organization_admin.access_level}",
+    )
+
+    return redirect(
+        "donor_dashboard:organization_details", organization_id=organization_id
+    )
+
+
+@login_required
+def remove_admin_owner(request, organization_id, admin_email):
+    organization = Organization.objects.get(organization_id=organization_id)
+    admin_user = User.objects.get(email=admin_email)
+
+    organization_admin = OrganizationAdmin.objects.get(
+        user=admin_user, organization=organization
+    )
+    organization_admin.delete()
+
+    messages.success(
+        request, f"Succesfully remove this org access to email: {admin_email}"
+    )
+    return redirect(
+        "donor_dashboard:organization_details", organization_id=organization_id
     )
