@@ -6,6 +6,7 @@ from django.utils import timezone
 from datetime import timedelta
 from uuid import uuid4
 
+
 class RecipientOrdersViewTests(TestCase):
 
     def setUp(self):
@@ -95,6 +96,7 @@ class RecipientOrdersViewTests(TestCase):
         self.assertEqual(canceled_orders.count(), 1)
         self.assertEqual(canceled_orders.first().donation.food_item, "Burger")
 
+
 class OrderStatusUpdateTests(TestCase):
 
     def setUp(self):
@@ -161,7 +163,10 @@ class OrderStatusUpdateTests(TestCase):
         # Verify failure message
         messages = list(response.wsgi_request._messages)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Unable to mark order as picked up. Please try again later.")
+        self.assertEqual(
+            str(messages[0]),
+            "Unable to mark order as picked up. Please try again later.",
+        )
 
     def test_mark_order_as_pending_success(self):
         """Test that a picked up order is successfully marked as pending."""
@@ -169,7 +174,9 @@ class OrderStatusUpdateTests(TestCase):
         self.order.order_status = "picked_up"
         self.order.save()
 
-        response = self.client.get(reverse("mark_order_as_pending", args=[self.order.order_id]))
+        response = self.client.get(
+            reverse("mark_order_as_pending", args=[self.order.order_id])
+        )
 
         # Check that the order status is updated to "pending"
         self.order.refresh_from_db()
@@ -186,7 +193,9 @@ class OrderStatusUpdateTests(TestCase):
     def test_mark_order_as_pending_failure(self):
         """Test that marking an invalid order as pending fails gracefully."""
         invalid_order_id = uuid4()  # UUID that doesn't exist
-        response = self.client.get(reverse("mark_order_as_pending", args=[invalid_order_id]))
+        response = self.client.get(
+            reverse("mark_order_as_pending", args=[invalid_order_id])
+        )
 
         # Check that the user is redirected to recipient_orders
         self.assertRedirects(response, reverse("recipient_orders"))
@@ -194,4 +203,6 @@ class OrderStatusUpdateTests(TestCase):
         # Verify failure message
         messages = list(response.wsgi_request._messages)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Unable to mark order as pending. Please try again later.")
+        self.assertEqual(
+            str(messages[0]), "Unable to mark order as pending. Please try again later."
+        )

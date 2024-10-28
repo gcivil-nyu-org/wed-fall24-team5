@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
-from database.models import Donation, Order
+from database.models import Order
 from django.contrib import messages
 
 
@@ -32,6 +32,7 @@ def recipient_orders(request):
 
     return render(request, "recipient_orders/orders.html", context)
 
+
 @login_required
 def pickup_order(request, order_id):
     try:
@@ -41,9 +42,12 @@ def pickup_order(request, order_id):
         messages.success(request, "Donation marked as picked up successfully.")
         return redirect("recipient_orders")
     except Exception:
-        messages.warning(request, "Unable to mark order as picked up. Please try again later.")
+        messages.warning(
+            request, "Unable to mark order as picked up. Please try again later."
+        )
         return redirect("recipient_orders")
-    
+
+
 @login_required
 def mark_order_as_pending(request, order_id):
     try:
@@ -53,5 +57,7 @@ def mark_order_as_pending(request, order_id):
         messages.success(request, "Donation marked as pending successfully.")
         return redirect("recipient_orders")
     except Exception:
-        messages.warning(request, "Unable to mark order as pending. Please try again later.")
+        messages.warning(
+            request, "Unable to mark order as pending. Please try again later."
+        )
         return redirect("recipient_orders")
