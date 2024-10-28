@@ -12,34 +12,27 @@ Manage Organization
         <h1 class="title mt-5">
             <strong>{{ organization.organization_name }}</strong>
         </h1>
-            <div id="organization-id" hidden>{{ organization.organization_id }}</div>
-                {% if status %}
-                    
-                        <div class="buttons">
-                            <button id="add-donation-button" class="button is-dark">Add Donation</button>
-                            {% if owner_access %}
-                            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}" class="button is-info">
-                                Manage Organization
-                            </a>
-
-                            <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
-                                {% csrf_token %}
-                                <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    
-                {% else %}
-                    <div class="media-right">
-                        <span class="tag is-primary is-light is-medium mt-1">In Active</span>
-                    </div>
-                {% endif %}
-            </div>
-            {% else %}
-            <div class="media-right">
-                <span class="tag is-primary is-light is-medium mt-1">In Active</span>
-            </div>
+        <div id="organization-id" hidden>{{ organization.organization_id }}</div>
+        {% if status %}
+        <div class="buttons">
+            <button id="add-donation-button" class="button is-dark">Add Donation</button>
+            {% if owner_access %}
+            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
+                class="button is-info">
+                Manage Organization
+            </a>
+            <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}"
+                method="post">
+                {% csrf_token %}
+                <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
+            </form>
             {% endif %}
+        </div>
+        {% else %}
+        <div class="media-right">
+            <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+        </div>
+        {% endif %}
     </div>
 
     <h2 class="subtitle mt-3"><strong>List of Donations</strong></h2>
@@ -114,13 +107,14 @@ Manage Organization
                     <td>{{ order.donation.pickup_by }}</td>
                     <td>{{ organization.address }}</td>
                     <td>{{ order.order_status }}</td>
-                    <td><a href="{% url 'donor_dashboard:manage_order' order.order_id %}" class="button is-small is-rounded is-success is-outlined">
+                    <td><a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
+                            class="button is-small is-rounded is-success is-outlined">
                             {% if order.order_status == "pending" %}
                             Complete
                             {% else %}
                             Incomplete
                             {% endif %}
-                    </a></td>
+                        </a></td>
                 </tr>
                 {% endfor %}
             </tbody>
