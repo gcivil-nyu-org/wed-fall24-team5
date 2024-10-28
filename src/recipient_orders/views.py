@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
 from database.models import Order, UserReview
-from django.contrib import messages
 from django.contrib.auth.decorators import login_required
+from django.contrib import messages
 
 
 @login_required
@@ -79,6 +79,33 @@ def submit_review(request):
             )
 
     return redirect("recipient_orders")
+def pickup_order(request, order_id):
+    try:
+        order = get_object_or_404(Order, pk=order_id, active=True)
+        order.order_status = "picked_up"
+        order.save()
+        messages.success(request, "Donation marked as picked up successfully.")
+        return redirect("recipient_orders")
+    except Exception:
+        messages.warning(
+            request, "Unable to mark order as picked up. Please try again later."
+        )
+        return redirect("recipient_orders")
+
+
+@login_required
+def mark_order_as_pending(request, order_id):
+    try:
+        order = get_object_or_404(Order, pk=order_id, active=True)
+        order.order_status = "pending"
+        order.save()
+        messages.success(request, "Donation marked as pending successfully.")
+        return redirect("recipient_orders")
+    except Exception:
+        messages.warning(
+            request, "Unable to mark order as pending. Please try again later."
+        )
+        return redirect("recipient_orders")
 
 
 @login_required
