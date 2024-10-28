@@ -1,43 +1,43 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/review_modal.css' %}">
-
 <div id="reviewModal" class="modal">
-  <div class="modal-background"></div>
-  <div class="modal-card">
-    <header class="modal-card-head">
-      <p class="modal-card-title">Review Your Order</p>
-      <button class="delete" aria-label="close"></button>
-    </header>
-    <section class="modal-card-body">
-      <form id="reviewForm" action="{% url 'submit_review' %}" method="POST">
-        {% csrf_token %}
-        <input type="hidden" name="order_id" id="orderId">
-        <input type="hidden" name="rating" id="ratingInput">
-
-        <div class="field has-text-centered">
-          <label class="label">Rating</label>
-          <div class="control">
-            <div class="stars is-flex is-justify-content-center" id="starRating">
-              <i class="fa fa-star-o is-size-2" data-value="1"></i>
-              <i class="fa fa-star-o is-size-2" data-value="2"></i>
-              <i class="fa fa-star-o is-size-2" data-value="3"></i>
-              <i class="fa fa-star-o is-size-2" data-value="4"></i>
-              <i class="fa fa-star-o is-size-2" data-value="5"></i>
-            </div>
-          </div>
-        </div>
-
-        <div class="field">
-          <label class="label">Comment</label>
-          <div class="control">
-            <textarea class="textarea" name="comment" id="comment" placeholder="Write your review..."></textarea>
-          </div>
-        </div>
-      </form>
-    </section>
-    <footer class="modal-card-foot">
-      <button class="button is-success" id="submitReview">Submit Review</button>
-      <button class="button" id="closeModal">Cancel</button>
-    </footer>
-  </div>
+    <div class="modal-background"></div>
+    <div class="modal-card">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Review Your Order</p>
+            <button class="delete" aria-label="close"></button>
+        </header>
+        <section class="modal-card-body">
+            <form id="reviewForm" action="{% url 'submit_review' %}" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="order_id" id="orderId">
+                <input type="hidden" name="rating" id="ratingInput">
+                <div class="field has-text-centered">
+                    <label class="label">Rating</label>
+                    <div class="control">
+                        <div class="stars is-flex is-justify-content-center" id="starRating">
+                            <i class="fa fa-star-o is-size-2" data-value="1"></i>
+                            <i class="fa fa-star-o is-size-2" data-value="2"></i>
+                            <i class="fa fa-star-o is-size-2" data-value="3"></i>
+                            <i class="fa fa-star-o is-size-2" data-value="4"></i>
+                            <i class="fa fa-star-o is-size-2" data-value="5"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Comment</label>
+                    <div class="control">
+                        <textarea class="textarea"
+                                  name="comment"
+                                  id="comment"
+                                  placeholder="Write your review..."></textarea>
+                    </div>
+                </div>
+            </form>
+        </section>
+        <footer class="modal-card-foot">
+            <button class="button is-success" id="submitReview">Submit Review</button>
+            <button class="button" id="closeModal">Cancel</button>
+        </footer>
+    </div>
 </div>

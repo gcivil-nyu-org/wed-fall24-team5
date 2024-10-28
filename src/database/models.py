@@ -80,7 +80,9 @@ class Donation(models.Model):
 
 class UserReview(models.Model):
     review_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
-    donation = models.ForeignKey(Donation, on_delete=models.CASCADE, null=True, blank=True)
+    donation = models.ForeignKey(
+        Donation, on_delete=models.CASCADE, null=True, blank=True
+    )
     user = models.ForeignKey(User, on_delete=models.SET_NULL, null=True, blank=True)
     rating = models.IntegerField()
     comment = models.TextField(blank=True, null=True)
@@ -89,7 +91,8 @@ class UserReview(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Review by {self.user.get_full_name() if self.user else 'Anonymous'} for {self.donation.food_item}: {self.donation.organization.organization_name}"
+        return f"Review by {self.user.get_full_name() if self.user else 'Anonymous'} for {self.donation.food_item}:\
+        {self.donation.organization.organization_name}"
 
 
 # As it currently stands it is users sending eachother messages, which needs to change to users exchanging messages with organizations.

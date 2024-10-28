@@ -1,243 +1,252 @@
 {% extends "_base.html" %}
 {% load static %}
-
 {% block extra_css %}
-<link rel="stylesheet" href="{% static 'css/orders.css' %}">
+    <link rel="stylesheet" href="{% static 'css/orders.css' %}">
 {% endblock extra_css %}
-
 {% block title %}
     My Orders
 {% endblock title %}
 <<<<<<< HEAD
 {% load static %}
 {% block content %}
-{% include 'recipient_orders/review_modal.html' %}
-{% include "partials/notifications.html" %}
-<div id="modifyOrderModal" class="modal">
-    <div class="modal-background"></div>
-    <div class="modal-card">
-        <header class="modal-card-head">
-            <p class="modal-card-title">Modify Order</p>
-            <button class="delete" aria-label="close"></button>
-        </header>
-        <form method="post" action="{% url 'modify_order' %}" id="modify-order-form">
-            {% csrf_token %}
-            <section class="modal-card-body">
-                <input type="hidden" id="order_id" name="order_id">
-                <input type="hidden" id="current_quantity" name="current_quantity">
-                <input type="hidden" id="available_quantity" name="available_quantity">
-                
-                <div class="field">
-                    <label class="label">Food Item</label>
-                    <div class="control">
-                        <input class="input" type="text" id="food_item" readonly>
-                    </div>
-                </div>
-
-                <div class="field">
-                    <label class="label">New Quantity</label>
-                    <div class="control">
-                        <input class="input" type="number" name="new_quantity" id="new_quantity" min="1" required>
-                    </div>
-                    <p class="help">Maximum allowed: <span id="max_allowed">3</span></p>
-                </div>
-            </section>
-            <footer class="modal-card-foot">
-                <button type="submit" class="button is-info">Save Changes</button>
-                <button type="button" class="button" onclick="closeModifyModal()">Cancel</button>
-            </footer>
-        </form>
-    </div>
-</div>
-<div class="container">
+    {% include "recipient_orders/review_modal.html" %}
     {% include "partials/notifications.html" %}
-    <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
-    <h2 class="subtitle mt-3">Your reservations:</h2>
-    
-    <div class="tabs is-centered is-toggle is-fullwidth">
-        <ul>
-            <li class="is-active" id="pending-tab">
-                <a><span>Pending</span></a>
-            </li>
-            <li id="picked-up-tab">
-                <a><span>Picked Up</span></a>
-            </li>
-            <li id="canceled-tab">
-                <a><span>Canceled</span></a>
-            </li>
-        </ul>
-    </div>
-
-    <!-- Pending Orders Section -->
-    <div id="pending-orders" class="order-list">
-        {% if pending_orders %}
-            <div class="columns is-multiline is-variable is-4">
-                {% for order in pending_orders %}
-                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                        <div class="card mb-5">
-                            <div class="card-content">
-                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                    <div class="media-content">
-                                        <p class="title is-4">{{ order.donation.food_item }}</p>
-                                    </div>
-                                    <div class="media-right mt-2-mobile">
-                                        <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
-                                    </div>
-                                </div>
-                                <div class="content">
-                                    <div class="columns is-flex-direction-column-mobile">
-                                        <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth address-link"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                {{ order.donation.organization.organization_name }}
-                                                <br>
-                                                {{ order.donation.organization.address }}
-                                            </a>
-                                        </div>
-                                        <div class="column is-one-third has-text-centered">
-                                            <strong>Pickup by:</strong>
-                                            <p>{{ order.donation.pickup_by }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <footer class="card-footer">
-                                <a href="#" 
-                                   class="card-footer-item"
-                                   onclick="openModifyModal('{{ order.order_id }}', 
-                                                         '{{ order.order_quantity }}',
-                                                         '{{ order.donation.quantity }}',
-                                                         '{{ order.donation.food_item }}')">
-                                    Modify
-                                </a>
-                                <form class="card-footer-item" method="post" action="{% url 'cancel_order' order.order_id %}" id="cancel-form-{{ order.order_id }}">
-                                    {% csrf_token %}
-                                    <button type="submit" 
-                                            class="has-text-danger"
-                                            style="width: 100%; background: none; border: none; cursor: pointer; font-size: inherit;"
-                                            onclick="return confirm('Are you sure you want to cancel this reservation?')">
-                                        Cancel
-                                    </button>
-                                </form>
-                            </footer>
+    <div id="modifyOrderModal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Modify Order</p>
+                <button class="delete" aria-label="close"></button>
+            </header>
+            <form method="post"
+                  action="{% url 'modify_order' %}"
+                  id="modify-order-form">
+                {% csrf_token %}
+                <section class="modal-card-body">
+                    <input type="hidden" id="order_id" name="order_id">
+                    <input type="hidden" id="current_quantity" name="current_quantity">
+                    <input type="hidden" id="available_quantity" name="available_quantity">
+                    <div class="field">
+                        <label class="label">Food Item</label>
+                        <div class="control">
+                            <input class="input" type="text" id="food_item" readonly>
                         </div>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="box">
-                <p>No pending orders.</p>
-            </div>
-        {% endif %}
-    </div>
-
-    <!-- Picked Up Orders Section -->
-    <div id="picked-up-orders" class="order-list is-hidden">
-        {% if picked_up_orders %}
-            <div class="columns is-multiline is-variable is-4">
-                {% for order in picked_up_orders %}
-                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                        <div class="card mb-5">
-                            <div class="card-content">
-                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                    <div class="media-content">
-                                        <p class="title is-4">{{ order.donation.food_item }}</p>
-                                    </div>
-                                    <div class="media-right mt-2-mobile">
-                                        <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
-                                    </div>
-                                </div>
-                                <div class="content">
-                                    <div class="columns is-flex-direction-column-mobile">
-                                        <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth address-link"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                {{ order.donation.organization.organization_name }}
-                                                <br>
-                                                {{ order.donation.organization.address }}
-                                            </a>
-                                        </div>
-                                        <div class="column is-one-third has-text-centered">
-                                            <strong>Pickup by:</strong>
-                                            <p>{{ order.donation.pickup_by }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                            <footer class="card-footer">
-                                <a href="#" 
-                                    class="card-footer-item review-btn" 
-                                    data-order-id="{{ order.order_id }}" 
-                                    data-rating="{% if order.review %}{{ order.review.rating }}{% else %}0{% endif %}" 
-                                    data-comment="{% if order.review %}{{ order.review.comment }}{% else %}{% endif %}">
-                                    {% if order.review %}Edit Review{% else %}Review{% endif %}
-                                </a>
-                            </footer>
+                    <div class="field">
+                        <label class="label">New Quantity</label>
+                        <div class="control">
+                            <input class="input"
+                                   type="number"
+                                   name="new_quantity"
+                                   id="new_quantity"
+                                   min="1"
+                                   required>
                         </div>
+                        <p class="help">
+                            Maximum allowed: <span id="max_allowed">3</span>
+                        </p>
                     </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="box">
-                <p>No picked up orders.</p>
-            </div>
-        {% endif %}
+                </section>
+                <footer class="modal-card-foot">
+                    <button type="submit" class="button is-info">Save Changes</button>
+                    <button type="button" class="button" onclick="closeModifyModal()">Cancel</button>
+                </footer>
+            </form>
+        </div>
     </div>
-
-    <!-- Canceled Orders Section -->
-    <div id="canceled-orders" class="order-list is-hidden">
-        {% if canceled_orders %}
-            <div class="columns is-multiline is-variable is-4">
-                {% for order in canceled_orders %}
-                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                        <div class="card mb-5">
-                            <div class="card-content">
-                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                    <div class="media-content">
-                                        <p class="title is-4">{{ order.donation.food_item }}</p>
+    <div class="container">
+        {% include "partials/notifications.html" %}
+        <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
+        <h2 class="subtitle mt-3">Your reservations:</h2>
+        <div class="tabs is-centered is-toggle is-fullwidth">
+            <ul>
+                <li class="is-active" id="pending-tab">
+                    <a><span>Pending</span></a>
+                </li>
+                <li id="picked-up-tab">
+                    <a><span>Picked Up</span></a>
+                </li>
+                <li id="canceled-tab">
+                    <a><span>Canceled</span></a>
+                </li>
+            </ul>
+        </div>
+        <!-- Pending Orders Section -->
+        <div id="pending-orders" class="order-list">
+            {% if pending_orders %}
+                <div class="columns is-multiline is-variable is-4">
+                    {% for order in pending_orders %}
+                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                            <div class="card mb-5">
+                                <div class="card-content">
+                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                        <div class="media-content">
+                                            <p class="title is-4">{{ order.donation.food_item }}</p>
+                                        </div>
+                                        <div class="media-right mt-2-mobile">
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
+                                        </div>
                                     </div>
-                                    <div class="media-right mt-2-mobile">
-                                        <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
+                                    <div class="content">
+                                        <div class="columns is-flex-direction-column-mobile">
+                                            <div class="column is-two-thirds">
+                                                <a class="button is-link is-light is-fullwidth address-link"
+                                                   href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer">
+                                                    {{ order.donation.organization.organization_name }}
+                                                    <br>
+                                                    {{ order.donation.organization.address }}
+                                                </a>
+                                            </div>
+                                            <div class="column is-one-third has-text-centered">
+                                                <strong>Pickup by:</strong>
+                                                <p>{{ order.donation.pickup_by }}</p>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                                <div class="content">
-                                    <div class="columns is-flex-direction-column-mobile">
-                                        <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth address-link"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                {{ order.donation.organization.organization_name }}
-                                                <br>
-                                                {{ order.donation.organization.address }}
-                                            </a>
-                                        </div>
-                                        <div class="column is-one-third has-text-centered">
-                                            <strong>Pickup by:</strong>
-                                            <p>{{ order.donation.pickup_by }}</p>
-                                        </div>
-                                    </div>
-                                </div>
+                                <footer class="card-footer">
+                                    <a href="#"
+                                       class="card-footer-item"
+                                       onclick="openModifyModal('{{ order.order_id }}', '{{ order.order_quantity }}', '{{ order.donation.quantity }}', '{{ order.donation.food_item }}')">
+                                        Modify
+                                    </a>
+                                    <form class="card-footer-item"
+                                          method="post"
+                                          action="{% url 'cancel_order' order.order_id %}"
+                                          id="cancel-form-{{ order.order_id }}">
+                                        {% csrf_token %}
+                                        <button type="submit"
+                                                class="has-text-danger"
+                                                style="width: 100%;
+                                                       background: none;
+                                                       border: none;
+                                                       cursor: pointer;
+                                                       font-size: inherit"
+                                                onclick="return confirm('Are you sure you want to cancel this reservation?')">
+                                            Cancel
+                                        </button>
+                                    </form>
+                                </footer>
                             </div>
-                            <footer class="card-footer">
-                                <div class="card-footer-item has-text-grey">Canceled</div>
-                            </footer>
                         </div>
-                    </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="box">
-                <p>No cancelled orders.</p>
-            </div>
-        {% endif %}
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="box">
+                    <p>No pending orders.</p>
+                </div>
+            {% endif %}
+        </div>
+        <!-- Picked Up Orders Section -->
+        <div id="picked-up-orders" class="order-list is-hidden">
+            {% if picked_up_orders %}
+                <div class="columns is-multiline is-variable is-4">
+                    {% for order in picked_up_orders %}
+                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                            <div class="card mb-5">
+                                <div class="card-content">
+                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                        <div class="media-content">
+                                            <p class="title is-4">{{ order.donation.food_item }}</p>
+                                        </div>
+                                        <div class="media-right mt-2-mobile">
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="columns is-flex-direction-column-mobile">
+                                            <div class="column is-two-thirds">
+                                                <a class="button is-link is-light is-fullwidth address-link"
+                                                   href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer">
+                                                    {{ order.donation.organization.organization_name }}
+                                                    <br>
+                                                    {{ order.donation.organization.address }}
+                                                </a>
+                                            </div>
+                                            <div class="column is-one-third has-text-centered">
+                                                <strong>Pickup by:</strong>
+                                                <p>{{ order.donation.pickup_by }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <footer class="card-footer">
+                                    <a href="#"
+                                       class="card-footer-item review-btn"
+                                       data-order-id="{{ order.order_id }}"
+                                       data-rating="{% if order.review %}{{ order.review.rating }}{% else %}0{% endif %}"
+                                       data-comment="{% if order.review %}{{ order.review.comment }}{% else %}{% endif %}">
+                                        {% if order.review %}
+                                            Edit Review
+                                        {% else %}
+                                            Review
+                                        {% endif %}
+                                    </a>
+                                </footer>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="box">
+                    <p>No picked up orders.</p>
+                </div>
+            {% endif %}
+        </div>
+        <!-- Canceled Orders Section -->
+        <div id="canceled-orders" class="order-list is-hidden">
+            {% if canceled_orders %}
+                <div class="columns is-multiline is-variable is-4">
+                    {% for order in canceled_orders %}
+                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                            <div class="card mb-5">
+                                <div class="card-content">
+                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                        <div class="media-content">
+                                            <p class="title is-4">{{ order.donation.food_item }}</p>
+                                        </div>
+                                        <div class="media-right mt-2-mobile">
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
+                                        </div>
+                                    </div>
+                                    <div class="content">
+                                        <div class="columns is-flex-direction-column-mobile">
+                                            <div class="column is-two-thirds">
+                                                <a class="button is-link is-light is-fullwidth address-link"
+                                                   href="https://www.google.com/maps/dir/?api=1&destination={{ order.donation.organization.address|urlencode }}"
+                                                   target="_blank"
+                                                   rel="noopener noreferrer">
+                                                    {{ order.donation.organization.organization_name }}
+                                                    <br>
+                                                    {{ order.donation.organization.address }}
+                                                </a>
+                                            </div>
+                                            <div class="column is-one-third has-text-centered">
+                                                <strong>Pickup by:</strong>
+                                                <p>{{ order.donation.pickup_by }}</p>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <footer class="card-footer">
+                                    <div class="card-footer-item has-text-grey">Canceled</div>
+                                </footer>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <div class="box">
+                    <p>No cancelled orders.</p>
+                </div>
+            {% endif %}
+        </div>
     </div>
-</div>
-<script>
+    <script>
     // Tab switching functionality
     document.addEventListener('DOMContentLoaded', () => {
         const tabs = document.querySelectorAll('.tabs ul li');
@@ -284,6 +293,6 @@
         const modal = document.getElementById('modifyOrderModal');
         modal.classList.remove('is-active');
     }
-</script>
-<script src="{% static 'js/review_modal.js' %}"></script>
+    </script>
+    <script src="{% static 'js/review_modal.js' %}"></script>
 {% endblock content %}

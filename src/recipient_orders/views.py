@@ -1,11 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
-from django.contrib.auth.decorators import login_required
 from database.models import Order, UserReview
 from django.contrib import messages
-from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.contrib import messages
-from database.models import Order
 
 
 @login_required
@@ -26,7 +22,7 @@ def recipient_orders(request):
         .select_related("donation")
         .order_by("order_created_at")
     )
-    
+
     # Get reviews and map them by donation_id for easier access
     reviews = {
         review.donation_id: review
@@ -36,7 +32,7 @@ def recipient_orders(request):
     # Attach review to each order
     for order in pending_orders:
         order.review = reviews.get(order.donation_id)
-    
+
     for order in picked_up_orders:
         order.review = reviews.get(order.donation_id)
 
@@ -52,12 +48,13 @@ def recipient_orders(request):
 
     return render(request, "recipient_orders/orders.html", context)
 
+
 @login_required
 def submit_review(request):
-    if request.method == 'POST':
-        order_id = request.POST.get('order_id')
-        rating = request.POST.get('rating')
-        comment = request.POST.get('comment')
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")
+        rating = request.POST.get("rating")
+        comment = request.POST.get("comment")
 
         # Fetch the order and related donation
         order = get_object_or_404(Order, pk=order_id)
@@ -67,20 +64,23 @@ def submit_review(request):
             review, created = UserReview.objects.get_or_create(
                 donation=order.donation,
                 user=request.user,
-                defaults={'rating': rating, 'comment': comment}
+                defaults={"rating": rating, "comment": comment},
             )
-            
+
             # If the review already exists, update its rating and comment
             if not created:
                 review.rating = rating
                 review.comment = comment
                 review.save()
             messages.success(request, "Review sent successfully. Thanks!")
-        except:
-            messages.warning(request, "Unable to provide review. Please try again later.")
+        except: # noqa <-- for bare except
+            messages.warning(
+                request, "Unable to provide review. Please try again later."
+            )
 
-        return redirect('/recipient_orders')
-    
+        return redirect("/recipient_orders")
+
+
 @login_required
 def cancel_order(request, order_id):
     # Get the order or return 404 if not found
