@@ -391,9 +391,9 @@ class ModifyOrderTests(TestCase):
         """Test modifying an order as an unauthorized user"""
         # Create another user
         User = get_user_model()
-        other_user = User.objects.create_user(
+        other_user = User.objects.create_user(  # noqa: F841
             username="otheruser", password="testpass123"
-        ) # noqa: F841
+        )
 
         # Login as the other user
         self.client.login(username="otheruser", password="testpass123")
