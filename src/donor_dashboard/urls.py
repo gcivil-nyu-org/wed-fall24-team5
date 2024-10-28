@@ -36,4 +36,5 @@ urlpatterns = [
         views.delete_donation,
         name="delete_donation",
     ),
+    path("manage_order/<uuid:order_id>/", views.manage_order, name="manage_order"),
 ]
