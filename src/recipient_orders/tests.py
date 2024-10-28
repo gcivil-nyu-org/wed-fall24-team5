@@ -270,13 +270,13 @@ class CancelOrderTests(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+
 class ModifyOrderTests(TestCase):
     def setUp(self):
         # Create test user
         User = get_user_model()
         self.user = User.objects.create_user(
-            username="testuser",
-            password="testpass123"
+            username="testuser", password="testpass123"
         )
         self.client = Client()
         self.client.login(username="testuser", password="testpass123")
@@ -312,14 +312,13 @@ class ModifyOrderTests(TestCase):
 
     def test_modify_order_success(self):
         """Test successful order modification within limits"""
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 3,
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": self.order.order_id, "new_quantity": 3, "current_quantity": 2},
+        )
 
         # Check redirect
-        self.assertRedirects(response, reverse('recipient_orders'))
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check if order was updated
         updated_order = Order.objects.get(order_id=self.order.order_id)
@@ -335,14 +334,17 @@ class ModifyOrderTests(TestCase):
 
     def test_modify_order_exceeds_maximum(self):
         """Test order modification exceeding maximum allowed quantity"""
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 4,  # Max allowed is 3
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {
+                "order_id": self.order.order_id,
+                "new_quantity": 4,  # Max allowed is 3
+                "current_quantity": 2,
+            },
+        )
 
-        self.assertRedirects(response, reverse('recipient_orders'))
-        
+        self.assertRedirects(response, reverse("recipient_orders"))
+
         # Check if order remained unchanged
         updated_order = Order.objects.get(order_id=self.order.order_id)
         self.assertEqual(updated_order.order_quantity, 2)
@@ -353,14 +355,13 @@ class ModifyOrderTests(TestCase):
 
     def test_modify_order_zero_quantity(self):
         """Test order modification with zero quantity"""
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 0,
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": self.order.order_id, "new_quantity": 0, "current_quantity": 2},
+        )
 
-        self.assertRedirects(response, reverse('recipient_orders'))
-        
+        self.assertRedirects(response, reverse("recipient_orders"))
+
         # Check if order remained unchanged
         updated_order = Order.objects.get(order_id=self.order.order_id)
         self.assertEqual(updated_order.order_quantity, 2)
@@ -372,15 +373,15 @@ class ModifyOrderTests(TestCase):
     def test_modify_nonexistent_order(self):
         """Test modifying an order that doesn't exist"""
         import uuid
-        fake_order_id = uuid.uuid4()
-        
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': fake_order_id,
-            'new_quantity': 2,
-            'current_quantity': 2
-        })
 
-        self.assertRedirects(response, reverse('recipient_orders'))
+        fake_order_id = uuid.uuid4()
+
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": fake_order_id, "new_quantity": 2, "current_quantity": 2},
+        )
+
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check error message
         messages = list(get_messages(response.wsgi_request))
@@ -391,20 +392,18 @@ class ModifyOrderTests(TestCase):
         # Create another user
         User = get_user_model()
         other_user = User.objects.create_user(
-            username="otheruser",
-            password="testpass123"
-        )
-        
+            username="otheruser", password="testpass123"
+        ) # noqa: F841
+
         # Login as the other user
         self.client.login(username="otheruser", password="testpass123")
 
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 3,
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": self.order.order_id, "new_quantity": 3, "current_quantity": 2},
+        )
 
-        self.assertRedirects(response, reverse('recipient_orders'))
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check if order remained unchanged
         updated_order = Order.objects.get(order_id=self.order.order_id)
@@ -416,9 +415,9 @@ class ModifyOrderTests(TestCase):
 
     def test_modify_order_get_request(self):
         """Test that GET requests are rejected"""
-        response = self.client.get(reverse('modify_order'))
-        
-        self.assertRedirects(response, reverse('recipient_orders'))
+        response = self.client.get(reverse("modify_order"))
+
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check error message
         messages = list(get_messages(response.wsgi_request))
@@ -430,13 +429,12 @@ class ModifyOrderTests(TestCase):
         self.order.order_status = "picked_up"
         self.order.save()
 
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 3,
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": self.order.order_id, "new_quantity": 3, "current_quantity": 2},
+        )
 
-        self.assertRedirects(response, reverse('recipient_orders'))
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check if order remained unchanged
         updated_order = Order.objects.get(order_id=self.order.order_id)
@@ -452,13 +450,12 @@ class ModifyOrderTests(TestCase):
         self.order.active = False
         self.order.save()
 
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 3,
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": self.order.order_id, "new_quantity": 3, "current_quantity": 2},
+        )
 
-        self.assertRedirects(response, reverse('recipient_orders'))
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check if order remained unchanged
         updated_order = Order.objects.get(order_id=self.order.order_id)
@@ -470,13 +467,12 @@ class ModifyOrderTests(TestCase):
 
     def test_modify_order_same_quantity(self):
         """Test modifying order with same quantity"""
-        response = self.client.post(reverse('modify_order'), {
-            'order_id': self.order.order_id,
-            'new_quantity': 2,
-            'current_quantity': 2
-        })
+        response = self.client.post(
+            reverse("modify_order"),
+            {"order_id": self.order.order_id, "new_quantity": 2, "current_quantity": 2},
+        )
 
-        self.assertRedirects(response, reverse('recipient_orders'))
+        self.assertRedirects(response, reverse("recipient_orders"))
 
         # Check success message (should still succeed even though nothing changed)
         messages = list(get_messages(response.wsgi_request))
