@@ -5,7 +5,7 @@ from database.models import Order, Donation, Organization
 from django.utils import timezone
 from datetime import timedelta
 from uuid import uuid4
-
+from django.contrib.messages import get_messages
 
 class RecipientOrdersViewTests(TestCase):
 
@@ -97,17 +97,14 @@ class RecipientOrdersViewTests(TestCase):
         self.assertEqual(canceled_orders.first().donation.food_item, "Burger")
 
 
-class OrderStatusUpdateTests(TestCase):
-
+class CancelOrderTests(TestCase):
     def setUp(self):
-        # Create a test user
+        # Create test user
         User = get_user_model()
         self.user = User.objects.create_user(username="testuser", password="testpass")
-
-        # Log in the user
         self.client.login(username="testuser", password="testpass")
 
-        # Create a test organization
+        # Create test organization
         self.organization = Organization.objects.create(
             organization_name="Test Organization",
             type="restaurant",
@@ -118,16 +115,16 @@ class OrderStatusUpdateTests(TestCase):
             active=True,
         )
 
-        # Create a test donation
+        # Create test donation
         self.donation = Donation.objects.create(
             organization=self.organization,
-            food_item="Pizza",
-            quantity=10,
-            pickup_by=timezone.now() + timedelta(days=2),
+            food_item="Test Food",
+            quantity=5,
+            pickup_by=timezone.now().date(),
             active=True,
         )
 
-        # Create a pending order
+        # Create test order
         self.order = Order.objects.create(
             donation=self.donation,
             user=self.user,
@@ -206,3 +203,67 @@ class OrderStatusUpdateTests(TestCase):
         self.assertEqual(
             str(messages[0]), "Unable to mark order as pending. Please try again later."
         )
+    def test_cancel_order_success(self):
+        """Test successful cancellation of a pending order"""
+        initial_donation_quantity = self.donation.quantity
+        response = self.client.post(reverse("cancel_order", args=[self.order.order_id]))
+
+        # Check redirect
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Refresh order from database
+        self.order.refresh_from_db()
+        self.donation.refresh_from_db()
+
+        # Check order status
+        self.assertEqual(self.order.order_status, "canceled")
+
+        # Check donation quantity was restored
+        self.assertEqual(
+            self.donation.quantity,
+            initial_donation_quantity + self.order.order_quantity,
+        )
+
+        # Check success message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(
+            str(messages[0]), "Your reservation has been cancelled successfully."
+        )
+
+    def test_cancel_non_pending_order(self):
+        """Test attempting to cancel a non-pending order"""
+        self.order.order_status = "picked_up"
+        self.order.save()
+
+        response = self.client.post(reverse("cancel_order", args=[self.order.order_id]))
+
+        # Check redirect
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Refresh order from database
+        self.order.refresh_from_db()
+
+        # Check order status hasn't changed
+        self.assertEqual(self.order.order_status, "picked_up")
+
+        # Check error message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Only pending orders can be cancelled.")
+
+    def test_cancel_order_get_request(self):
+        """Test that GET requests are not allowed for canceling orders"""
+        response = self.client.get(reverse("cancel_order", args=[self.order.order_id]))
+
+        # Check redirect
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Check error message
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Invalid request method.")
+
+    def test_cancel_nonexistent_order(self):
+        """Test attempting to cancel a non-existent order"""
+        response = self.client.post(
+            reverse("cancel_order", args=["12345678-1234-5678-1234-567812345678"])
+        )
+        self.assertEqual(response.status_code, 404)

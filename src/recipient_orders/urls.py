@@ -10,4 +10,6 @@ urlpatterns = [
         views.mark_order_as_pending,
         name="mark_order_as_pending",
     ),
+    path("cancel/<uuid:order_id>/", views.cancel_order, name="cancel_order"),
+    path("modify/", views.modify_order, name="modify_order"),
 ]
