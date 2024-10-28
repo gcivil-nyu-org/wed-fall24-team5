@@ -270,6 +270,7 @@ class CancelOrderTests(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
+
 class ModifyOrderTests(TestCase):
     def setUp(self):
         # Create test user with a unique email
@@ -374,7 +375,7 @@ class ModifyOrderTests(TestCase):
     def test_modify_order_unauthorized_user(self):
         """Test modifying an order as an unauthorized user"""
         User = get_user_model()
-        other_user = User.objects.create_user(
+        other_user = User.objects.create_user(  # noqa
             username="otheruser", email="otheruser@example.com", password="testpass123"
         )
         self.client.login(username="otheruser", password="testpass123")
@@ -432,31 +433,6 @@ class ModifyOrderTests(TestCase):
 
         messages = list(get_messages(response.wsgi_request))
         self.assertEqual(str(messages[0]), "Order not found")
-
-    def test_modify_order_same_quantity(self):
-        """Test modifying order with the same quantity"""
-        response = self.client.post(
-            reverse("modify_order"),
-            {"order_id": self.order.order_id, "new_quantity": 2, "current_quantity": 2},
-        )
-        self.assertRedirects(response, reverse("recipient_orders"))
-
-        messages = list(get_messages(response.wsgi_request))
-        self.assertEqual(str(messages[0]), "Order quantity updated successfully")
-
-        updated_donation = Donation.objects.get(donation_id=self.donation.donation_id)
-        self.assertEqual(updated_donation.quantity, 5)
-            pickup_by=timezone.now().date(),
-            active=True,
-        )
-
-        self.order = Order.objects.create(
-            user=self.user,
-            donation=self.donation,
-            order_quantity=2,
-            order_status="picked_up",
-            active=True,
-        )
 
     def test_attach_review_to_order(self):
         """Test if review is correctly attached to each order in recipient_orders"""
