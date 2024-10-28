@@ -54,3 +54,8 @@
     text-decoration: none; 
     cursor: pointer;
 }
+
+.order-table {
+    border-radius: 1rem;
+    padding: 8px;
+}

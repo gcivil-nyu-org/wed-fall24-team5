@@ -1,6 +1,6 @@
 {% extends "_base.html" %}
 {% block title %}
-    Manage Organization
+Manage Organization
 {% endblock title %}
 {% load static %}
 {% block content %}
@@ -80,6 +80,47 @@
             </div>
         {% else %}
             <p class="box">No donations available at the moment.</p>
+        {% endif %}
+        <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+        {% if orders %}
+        <div class="table-container">
+            <table class="table order-table is-hoverable is-striped is-fullwidth" style="border-radius: 1rem;">
+                <thead>
+                    <tr>
+                        <th>Item</th>
+                        <th>User</th>
+                        <th>Quantity</th>
+                        <th>Pickup Date</th>
+                        <th>Address</th>
+                        <th>Status</th>
+                        <th>Mark As</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for order in orders %}
+                    <tr>
+                        <td>{{ order.donation.food_item }}</td>
+                        <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                        <td>{{ order.order_quantity }}</td>
+                        <td>{{ order.donation.pickup_by }}</td>
+                        <td>{{ organization.address }}</td>
+                        <td>{{ order.order_status }}</td>
+                        <td><a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
+                                class="button is-small is-rounded is-success is-outlined">
+                                {% if order.order_status == "pending" %}
+                                Complete
+                                {% else %}
+                                Incomplete
+                                {% endif %}
+                            </a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <p class="box">No orders to display.</p>
         {% endif %}
     </div>
     <div id="addDonationModal" class="modal">
