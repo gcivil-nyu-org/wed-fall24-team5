@@ -78,7 +78,7 @@ def submit_review(request):
                 request, "Unable to provide review. Please try again later."
             )
 
-        return redirect("/recipient_orders/orders.html")
+    return redirect("recipient_orders")
 
 
 @login_required
@@ -106,14 +106,14 @@ def cancel_order(request, order_id):
         return redirect("recipient_orders")
 
     messages.error(request, "Invalid request method.")
-    return redirect("/recipient_orders/orders.html")
+    return redirect("recipient_orders")
 
 
 @login_required
 def modify_order(request):
     if request.method != "POST":
         messages.error(request, "Invalid request method")
-        return redirect("/recipient_orders/orders.html")
+        return redirect("recipient_orders")
 
     order_id = request.POST.get("order_id")
     new_quantity = int(request.POST.get("new_quantity", 0))
@@ -155,4 +155,4 @@ def modify_order(request):
     except Exception as e:
         messages.error(request, f"Error modifying order: {str(e)}")
 
-    return redirect("/recipient_orders/orders.html")
+    return redirect("recipient_orders")
