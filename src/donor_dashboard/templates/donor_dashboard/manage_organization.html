@@ -4,84 +4,127 @@ Manage Organization
 {% endblock title %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
-<script src="{% static 'js/manage_organization.js' %}"></script>
-<div class="container">
-    {% include "partials/notifications.html" %}
-    <div class="flex-container">
-        <h1 class="title mt-5">
-            <strong>{{ organization.organization_name }}</strong>
-        </h1>
-        <div id="organization-id" hidden>{{ organization.organization_id }}</div>
-        {% if status %}
-        <div class="buttons">
-            <button id="add-donation-button" class="button is-dark">Add Donation</button>
-            {% if owner_access %}
-            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
-                class="button is-info">
-                Manage Organization
-            </a>
-            <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}"
-                method="post">
-                {% csrf_token %}
-                <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
-            </form>
+    <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
+    <script src="{% static 'js/manage_organization.js' %}"></script>
+    <div class="container">
+        {% include "partials/notifications.html" %}
+        <div class="flex-container">
+            <h2 class="subtitle mt-5">
+                <strong>{{ organization.organization_name }}</strong>
+            </h2>
+            <div id="organization-id" hidden>{{ organization.organization_id }}</div>
+            {% if status %}
+                <div class="buttons">
+                    <button id="add-donation-button" class="button is-dark">Add Donation</button>
+                    {% if owner_access %}
+                        <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
+                           class="button is-info">Manage Organization</a>
+                        <form id="delete-form"
+                              action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}"
+                              method="post">
+                            {% csrf_token %}
+                            <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
+                        </form>
+                    {% endif %}
+                </div>
+            {% else %}
+                <div class="media-right">
+                    <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                </div>
             {% endif %}
         </div>
+        <h2 class="subtitle mt-3">List of Donations:</h2>
+        {% if donations %}
+            <div class="columns is-multiline is-variable is-4">
+                {% for donation in donations %}
+                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                        <div class="card mb-5">
+                            <div class="card-content">
+                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                    <div class="media-content">
+                                        <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                                    </div>
+                                    <div class="media-right mt-2-mobile">
+                                        <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }} Available</span>
+                                    </div>
+                                </div>
+                                <div class="content">
+                                    <div class="columns is-flex-direction-column-mobile">
+                                        <div class="column is-one-third has-text-centered">
+                                            <strong>Pickup by:</strong>
+                                            <p>{{ donation.pickup_by }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="#"
+                                   class="card-footer-item edit-link"
+                                   data-id="{{ donation.donation_id }}"
+                                   data-food-item="{{ donation.food_item }}"
+                                   data-quantity="{{ donation.quantity }}"
+                                   data-pickup-by="{{ donation.pickup_by|date:'Y-m-d' }}"
+                                   data-organization-id="{{ donation.organization.organization_id }}">Modify</a>
+                                <form class="card-footer-item"
+                                      method="post"
+                                      action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}"
+                                      id="delete-form-{{ donation.donation_id }}">
+                                    {% csrf_token %}
+                                    <a class="delete-link is-danger"
+                                       onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
+                                </form>
+                            </footer>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         {% else %}
-        <div class="media-right">
-            <span class="tag is-primary is-light is-medium mt-1">In Active</span>
-        </div>
+            <p class="box">No donations available at the moment.</p>
         {% endif %}
     </div>
-
-    <h2 class="subtitle mt-3"><strong>List of Donations</strong></h2>
-    {% if donations %}
-    <div class="columns is-multiline is-variable is-4">
-        {% for donation in donations %}
-        <div class="column is-full-mobile is-half-tablet is-half-desktop">
-            <div class="card mb-5">
-                <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                        <div class="media-content">
-                            <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
-                        </div>
-                        <div class="media-right mt-2-mobile">
-                            <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
-                                Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <div class="columns is-flex-direction-column-mobile">
-                            <div class="column is-one-third has-text-centered">
-                                <strong>Pickup by:</strong>
-                                <p>{{ donation.pickup_by }}</p>
-                            </div>
-                        </div>
-                    </div>
+    <div id="addDonationModal" class="modal">
+        <div class="modal-content">
+            <!-- djlint:off -->
+                            <span class="close" name="modal-close" id="closeModal">&times;</span>
+        <!-- djlint:on -->
+        <h2 id="modal-header">Add a Donation</h2>
+        <hr>
+        <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
+            {% csrf_token %}
+            <!-- Donation Form Fields -->
+            <div class="field">
+                <label class="label">Food Item</label>
+                <div class="control">
+                    <input class="input" type="text" name="food_item" placeholder="Food item">
                 </div>
-                <footer class="card-footer">
-                    <a href="#" class="card-footer-item edit-link" data-id="{{ donation.donation_id }}"
-                        data-food-item="{{ donation.food_item }}" data-quantity="{{ donation.quantity }}"
-                        data-pickup-by="{{ donation.pickup_by|date:'Y-m-d' }}"
-                        data-organization-id="{{ donation.organization.organization_id }}">
-                        Modify
-                    </a>
-                    <form class="card-footer-item" method="post"
-                        action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}"
-                        id="delete-form-{{ donation.donation_id }}">
-                        {% csrf_token %}
-                        <a class="delete-link is-danger"
-                            onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
-                    </form>
-                </footer>
             </div>
-        </div>
-        {% endfor %}
+            <div class="field">
+                <label class="label">Quantity</label>
+                <div class="control">
+                    <input class="input" type="number" name="quantity" placeholder="Quantity">
+                </div>
+            </div>
+            <div class="field">
+                <label class="label">Pickup By</label>
+                <div class="control">
+                    <input class="input" type="date" name="pickup_by">
+                </div>
+            </div>
+            <div class="field" hidden>
+                <label class="label">Organization</label>
+                <div class="control">
+                    <input type="hidden"
+                           name="organization"
+                           value="{{ organization.organization_id }}">
+                </div>
+            </div>
+            <div class="field">
+                <div class="control">
+                    <button type="submit" class="button is-primary">Submit</button>
+                </div>
+            </div>
+        </form>
     </div>
-    {% else %}
-    <p class="box">No donations available at the moment.</p>
-    {% endif %}
     <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
     {% if orders %}
     <div class="table-container">
@@ -123,52 +166,5 @@ Manage Organization
     {% else %}
     <p class="box">No orders to display.</p>
     {% endif %}
-</div>
-
-<div id="addDonationModal" class="modal">
-    <div class="modal-content">
-        <!-- djlint:off -->
-        <span class="close" name="modal-close" id="closeModal">&times;</span>
-        <!-- djlint:on -->
-        <h2 id="modal-header">Add a Donation</h2>
-        <hr>
-        <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
-            {% csrf_token %}
-            <!-- Donation Form Fields -->
-            <div class="field">
-                <label class="label">Food Item</label>
-                <div class="control">
-                    <input class="input" type="text" name="food_item" placeholder="Food item">
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label">Quantity</label>
-                <div class="control">
-                    <input class="input" type="number" name="quantity" placeholder="Quantity">
-                </div>
-            </div>
-
-            <div class="field">
-                <label class="label">Pickup By</label>
-                <div class="control">
-                    <input class="input" type="date" name="pickup_by">
-                </div>
-            </div>
-
-            <div class="field" hidden>
-                <label class="label">Organization</label>
-                <div class="control">
-                    <input type="hidden" name="organization" value="{{ organization.organization_id }}">
-                </div>
-            </div>
-
-            <div class="field">
-                <div class="control">
-                    <button type="submit" class="button is-primary">Submit</button>
-                </div>
-            </div>
-        </form>
-    </div>
 </div>
 {% endblock content %}
