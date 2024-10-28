@@ -1,0 +1,21 @@
+.stars {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.stars i {
+    cursor: pointer;
+    color: #ccc;
+    /* Default color */
+}
+
+.stars i.selected {
+    color: #ffd700;
+    /* Gold color for selected stars */
+}
+
+.stars i:hover,
+.stars i:hover~i {
+    color: #ffcc00;
+    /* Hover color for stars */
+}

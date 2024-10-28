@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase, Client
 from django.urls import reverse
-from database.models import Order, Donation, Organization
+from database.models import Order, Donation, Organization, UserReview
 from django.utils import timezone
 from datetime import timedelta
 from uuid import uuid4
@@ -270,7 +270,6 @@ class CancelOrderTests(TestCase):
         )
         self.assertEqual(response.status_code, 404)
 
-
 class ModifyOrderTests(TestCase):
     def setUp(self):
         # Create test user with a unique email
@@ -446,3 +445,109 @@ class ModifyOrderTests(TestCase):
 
         updated_donation = Donation.objects.get(donation_id=self.donation.donation_id)
         self.assertEqual(updated_donation.quantity, 5)
+            pickup_by=timezone.now().date(),
+            active=True,
+        )
+
+        self.order = Order.objects.create(
+            user=self.user,
+            donation=self.donation,
+            order_quantity=2,
+            order_status="picked_up",
+            active=True,
+        )
+
+    def test_attach_review_to_order(self):
+        """Test if review is correctly attached to each order in recipient_orders"""
+        UserReview.objects.create(
+            donation=self.donation,
+            user=self.user,
+            rating=5,
+            comment="Great food!",
+            active=True,
+        )
+
+        response = self.client.get(reverse("recipient_orders"))
+        orders = response.context["picked_up_orders"]
+
+        # Check that the review is correctly attached to the order
+        self.assertEqual(orders[0].review.rating, 5)
+        self.assertEqual(orders[0].review.comment, "Great food!")
+        self.assertEqual(orders[0].review.donation, self.donation)
+
+
+class SubmitReviewTest(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.login(username="testuser", password="testpass")
+
+        # Create test organization
+        self.organization = Organization.objects.create(
+            organization_name="Test Organization",
+            type="restaurant",
+            address="123 Test St",
+            zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
+        )
+
+        # Create test donation
+        self.donation = Donation.objects.create(
+            organization=self.organization,
+            food_item="Test Food",
+            quantity=5,
+            pickup_by=timezone.now().date(),
+            active=True,
+        )
+        self.order = Order.objects.create(
+            user=self.user,
+            donation=self.donation,
+            order_quantity=2,
+            order_status="picked_up",
+            active=True,
+        )
+
+    def test_create_review(self):
+        """Test creating a new review if one doesn't exist"""
+        data = {
+            "order_id": str(self.order.pk),
+            "rating": 4,
+            "comment": "Very good food",
+        }
+
+        response = self.client.post(reverse("submit_review"), data)
+
+        self.assertEqual(UserReview.objects.count(), 1)
+        review = UserReview.objects.first()
+        self.assertEqual(review.donation, self.donation)
+        self.assertEqual(review.user, self.user)
+        self.assertEqual(review.rating, 4)
+        self.assertEqual(review.comment, "Very good food")
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+    def test_update_existing_review(self):
+        """Test updating an existing review if it already exists"""
+        # Create an initial review
+        UserReview.objects.create(
+            donation=self.donation,
+            user=self.user,
+            rating=3,
+            comment="Good food",
+            active=True,
+        )
+
+        data = {
+            "order_id": str(self.order.pk),
+            "rating": 5,
+            "comment": "Excellent food!",
+        }
+
+        response = self.client.post(reverse("submit_review"), data)
+
+        # Check that the review has been updated
+        review = UserReview.objects.first()
+        self.assertEqual(review.rating, 5)
+        self.assertEqual(review.comment, "Excellent food!")
+        self.assertRedirects(response, reverse("recipient_orders"))
