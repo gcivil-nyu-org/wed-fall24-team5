@@ -13,10 +13,6 @@
 {% block content %}
 {% include 'recipient_orders/review_modal.html' %}
 {% include "partials/notifications.html" %}
-=======
-
-{% block content %}
-<!-- Modify Order Modal -->
 <div id="modifyOrderModal" class="modal">
     <div class="modal-background"></div>
     <div class="modal-card">
@@ -53,8 +49,6 @@
         </form>
     </div>
 </div>
-
->>>>>>> origin/develop
 <div class="container">
     {% include "partials/notifications.html" %}
     <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
