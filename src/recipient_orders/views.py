@@ -1,7 +1,7 @@
 from django.shortcuts import get_object_or_404, redirect, render
+from database.models import Order, UserReview
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from database.models import Order
 
 
 @login_required
@@ -23,7 +23,23 @@ def recipient_orders(request):
         .order_by("order_created_at")
     )
 
-    # Pass the grouped orders to the template
+    # Get reviews and map them by donation_id for easier access
+    reviews = {
+        review.donation_id: review
+        for review in UserReview.objects.filter(user=request.user, active=True)
+    }
+
+    # Attach review to each order
+    for order in pending_orders:
+        order.review = reviews.get(order.donation_id)
+
+    for order in picked_up_orders:
+        order.review = reviews.get(order.donation_id)
+
+    for order in canceled_orders:
+        order.review = reviews.get(order.donation_id)
+
+    # Pass the orders and other context to the template
     context = {
         "pending_orders": pending_orders,
         "picked_up_orders": picked_up_orders,
@@ -34,6 +50,37 @@ def recipient_orders(request):
 
 
 @login_required
+def submit_review(request):
+    if request.method == "POST":
+        order_id = request.POST.get("order_id")
+        rating = request.POST.get("rating")
+        comment = request.POST.get("comment")
+
+        # Fetch the order and related donation
+        order = get_object_or_404(Order, pk=order_id)
+
+        # Try to get the existing review or create a new one if it doesn't exist
+        try:
+            review, created = UserReview.objects.get_or_create(
+                donation=order.donation,
+                user=request.user,
+                defaults={"rating": rating, "comment": comment},
+            )
+
+            # If the review already exists, update its rating and comment
+            if not created:
+                review.rating = rating
+                review.comment = comment
+                review.save()
+            messages.success(request, "Review sent successfully. Thanks!")
+        except:  # noqa <-- for bare except
+            messages.warning(
+                request, "Unable to provide review. Please try again later."
+            )
+
+    return redirect("recipient_orders")
+
+
 def pickup_order(request, order_id):
     try:
         order = get_object_or_404(Order, pk=order_id, active=True)
