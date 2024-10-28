@@ -73,7 +73,7 @@ def submit_review(request):
                 review.comment = comment
                 review.save()
             messages.success(request, "Review sent successfully. Thanks!")
-        except: # noqa <-- for bare except
+        except:  # noqa <-- for bare except
             messages.warning(
                 request, "Unable to provide review. Please try again later."
             )
