@@ -299,38 +299,27 @@ def add_org_admin(request):
 
 
 @login_required
-def make_as_admin(request, organization_id, admin_email):
+def assign_organization_access_level(
+    request, organization_id, admin_email, current_access_level
+):
     organization = Organization.objects.get(organization_id=organization_id)
     admin_user = User.objects.get(email=admin_email)
 
     organization_admin = OrganizationAdmin.objects.get(
         user=admin_user, organization=organization
     )
-    organization_admin.access_level = "admin"
+    if current_access_level == "owner":
+        organization_admin.access_level = "admin"
+    elif current_access_level == "admin":
+        organization_admin.access_level = "owner"
+
     organization_admin.save()
 
     messages.success(
-        request, f"Succesfully made user with email: {admin_email} as admin"
-    )
-    return redirect(
-        "donor_dashboard:organization_details", organization_id=organization_id
+        request,
+        f"Succesfully made user with email: {admin_email} as {organization_admin.access_level}",
     )
 
-
-@login_required
-def make_as_owner(request, organization_id, admin_email):
-    organization = Organization.objects.get(organization_id=organization_id)
-    admin_user = User.objects.get(email=admin_email)
-
-    organization_admin = OrganizationAdmin.objects.get(
-        user=admin_user, organization=organization
-    )
-    organization_admin.access_level = "owner"
-    organization_admin.save()
-
-    messages.success(
-        request, f"Succesfully made user with email: {admin_email} as owner"
-    )
     return redirect(
         "donor_dashboard:organization_details", organization_id=organization_id
     )

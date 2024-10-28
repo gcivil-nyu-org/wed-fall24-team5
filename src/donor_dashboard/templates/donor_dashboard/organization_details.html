@@ -87,11 +87,11 @@
                                 <div class="column is-full-mobile is-one-third-tablet">
                                     {% if admin.access_level == "owner" %}
                                     <!-- djlint:off -->
-                                    <a href="{% url 'donor_dashboard:make_as_admin' organization.organization_id admin.email %}" style="color: green;">
+                                    <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" style="color: green;">
                                         Make as admin
                                     </a>
                                     {% else %}
-                                    <a href="{% url 'donor_dashboard:make_as_owner' organization.organization_id admin.email %}" style="color: green;">
+                                    <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" style="color: green;">
                                         Make as owner
                                     </a>
                                     <!-- djlint:on -->

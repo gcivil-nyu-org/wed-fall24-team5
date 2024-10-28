@@ -19,7 +19,7 @@
                             <button id="add-donation-button" class="button is-dark">Add Donation</button>
                             {% if owner_access %}
                             <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}" class="button is-info">
-                                Organization Details
+                                Manage Organization
                             </a>
 
                             <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
