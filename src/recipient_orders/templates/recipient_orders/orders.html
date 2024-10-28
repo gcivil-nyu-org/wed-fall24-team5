@@ -54,7 +54,6 @@
         </div>
     </div>
     <div class="container">
-        {% include "partials/notifications.html" %}
         <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
         <h2 class="subtitle mt-3">Your reservations:</h2>
         <div class="tabs is-centered is-toggle is-fullwidth">
@@ -106,7 +105,8 @@
                                     </div>
                                 </div>
                                 <footer class="card-footer">
-                                    <a href="{% url 'pickup_order' order.order_id %}" class="card-footer-item">Mark as Picked Up</a>
+                                    <a href="{% url 'pickup_order' order.order_id %}"
+                                       class="card-footer-item">Mark as Picked Up</a>
                                     <a href="#"
                                        class="card-footer-item"
                                        onclick="openModifyModal('{{ order.order_id }}', '{{ order.order_quantity }}', '{{ order.donation.quantity }}', '{{ order.donation.food_item }}')">
@@ -175,7 +175,8 @@
                                     </div>
                                 </div>
                                 <footer class="card-footer">
-                                    <a href="{% url 'mark_order_as_pending' order.order_id %}" class="card-footer-item">Mark as Pending</a>
+                                    <a href="{% url 'mark_order_as_pending' order.order_id %}"
+                                       class="card-footer-item">Mark as Pending</a>
                                     <a href="#"
                                        class="card-footer-item review-btn"
                                        data-order-id="{{ order.order_id }}"

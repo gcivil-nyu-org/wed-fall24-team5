@@ -47,18 +47,23 @@
                 </footer>
             </div>
         </form>
-
         <h2 class="subtitle mt-4">
             <strong>Add Admins:</strong>
         </h2>
-
         <form method="post" action="{% url 'donor_dashboard:add_org_admin' %}">
             {% csrf_token %}
             <div class="card">
-                <input type="hidden" name="organization_id" value="{{ organization.organization_id }}">
+                <input type="hidden"
+                       name="organization_id"
+                       value="{{ organization.organization_id }}">
                 <div class="card-content">
-                    <h2>Email:
-                        <input type="email" id="email" name="email" placeholder="Enter new admin email" required>
+                    <h2>
+                        Email:
+                        <input type="email"
+                               id="email"
+                               name="email"
+                               placeholder="Enter new admin email"
+                               required>
                     </h2>
                 </div>
                 <footer class="card-footer">
@@ -68,11 +73,9 @@
                 </footer>
             </div>
         </form>
-
         <h2 class="subtitle mt-4">
             <strong>All Admins list</strong>
         </h2>
-
         <div class="columns is-multiline is-variable is-4">
             {% if admins %}
                 {% for admin in admins %}
@@ -82,38 +85,40 @@
                                 <div class="column is-full-mobile is-two-thirds-tablet">
                                     <h3 class="title is-4">{{ admin.name }}</h3>
                                 </div>
-
                                 <div class="column is-full-mobile is-one-third-tablet">
                                     {% if admin.access_level == "owner" %}
-                                    <!-- djlint:off -->
-                                    <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" style="color: green;">
-                                        Make as admin
-                                    </a>
-                                    {% else %}
-                                    <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" style="color: green;">
-                                        Make as owner
-                                    </a>
-                                    <!-- djlint:on -->
-                                    {% endif %}
-                                </div>
-                            </div>
-                            <p><strong>Email:</strong> {{ admin.email }}</p>
-                            <p><strong>Role:</strong> {{ admin.access_level }}</p>
-                            <!-- djlint:off -->
-                            <footer class="card-footer" style="color: red;">
-                            <!-- djlint:on -->
-                                <a href="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}" class="card-footer-item">
-                                    Remove
-                                </a>
-                            </footer>
-                           
+                                        <!-- djlint:off -->
+                                                                            <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}"
+                                                                               style="color: green">
+                                                                                Make as admin
+                                                                        </a>
+                                                                        {% else %}
+                                                                        <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}"
+                                                                           style="color: green">
+                                                                            Make as owner
+                                                                    </a>
+                                <!-- djlint:on -->
+                            {% endif %}
                         </div>
                     </div>
-                {% endfor %}
-            {% else %}
-                <p class="box">No Admins in this Organizations!!</p>
-            {% endif %}
+                    <p>
+                        <strong>Email:</strong> {{ admin.email }}
+                    </p>
+                    <p>
+                        <strong>Role:</strong> {{ admin.access_level }}
+                    </p>
+                    <!-- djlint:off -->
+                                                <footer class="card-footer" style="color: red;">
+                    <!-- djlint:on -->
+                    <a href="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}"
+                       class="card-footer-item">Remove</a>
+                </footer>
+            </div>
         </div>
-
-    </div>
+    {% endfor %}
+{% else %}
+    <p class="box">No Admins in this Organizations!!</p>
+{% endif %}
+</div>
+</div>
 {% endblock content %}

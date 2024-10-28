@@ -79,6 +79,8 @@ def submit_review(request):
             )
 
     return redirect("recipient_orders")
+
+
 def pickup_order(request, order_id):
     try:
         order = get_object_or_404(Order, pk=order_id, active=True)
