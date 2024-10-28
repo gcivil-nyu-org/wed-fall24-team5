@@ -19,7 +19,7 @@ services:
 jobs:
   include:
     - stage: merge-develop-into-main
-      if: type = cron
+      if: "type = cron"
       branches:
         only:
           - main
