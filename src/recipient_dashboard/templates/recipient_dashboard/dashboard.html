@@ -1,120 +1,109 @@
 {% extends "_base.html" %}
 {% block title %}
-Donation Dashboard
+    Donation Dashboard
 {% endblock title %}
 {% block content %}
-<div class="container">
-    {% include "partials/notifications.html" %}
-    <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-    <form method="get">
-        {% csrf_token %}
-        <div class="card">
-            <div class="card-content">
-                <div class="columns is-multiline is-centered">
-                    <div class="column is-three-quarters">
-                        <div class="field has-addons has-addons-centered">
-                            <div class="control">
-                                {{ form.type }}
-                            </div>
-                            <div class="control is-expanded">
-                                {{ form.keyword }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column is-one-quarter">
-                        <div class="field is-grouped is-grouped-centered">
-                            <div class="control">
-                                <button class="button is-info" type="submit">
-                                    Search
-                                </button>
-                            </div>
-                            <div class="control">
-                                <a href="{% url 'recipient_dashboard' %}" class="button is-danger">
-                                    Clear all
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Organization Type</label>
-                            <div class="control is-expanded">
-                                {{ form.category }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Pickup Date After</label>
-                            <div class="control">
-                                {{ form.date }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Quantity Available</label>
-                            <div class="control">
-                                {{ form.min_quantity }}
-                            </div>
-                        </div>
-                    </div>
-                    <div class="column">
-                        <div class="field">
-                            <label class="label">Address</label>
-                            <div class="control">
-                                {{ form.address }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </form>
-    <h2 class="subtitle mt-3"><strong>Available Donations</strong></h2>
-    {% if donations %}
-    <div class="columns is-multiline is-variable is-4">
-        {% for donation in donations %}
-        <div class="column is-full-mobile is-half-tablet is-half-desktop">
-            <div class="card mb-5">
+    <div class="container">
+        {% include "partials/notifications.html" %}
+        <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+        <form method="get">
+            {% csrf_token %}
+            <div class="card">
                 <div class="card-content">
-                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                        <div class="media-content">
-                            <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
-                        </div>
-                        <div class="media-right mt-2-mobile">
-                            <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
-                                Available</span>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <div class="columns is-flex-direction-column-mobile">
-                            <div class="column is-two-thirds">
-                                <a class="button is-link is-light is-fullwidth" style="white-space: normal;
-                                                      word-wrap: break-word"
-                                    href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
-                                    target="_blank" rel="noopener noreferrer">
-                                    {{ donation.organization.organization_name }}
-                                    <br>
-                                    {{ donation.organization.address }}
-                                </a>
+                    <div class="columns is-multiline is-centered">
+                        <div class="column is-three-quarters">
+                            <div class="field has-addons has-addons-centered">
+                                <div class="control">{{ form.type }}</div>
+                                <div class="control is-expanded">{{ form.keyword }}</div>
                             </div>
-                            <div class="column is-one-third has-text-centered">
-                                <strong>Pickup by:</strong>
-                                <p>{{ donation.pickup_by }}</p>
+                        </div>
+                        <div class="column is-one-quarter">
+                            <div class="field is-grouped is-grouped-centered">
+                                <div class="control">
+                                    <button class="button is-info" type="submit">Search</button>
+                                </div>
+                                <div class="control">
+                                    <a href="{% url 'recipient_dashboard' %}" class="button is-danger">Clear all</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Organization Type</label>
+                                <div class="control is-expanded">{{ form.category }}</div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Pickup Date After</label>
+                                <div class="control">{{ form.date }}</div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Quantity Available</label>
+                                <div class="control">{{ form.min_quantity }}</div>
+                            </div>
+                        </div>
+                        <div class="column">
+                            <div class="field">
+                                <label class="label">Address</label>
+                                <div class="control">{{ form.address }}</div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <footer class="card-footer">
-                    <a href="{% url 'reserve_donation' donation.donation_id %}" class="card-footer-item">Reserve</a>
-                </footer>
             </div>
-        </div>
-        {% endfor %}
+        </form>
+        <h2 class="subtitle mt-3">
+            <strong>Available Donations</strong>
+        </h2>
+        {% if donations %}
+            <div class="columns is-multiline is-variable is-4">
+                {% for donation in donations %}
+                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                        <div class="card mb-5">
+                            <div class="card-content">
+                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                    <div class="media-content">
+                                        <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                                    </div>
+                                    <div class="media-right mt-2-mobile">
+                                        <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
+                                        Available</span>
+                                    </div>
+                                </div>
+                                <div class="content">
+                                    <div class="columns is-flex-direction-column-mobile">
+                                        <div class="column is-two-thirds">
+                                            <a class="button is-link is-light is-fullwidth"
+                                               style="white-space: normal;
+                                                      word-wrap: break-word"
+                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                {{ donation.organization.organization_name }}
+                                                <br>
+                                                {{ donation.organization.address }}
+                                            </a>
+                                        </div>
+                                        <div class="column is-one-third has-text-centered">
+                                            <strong>Pickup by:</strong>
+                                            <p>{{ donation.pickup_by }}</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <footer class="card-footer">
+                                <a href="{% url 'reserve_donation' donation.donation_id %}"
+                                   class="card-footer-item">Reserve</a>
+                            </footer>
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="box">No donations available at the moment.</p>
+        {% endif %}
     </div>
-    {% else %}
-    <p class="box">No donations available at the moment.</p>
-    {% endif %}
-</div>
 {% endblock content %}
