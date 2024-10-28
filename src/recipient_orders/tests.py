@@ -360,6 +360,7 @@ class ModifyOrderTests(TestCase):
     def test_modify_nonexistent_order(self):
         """Test modifying an order that doesn't exist"""
         import uuid
+
         fake_order_id = uuid.uuid4()
 
         response = self.client.post(
