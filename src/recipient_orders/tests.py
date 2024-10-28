@@ -4,7 +4,7 @@ from django.urls import reverse
 from database.models import Order, Donation, Organization
 from django.utils import timezone
 from datetime import timedelta
-
+from uuid import uuid4
 
 class RecipientOrdersViewTests(TestCase):
 
@@ -94,3 +94,104 @@ class RecipientOrdersViewTests(TestCase):
         canceled_orders = response.context["canceled_orders"]
         self.assertEqual(canceled_orders.count(), 1)
         self.assertEqual(canceled_orders.first().donation.food_item, "Burger")
+
+class OrderStatusUpdateTests(TestCase):
+
+    def setUp(self):
+        # Create a test user
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+
+        # Log in the user
+        self.client.login(username="testuser", password="testpass")
+
+        # Create a test organization
+        self.organization = Organization.objects.create(
+            organization_name="Test Organization",
+            type="restaurant",
+            address="123 Test St",
+            zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
+        )
+
+        # Create a test donation
+        self.donation = Donation.objects.create(
+            organization=self.organization,
+            food_item="Pizza",
+            quantity=10,
+            pickup_by=timezone.now() + timedelta(days=2),
+            active=True,
+        )
+
+        # Create a pending order
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=2,
+            order_status="pending",
+            active=True,
+        )
+
+    def test_pickup_order_success(self):
+        """Test that a pending order is successfully marked as picked up."""
+        response = self.client.get(reverse("pickup_order", args=[self.order.order_id]))
+
+        # Check that the order status is updated to "picked_up"
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.order_status, "picked_up")
+
+        # Check that the user is redirected to recipient_orders
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Verify success message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Donation marked as picked up successfully.")
+
+    def test_pickup_order_failure(self):
+        """Test that marking an invalid order as picked up fails gracefully."""
+        invalid_order_id = uuid4()  # UUID that doesn't exist
+        response = self.client.get(reverse("pickup_order", args=[invalid_order_id]))
+
+        # Check that the user is redirected to recipient_orders
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Verify failure message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Unable to mark order as picked up. Please try again later.")
+
+    def test_mark_order_as_pending_success(self):
+        """Test that a picked up order is successfully marked as pending."""
+        # Change the order status to picked_up
+        self.order.order_status = "picked_up"
+        self.order.save()
+
+        response = self.client.get(reverse("mark_order_as_pending", args=[self.order.order_id]))
+
+        # Check that the order status is updated to "pending"
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.order_status, "pending")
+
+        # Check that the user is redirected to recipient_orders
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Verify success message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Donation marked as pending successfully.")
+
+    def test_mark_order_as_pending_failure(self):
+        """Test that marking an invalid order as pending fails gracefully."""
+        invalid_order_id = uuid4()  # UUID that doesn't exist
+        response = self.client.get(reverse("mark_order_as_pending", args=[invalid_order_id]))
+
+        # Check that the user is redirected to recipient_orders
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        # Verify failure message
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(str(messages[0]), "Unable to mark order as pending. Please try again later.")

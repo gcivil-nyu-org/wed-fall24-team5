@@ -63,6 +63,7 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
+                                <a href="{% url 'pickup_order' order.order_id %}" class="card-footer-item">Mark as Picked Up</a>
                                 <a href="#" class="card-footer-item">Modify</a>
                                 <a href="#" class="card-footer-item">Cancel</a>
                             </footer>
@@ -113,6 +114,7 @@
                                 </div>
                             </div>
                             <footer class="card-footer">
+                                <a href="{% url 'mark_order_as_pending' order.order_id %}" class="card-footer-item">Mark as Pending</a>
                                 <a href="#" class="card-footer-item">Modify</a>
                                 <a href="#" class="card-footer-item">Cancel</a>
                             </footer>
