@@ -3,6 +3,7 @@
     My Orders
 {% endblock title %}
 {% block content %}
+{% include "partials/notifications.html" %}
 <div class="container">
     <h1 class="title">Hi, {{ user.first_name }} {{ user.last_name }}!</h1>
     <h2 class="subtitle mt-3">Your reservations:</h2>
