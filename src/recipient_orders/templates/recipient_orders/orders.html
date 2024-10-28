@@ -105,8 +105,6 @@
                             </div>
                             <footer class="card-footer">
                                 <a href="{% url 'pickup_order' order.order_id %}" class="card-footer-item">Mark as Picked Up</a>
-                                <a href="#" class="card-footer-item">Modify</a>
-                                <a href="#" class="card-footer-item">Cancel</a>
                                 <a href="#" 
                                    class="card-footer-item"
                                    onclick="openModifyModal('{{ order.order_id }}', 
