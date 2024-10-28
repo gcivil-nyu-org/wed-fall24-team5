@@ -6,14 +6,30 @@ document.addEventListener('DOMContentLoaded', () => {
     const submitBtn = document.getElementById('submitReview');
     const orderIdInput = document.getElementById('orderId');
     const ratingInput = document.getElementById('ratingInput');
+    const commentInput = document.getElementById('comment');
     const stars = document.querySelectorAll('#starRating i');
     let selectedRating = 0;
 
-    // Function to open modal
-    function openModal(orderId) {
+    // Function to open modal and populate fields if review exists
+    function openModal(orderId, existingRating, existingComment) {
         orderIdInput.value = orderId;
         modal.classList.add('is-active');
-        resetStars(); // Reset stars when the modal is opened
+
+        // If a rating exists, populate the modal with the existing rating
+        if (existingRating && existingRating !== '0') {
+            selectedRating = existingRating;
+            ratingInput.value = existingRating;
+            updateStars(existingRating); // Update the stars based on the existing rating
+        } else {
+            resetStars(); // Reset stars if no existing rating
+        }
+
+        // Set the comment if it exists
+        if (existingComment) {
+            commentInput.value = existingComment;
+        } else {
+            commentInput.value = ''; // Clear the comment field if no comment exists
+        }
     }
 
     // Close modal
@@ -65,7 +81,10 @@ document.addEventListener('DOMContentLoaded', () => {
         button.addEventListener('click', (event) => {
             event.preventDefault();
             const orderId = event.target.getAttribute('data-order-id');
-            openModal(orderId);
+            const existingRating = event.target.getAttribute('data-rating');
+            const existingComment = event.target.getAttribute('data-comment');
+
+            openModal(orderId, existingRating, existingComment);
         });
     });
 
