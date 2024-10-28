@@ -2,7 +2,6 @@ from django.shortcuts import get_object_or_404, redirect, render
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from database.models import Order
-from django.contrib import messages
 
 
 @login_required
@@ -62,6 +61,7 @@ def mark_order_as_pending(request, order_id):
             request, "Unable to mark order as pending. Please try again later."
         )
         return redirect("recipient_orders")
+
 
 @login_required
 def cancel_order(request, order_id):

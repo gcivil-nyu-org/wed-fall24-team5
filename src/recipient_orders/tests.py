@@ -7,6 +7,7 @@ from datetime import timedelta
 from uuid import uuid4
 from django.contrib.messages import get_messages
 
+
 class RecipientOrdersViewTests(TestCase):
 
     def setUp(self):
@@ -203,6 +204,7 @@ class CancelOrderTests(TestCase):
         self.assertEqual(
             str(messages[0]), "Unable to mark order as pending. Please try again later."
         )
+
     def test_cancel_order_success(self):
         """Test successful cancellation of a pending order"""
         initial_donation_quantity = self.donation.quantity
