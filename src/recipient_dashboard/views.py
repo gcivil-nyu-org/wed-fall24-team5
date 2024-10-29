@@ -5,6 +5,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from .forms import SearchDonationForm
+from django.db.models import Avg
 
 
 @login_required
@@ -13,6 +14,11 @@ def recipient_dashboard(request):
     form = SearchDonationForm(request.GET)
     donations = Donation.objects.filter(
         Q(active=True) & Q(quantity__gt=0) & Q(pickup_by__gte=currdate)
+    ).select_related("organization")
+
+    # Annotate each donation with the average rating of its organization by joining UserReview through Donation
+    donations = donations.annotate(
+        avg_rating=Avg("organization__donation__userreview__rating")
     ).order_by("created_at")
 
     if form.is_valid():
