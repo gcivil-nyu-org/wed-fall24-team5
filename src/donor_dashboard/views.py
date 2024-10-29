@@ -1,5 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404  # noqa
-from database.models import Organization, OrganizationAdmin, User, Donation, Order
+from database.models import (
+    Organization,
+    OrganizationAdmin,
+    User,
+    Donation,
+    Order,
+    UserReview,
+)
 from django.contrib import messages
 from donor_dashboard.forms import AddOrganizationForm
 from django.contrib.auth.decorators import login_required
@@ -94,6 +101,12 @@ def manage_organization(request, organization_id):
             donation__organization=organization
         ).prefetch_related("donation")
         status = organization.active
+        reviews = (
+            UserReview.objects.filter(donation__organization=organization)
+            .order_by("modified_at")
+            .values("rating", "comment")
+        )
+
         return render(
             request,
             "donor_dashboard/manage_organization.html",
@@ -103,6 +116,7 @@ def manage_organization(request, organization_id):
                 "status": status,
                 "orders": orders,
                 "owner_access": owner_access,
+                "reviews": reviews,
             },
         )
     except Exception:
