@@ -275,7 +275,7 @@ def manage_order(request, order_id):
     order = get_object_or_404(Order, order_id=order_id, active=True)
     donation = Donation.objects.get(donation_id=order.donation_id)
 
-    order.order_status = "complete" if order.order_status == "pending" else "pending"
+    order.order_status = "picked_up" if order.order_status == "pending" else "pending"
     order.save()
 
     return redirect(
