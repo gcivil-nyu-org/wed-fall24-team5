@@ -36,6 +36,7 @@ urlpatterns = [
         views.delete_donation,
         name="delete_donation",
     ),
+    path("manage_order/<uuid:order_id>/", views.manage_order, name="manage_order"),
     path("add_org_admin/", views.add_org_admin, name="add_org_admin"),
     path(
         "assign_organization_access_level/<uuid:organization_id>/<str:admin_email>/<str:current_access_level>",

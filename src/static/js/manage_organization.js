@@ -1,23 +1,42 @@
-function confirmDelete() {
-    if (confirm("Are you sure you want to delete this organization?")) {
-        document.getElementById("delete-form").submit();
-    }
-}
+document.addEventListener("DOMContentLoaded", function () {
+    // Handle the tab switching logic
+    const tabs = document.querySelectorAll('.tabs ul li');
+    const donationsContent = document.getElementById('donations-content');
+    const ordersContent = document.getElementById('orders-content');
+    const reviewsContent = document.getElementById('reviews-content');
 
-function submitDeleteForm(donationId) {
-    const form = document.getElementById(`delete-form-${donationId}`);
-    if (confirm("Are you sure you want to delete this donation? All existing reservations for this donation will still exist!")) {
-        form.submit();
+    function clearActiveTabs() {
+        tabs.forEach(tab => {
+            tab.classList.remove('is-active');
+        });
+        donationsContent.classList.add('is-hidden');
+        ordersContent.classList.add('is-hidden');
+        reviewsContent.classList.add('is-hidden');
     }
-}
 
-document.addEventListener("DOMContentLoaded", function() {
+    // Add event listeners for the tabs
+    tabs.forEach(tab => {
+        tab.addEventListener('click', function () {
+            clearActiveTabs();
+            this.classList.add('is-active');
+            // Show the content based on the clicked tab's id
+            if (this.id === 'donations-tab') {
+                donationsContent.classList.remove('is-hidden');
+            } else if (this.id === 'orders-tab') {
+                ordersContent.classList.remove('is-hidden');
+            } else if (this.id === 'reviews-tab') {
+                reviewsContent.classList.remove('is-hidden');
+            }
+        });
+    });
+
+    // Existing code for modals, delete confirmation, etc.
     var addDonationButton = document.getElementById("add-donation-button");
     if (addDonationButton) {
-        addDonationButton.onclick = function() {
+        addDonationButton.onclick = function () {
             const modalHeader = document.getElementById('modal-header');
-            modalHeader.textContent = 'Add a Donation'; 
-            const organizationId =  document.getElementById('organization-id').innerHTML;
+            modalHeader.textContent = 'Add a Donation';
+            const organizationId = document.getElementById('organization-id').innerHTML;
             document.querySelector('input[name="food_item"]').value = "";
             document.querySelector('input[name="quantity"]').value = "";
             document.querySelector('input[name="pickup_by"]').value = "";
@@ -28,17 +47,17 @@ document.addEventListener("DOMContentLoaded", function() {
             document.getElementById("addDonationModal").style.display = "block";
         };
     }
-    
+
     const editLinks = document.querySelectorAll('.edit-link');
     editLinks.forEach(link => {
-        link.onclick = function() {
+        link.onclick = function () {
             const modalHeader = document.getElementById('modal-header');
-            modalHeader.textContent = 'Modify Donation'; 
+            modalHeader.textContent = 'Modify Donation';
             const donationId = this.getAttribute('data-id');
             const foodItem = this.getAttribute('data-food-item');
             const quantity = this.getAttribute('data-quantity');
             const pickupBy = this.getAttribute('data-pickup-by');
-            const organizationId =  document.getElementById('organization-id').innerHTML;
+            const organizationId = document.getElementById('organization-id').innerHTML;
 
             document.querySelector('input[name="food_item"]').value = foodItem;
             document.querySelector('input[name="quantity"]').value = quantity;
@@ -55,13 +74,12 @@ document.addEventListener("DOMContentLoaded", function() {
 
     var closeButton = document.getElementById("closeModal");
     if (closeButton) {
-        closeButton.onclick = function() {
+        closeButton.onclick = function () {
             document.getElementById("addDonationModal").style.display = "none";
         };
     }
 
-    // Clicking anywhere outside the modal closes it
-    window.onclick = function(event) {
+    window.onclick = function (event) {
         var modal = document.getElementById("addDonationModal");
         if (event.target == modal) {
             modal.style.display = "none";

@@ -1,42 +1,53 @@
 {% extends "_base.html" %}
 {% block title %}
-    Manage Organization
+Manage Organization
 {% endblock title %}
 {% load static %}
 {% block content %}
-<link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
-<script src="{% static 'js/manage_organization.js' %}"></script>
+    <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
+    <script src="{% static 'js/manage_organization.js' %}"></script>
     <div class="container">
         {% include "partials/notifications.html" %}
-        <div class="flex-container">
+        <div class="flex-container is-justify-content-space-between is-align-items-center">
             <h2 class="subtitle mt-5">
                 <strong>{{ organization.organization_name }}</strong>
             </h2>
             <div id="organization-id" hidden>{{ organization.organization_id }}</div>
-                {% if status %}
-                    
-                        <div class="buttons">
-                            <button id="add-donation-button" class="button is-dark">Add Donation</button>
-                            {% if owner_access %}
-                            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}" class="button is-info">
-                                Manage Organization
-                            </a>
+            {% if owner_access %}
+                <div class="buttons is-inline-block">
+                    <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
+                       class="button is-info">Manage Organization</a>
+                    <form id="delete-form" class="is-inline-block"
+                          action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}"
+                          method="post">
+                        {% csrf_token %}
+                        <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
+                    </form>
+                </div>
+            {% endif %}
+        </div>
 
-                            <form id="delete-form" action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
-                                {% csrf_token %}
-                                <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
-                            </form>
-                            {% endif %}
-                        </div>
-                    
-                {% else %}
-                    <div class="media-right">
-                        <span class="tag is-primary is-light is-medium mt-1">In Active</span>
-                    </div>
-                {% endif %}
-            </div>
-        
-        <h2 class="subtitle mt-3">List of Donations:</h2>
+        <!-- Tab navigation -->
+        <div class="tabs is-centered is-toggle is-fullwidth mt-3">
+            <ul>
+                <li id="donations-tab" class="is-active"><a>Donations</a></li>
+                <li id="orders-tab"><a>Orders</a></li>
+                <li id="reviews-tab"><a>Reviews</a></li>
+            </ul>
+        </div>
+
+        <!-- Content for List of Donations tab -->
+        <div id="donations-content">
+            {% if status %}
+                <div class="buttons">
+                    <button id="add-donation-button" class="button is-dark">Add Donation</button>
+                </div>
+            {% else %}
+                <div class="media-right">
+                    <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                </div>
+            {% endif %}
+            <h2 class="subtitle mt-3">List of Donations:</h2>
             {% if donations %}
                 <div class="columns is-multiline is-variable is-4">
                     {% for donation in donations %}
@@ -61,17 +72,20 @@
                                     </div>
                                 </div>
                                 <footer class="card-footer">
-                                    <a href="#" class="card-footer-item edit-link" 
-                                       data-id="{{ donation.donation_id }}" 
-                                       data-food-item="{{ donation.food_item }}" 
-                                       data-quantity="{{ donation.quantity }}" 
+                                    <a href="#"
+                                       class="card-footer-item edit-link"
+                                       data-id="{{ donation.donation_id }}"
+                                       data-food-item="{{ donation.food_item }}"
+                                       data-quantity="{{ donation.quantity }}"
                                        data-pickup-by="{{ donation.pickup_by|date:'Y-m-d' }}"
-                                       data-organization-id="{{ donation.organization.organization_id }}">
-                                       Modify
-                                    </a>
-                                    <form class="card-footer-item" method="post" action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}" id="delete-form-{{ donation.donation_id }}">
+                                       data-organization-id="{{ donation.organization.organization_id }}">Modify</a>
+                                    <form class="card-footer-item"
+                                          method="post"
+                                          action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}"
+                                          id="delete-form-{{ donation.donation_id }}">
                                         {% csrf_token %}
-                                        <a class="delete-link is-danger" onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
+                                        <a class="delete-link is-danger"
+                                           onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
                                     </form>
                                 </footer>
                             </div>
@@ -81,13 +95,96 @@
             {% else %}
                 <p class="box">No donations available at the moment.</p>
             {% endif %}
+        </div>
+
+        <!-- Content for Orders Received tab -->
+        <div id="orders-content" class="is-hidden">
+            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+            {% if orders %}
+            <div class="table-container">
+                <table class="table order-table is-hoverable is-striped is-fullwidth" style="border-radius: 1rem;">
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>User</th>
+                            <th>Quantity</th>
+                            <th>Pickup Date</th>
+                            <th>Address</th>
+                            <th>Status</th>
+                            <th>Mark As</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for order in orders %}
+                        <tr>
+                            <td>{{ order.donation.food_item }}</td>
+                            <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                            <td>{{ order.order_quantity }}</td>
+                            <td>{{ order.donation.pickup_by }}</td>
+                            <td>{{ organization.address }}</td>
+                            <td>{{ order.order_status }}</td>
+                            <td><a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
+                                    class="button is-small is-rounded is-success is-outlined">
+                                    {% if order.order_status == "pending" %}
+                                    Complete
+                                    {% else %}
+                                    Incomplete
+                                    {% endif %}
+                                </a></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+            {% else %}
+            <p class="box">No orders to display.</p>
+            {% endif %}
+        </div>
+
+        <!-- Content for My Reviews tab -->
+        <div id="reviews-content" class="tab-content is-hidden">
+            <h2 class="subtitle mt-3"><strong>My Reviews</strong></h2>
+            {% if reviews %}
+                <div class="columns is-multiline is-variable is-3">
+                    {% for review in reviews %}
+                        <div class="column">
+                            <div class="card mb-5">
+                                <div class="card-content">
+                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                        <div class="media-content">
+                                            <p class="is-5 is-clipped">{{ review.comment }}</p>
+                                        </div>
+                                        <div class="media-right mt-2-mobile">
+                                            <span class="tag is-primary is-light is-medium mt-1">
+                                                <!-- Rating Stars -->
+                                                {% with ""|center:5 as range %}
+                                                    {% for _ in range %}
+                                                        {% if forloop.counter <= review.rating %}
+                                                            <i class="fas fa-star"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="box">No reviews available at the moment.</p>
+            {% endif %}
+        </div>
+
     </div>
 
     <div id="addDonationModal" class="modal">
         <div class="modal-content">
-            <!-- djlint:off -->
-            <span class="close" name="modal-close" id="closeModal">&times;</span>
-            <!-- djlint:on -->
+            <span class="close" name="modal-close" id="closeModal">X</span>
             <h2 id="modal-header">Add a Donation</h2>
             <hr>
             <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
@@ -99,28 +196,26 @@
                         <input class="input" type="text" name="food_item" placeholder="Food item">
                     </div>
                 </div>
-    
                 <div class="field">
                     <label class="label">Quantity</label>
                     <div class="control">
                         <input class="input" type="number" name="quantity" placeholder="Quantity">
                     </div>
                 </div>
-    
                 <div class="field">
                     <label class="label">Pickup By</label>
                     <div class="control">
                         <input class="input" type="date" name="pickup_by">
                     </div>
                 </div>
-    
                 <div class="field" hidden>
                     <label class="label">Organization</label>
                     <div class="control">
-                        <input type="hidden" name="organization" value="{{ organization.organization_id }}">
+                        <input type="hidden"
+                               name="organization"
+                               value="{{ organization.organization_id }}">
                     </div>
                 </div>
-    
                 <div class="field">
                     <div class="control">
                         <button type="submit" class="button is-primary">Submit</button>
