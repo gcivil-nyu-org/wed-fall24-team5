@@ -30,9 +30,9 @@ Manage Organization
         <!-- Tab navigation -->
         <div class="tabs is-centered is-toggle is-fullwidth mt-3">
             <ul>
-                <li id="donations-tab" class="is-active"><a>List of Donations</a></li>
-                <li id="orders-tab"><a>Orders Received</a></li>
-                <li id="reviews-tab"><a>My Reviews</a></li>
+                <li id="donations-tab" class="is-active"><a>Donations</a></li>
+                <li id="orders-tab"><a>Orders</a></li>
+                <li id="reviews-tab"><a>Reviews</a></li>
             </ul>
         </div>
 
@@ -143,10 +143,41 @@ Manage Organization
         </div>
 
         <!-- Content for My Reviews tab -->
-        <div id="reviews-content" class="is-hidden">
+        <div id="reviews-content" class="tab-content is-hidden">
             <h2 class="subtitle mt-3"><strong>My Reviews</strong></h2>
-            <!-- Placeholder for reviews content -->
-            <p class="box">No reviews available at the moment.</p>
+            {% if reviews %}
+                <div class="columns is-multiline is-variable is-3">
+                    {% for review in reviews %}
+                        <div class="column">
+                            <div class="card mb-5">
+                                <div class="card-content">
+                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                                        <div class="media-content">
+                                            <p class="is-5 is-clipped">{{ review.comment }}</p>
+                                        </div>
+                                        <div class="media-right mt-2-mobile">
+                                            <span class="tag is-primary is-light is-medium mt-1">
+                                                <!-- Rating Stars -->
+                                                {% with ""|center:5 as range %}
+                                                    {% for _ in range %}
+                                                        {% if forloop.counter <= review.rating %}
+                                                            <i class="fas fa-star"></i>
+                                                        {% else %}
+                                                            <i class="far fa-star"></i>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                {% endwith %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="box">No reviews available at the moment.</p>
+            {% endif %}
         </div>
 
     </div>
