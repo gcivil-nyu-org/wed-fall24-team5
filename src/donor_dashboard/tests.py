@@ -115,7 +115,7 @@ class DonorDashboardViewsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.organization.refresh_from_db()
         self.assertFalse(self.organization.active)
-    
+
     def test_view_organization_orders(self):
         self.donation = Donation.objects.create(
             food_item="Test Food",
@@ -138,7 +138,7 @@ class DonorDashboardViewsTests(TestCase):
         )
         self.assertEqual(len(response.context["orders"]), 1)
         self.assertIn(self.order, response.context["orders"])
-    
+
     def test_view_organization_no_orders(self):
         self.organization1 = Organization.objects.create(
             organization_name="Test Org1",
