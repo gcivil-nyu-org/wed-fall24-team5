@@ -76,72 +76,100 @@ def get_org_list(request):
 @login_required
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
-    organization = Organization.objects.get(organization_id=organization_id)
-    org_user = User.objects.get(email=request.user.email)
-    organization_admin = OrganizationAdmin.objects.get(
-        user=org_user, organization=organization
-    )
-    access_level = organization_admin.access_level
-    if access_level == "owner":
-        owner_access = True
-    else:
-        owner_access = False
-    donations = Donation.objects.filter(
-        organization_id=organization.organization_id, active=True
-    )
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
-    )
-    status = organization.active
-    return render(
-        request,
-        "donor_dashboard/manage_organization.html",
-        {
-            "organization": organization,
-            "donations": donations,
-            "status": status,
-            "orders": orders,
-            "owner_access": owner_access,
-        },
-    )
+    try:
+        organization = Organization.objects.get(organization_id=organization_id)
+        org_user = User.objects.get(email=request.user.email)
+        organization_admin = OrganizationAdmin.objects.get(
+            user=org_user, organization=organization
+        )
+        access_level = organization_admin.access_level
+        if access_level == "owner":
+            owner_access = True
+        else:
+            owner_access = False
+        donations = Donation.objects.filter(
+            organization_id=organization.organization_id, active=True
+        )
+        orders = Order.objects.filter(
+            donation__organization=organization
+        ).prefetch_related("donation")
+        status = organization.active
+        return render(
+            request,
+            "donor_dashboard/manage_organization.html",
+            {
+                "organization": organization,
+                "donations": donations,
+                "status": status,
+                "orders": orders,
+                "owner_access": owner_access,
+            },
+        )
+    except Exception:
+        messages.warning(request, "You Don't have permission to do this action")
+        return redirect(
+            "donor_dashboard:org_list",
+        )
 
 
 @login_required
 def organization_details(request, organization_id):
+    try:
+        organization = Organization.objects.get(organization_id=organization_id)
+        current_user = User.objects.get(email=request.user.email)
+        current_org_admin = OrganizationAdmin.objects.get(
+            user=current_user, organization=organization
+        )
 
-    organization = Organization.objects.get(organization_id=organization_id)
+        if current_org_admin.access_level == "owner":
+            organization_admins = OrganizationAdmin.objects.filter(
+                organization_id=organization_id
+            )
 
-    if request.method == "POST":
-        form = AddOrganizationForm(request.POST, instance=organization)
-        if form.is_valid():
-            organization = form.save()
-            messages.success(request, "Organization Details Updated Succesfully.")
+            if request.method == "POST":
+                form = AddOrganizationForm(request.POST, instance=organization)
+                if form.is_valid():
+                    organization = form.save()
+                    messages.success(
+                        request, "Organization Details Updated Succesfully."
+                    )
+                    return redirect(
+                        "donor_dashboard:manage_organization",
+                        organization_id=organization_id,
+                    )
+            else:
+                form = AddOrganizationForm(instance=organization)
+
+            organization_admins = OrganizationAdmin.objects.filter(
+                organization_id=organization_id
+            )
+            admins = []
+            for organization_admin in organization_admins:
+                admins.append(
+                    {
+                        "name": organization_admin.user.first_name
+                        + " "
+                        + organization_admin.user.last_name,
+                        "email": organization_admin.user.email,
+                        "access_level": organization_admin.access_level,
+                    }
+                )
+
+            return render(
+                request,
+                "donor_dashboard/organization_details.html",
+                {"organization": organization, "form": form, "admins": admins},
+            )
+        else:
+            messages.warning(request, "You Don't have permission to do this action")
             return redirect(
                 "donor_dashboard:manage_organization", organization_id=organization_id
             )
-    else:
-        form = AddOrganizationForm(instance=organization)
-
-    organization_admins = OrganizationAdmin.objects.filter(
-        organization_id=organization_id
-    )
-    admins = []
-    for organization_admin in organization_admins:
-        admins.append(
-            {
-                "name": organization_admin.user.first_name
-                + " "
-                + organization_admin.user.last_name,
-                "email": organization_admin.user.email,
-                "access_level": organization_admin.access_level,
-            }
+    except Exception:
+        messages.warning(request, "You Don't have permission to do this action")
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
         )
-
-    return render(
-        request,
-        "donor_dashboard/organization_details.html",
-        {"organization": organization, "form": form, "admins": admins},
-    )
 
 
 @login_required
@@ -286,76 +314,121 @@ def manage_order(request, order_id):
 
 @login_required
 def add_org_admin(request):
-    if request.method == "POST":
+    try:
         organization_id = request.POST["organization_id"]
         new_admin_email = request.POST.get("email")
-
         organization = Organization.objects.get(organization_id=organization_id)
-        new_admin_user = User.objects.get(email=new_admin_email)
-        if (
-            len(
-                OrganizationAdmin.objects.filter(
-                    user=new_admin_user, organization=organization
-                )
-            )
-            == 0
-        ):
+        current_user = User.objects.get(email=request.user.email)
+        current_org_admin = OrganizationAdmin.objects.get(
+            user=current_user, organization=organization
+        )
+        if current_org_admin.access_level == "owner":
+            if request.method == "POST":
+                new_admin_user = User.objects.get(email=new_admin_email)
+                if (
+                    len(
+                        OrganizationAdmin.objects.filter(
+                            user=new_admin_user, organization=organization
+                        )
+                    )
+                    == 0
+                ):
 
-            OrganizationAdmin.objects.create(
-                user=new_admin_user, organization=organization, access_level="admin"
-            )
-            messages.success(request, "Admin successfully added.")
-
+                    OrganizationAdmin.objects.create(
+                        user=new_admin_user,
+                        organization=organization,
+                        access_level="admin",
+                    )
+                    messages.success(request, "Admin successfully added.")
+                else:
+                    messages.success(request, "Admin already associated")
             return redirect(
                 "donor_dashboard:organization_details", organization_id=organization_id
             )
         else:
-            messages.success(request, "Admin already associated")
+            messages.warning(request, "You Don't have permission to do this action")
             return redirect(
-                "donor_dashboard:organization_details", organization_id=organization_id
+                "donor_dashboard:manage_organization", organization_id=organization_id
             )
+    except Exception:
+        messages.warning(request, "You Don't have permission to do this action")
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )
 
 
 @login_required
 def assign_organization_access_level(
     request, organization_id, admin_email, current_access_level
 ):
-    organization = Organization.objects.get(organization_id=organization_id)
-    admin_user = User.objects.get(email=admin_email)
+    try:
+        organization = Organization.objects.get(organization_id=organization_id)
+        current_user = User.objects.get(email=request.user.email)
+        current_org_admin = OrganizationAdmin.objects.get(
+            user=current_user, organization=organization
+        )
+        if current_org_admin.access_level == "owner":
+            if request.method == "POST":
+                admin_user = User.objects.get(email=admin_email)
+                organization_admin = OrganizationAdmin.objects.get(
+                    user=admin_user, organization=organization
+                )
+                if current_access_level == "owner":
+                    organization_admin.access_level = "admin"
+                elif current_access_level == "admin":
+                    organization_admin.access_level = "owner"
 
-    organization_admin = OrganizationAdmin.objects.get(
-        user=admin_user, organization=organization
-    )
-    if current_access_level == "owner":
-        organization_admin.access_level = "admin"
-    elif current_access_level == "admin":
-        organization_admin.access_level = "owner"
+                organization_admin.save()
 
-    organization_admin.save()
-
-    messages.success(
-        request,
-        f"Succesfully made user with email: {admin_email} as {organization_admin.access_level}",
-    )
-
-    return redirect(
-        "donor_dashboard:organization_details", organization_id=organization_id
-    )
+                messages.success(
+                    request,
+                    f"Succesfully made user with email: {admin_email} as {organization_admin.access_level}",
+                )
+            return redirect(
+                "donor_dashboard:organization_details", organization_id=organization_id
+            )
+        else:
+            messages.warning(request, "You Don't have permission to do this action")
+            return redirect(
+                "donor_dashboard:manage_organization", organization_id=organization_id
+            )
+    except Exception:
+        messages.warning(request, "You Don't have permission to do this action")
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )
 
 
 @login_required
 def remove_admin_owner(request, organization_id, admin_email):
-    organization = Organization.objects.get(organization_id=organization_id)
-    admin_user = User.objects.get(email=admin_email)
+    try:
+        organization = Organization.objects.get(organization_id=organization_id)
+        current_user = User.objects.get(email=request.user.email)
+        current_org_admin = OrganizationAdmin.objects.get(
+            user=current_user, organization=organization
+        )
+        if current_org_admin.access_level == "owner":
+            if request.method == "POST":
+                admin_user = User.objects.get(email=admin_email)
+                organization_admin = OrganizationAdmin.objects.get(
+                    user=admin_user, organization=organization
+                )
+                organization_admin.delete()
 
-    organization_admin = OrganizationAdmin.objects.get(
-        user=admin_user, organization=organization
-    )
-    organization_admin.delete()
-
-    messages.success(
-        request, f"Succesfully remove this org access to email: {admin_email}"
-    )
-    return redirect(
-        "donor_dashboard:organization_details", organization_id=organization_id
-    )
+                messages.success(
+                    request,
+                    f"Succesfully remove this org access to email: {admin_email}",
+                )
+            return redirect(
+                "donor_dashboard:organization_details", organization_id=organization_id
+            )
+        else:
+            messages.warning(request, "You Don't have permission to do this action")
+            return redirect(
+                "donor_dashboard:manage_organization", organization_id=organization_id
+            )
+    except Exception:
+        messages.warning(request, "You Don't have permission to do this action")
+        return redirect(
+            "donor_dashboard:manage_organization", organization_id=organization_id
+        )

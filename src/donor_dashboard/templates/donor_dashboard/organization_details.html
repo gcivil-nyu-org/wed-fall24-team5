@@ -88,15 +88,19 @@
                                 <div class="column is-full-mobile is-one-third-tablet">
                                     {% if admin.access_level == "owner" %}
                                         <!-- djlint:off -->
-                                                                            <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}"
-                                                                               style="color: green">
-                                                                                Make as admin
-                                                                        </a>
-                                                                        {% else %}
-                                                                        <a href="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}"
-                                                                           style="color: green">
-                                                                            Make as owner
-                                                                    </a>
+                                        <form action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" method="post" style="display: inline;">
+                                            {% csrf_token %}
+                                            <button type="submit" style="color: green; background: none; border: none; cursor: pointer;">
+                                                Make as admin
+                                            </button>
+                                        </form>
+                                    {% else %}
+                                        <form action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" method="post" style="display: inline;">
+                                                {% csrf_token %}
+                                            <button type="submit" style="color: green; background: none; border: none; cursor: pointer;">
+                                                Make as owner
+                                            </button>
+                                        </form>                                     
                                 <!-- djlint:on -->
                             {% endif %}
                         </div>
@@ -108,11 +112,15 @@
                         <strong>Role:</strong> {{ admin.access_level }}
                     </p>
                     <!-- djlint:off -->
-                                                <footer class="card-footer" style="color: red;">
-                    <!-- djlint:on -->
-                    <a href="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}"
-                       class="card-footer-item">Remove</a>
-                </footer>
+                    <footer class="card-footer" style="color: red;">
+                        <!-- djlint:on -->
+                        <form action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}" method="post" style="display: inline;">
+                            {% csrf_token %}
+                            <button type="submit" class="card-footer-item" style="background: none; border: none; color: inherit; cursor: pointer;">
+                                Remove
+                            </button>
+                        </form>
+                    </footer>
             </div>
         </div>
     {% endfor %}
