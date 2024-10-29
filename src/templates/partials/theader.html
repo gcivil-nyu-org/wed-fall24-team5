@@ -58,7 +58,7 @@
                 {% if user.is_authenticated %}
                     <a class="navbar-item" href="{% url 'recipient_dashboard' %}">Dashboard</a>
                     <a class="navbar-item" href="{% url 'recipient_orders' %}">Reservations</a>
-                    <a class="navbar-item" href="#">Profile</a>
+                    <a class="navbar-item" href="{% url 'user_profile:profile' %}">Profile</a>
                 {% endif %}
                 <div class="navbar-item">
                     {% if user.is_authenticated %}
