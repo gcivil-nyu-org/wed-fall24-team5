@@ -81,7 +81,12 @@ Manage Organization
         {% else %}
             <p class="box">No donations available at the moment.</p>
         {% endif %}
-        <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+        <div class="flex-container">
+            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+            {% if orders %}
+            <a href="{% url 'donor_dashboard:download_orders' organization_id=organization.organization_id %}" class="button">Download CSV</a>
+            {% endif %}
+        </div>
         {% if orders %}
         <div class="table-container">
             <table class="table order-table is-hoverable is-striped is-fullwidth" style="border-radius: 1rem;">
@@ -94,7 +99,6 @@ Manage Organization
                         <th>Address</th>
                         <th>Status</th>
                         <th>Mark As</th>
-                        <th></th>
                     </tr>
                 </thead>
                 <tbody>

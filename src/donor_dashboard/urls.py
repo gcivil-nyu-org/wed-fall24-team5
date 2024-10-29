@@ -37,6 +37,11 @@ urlpatterns = [
         name="delete_donation",
     ),
     path("manage_order/<uuid:order_id>/", views.manage_order, name="manage_order"),
+    path(
+        "download_orders/<uuid:organization_id>/",
+        views.download_orders,
+        name="download_orders",
+    ),
     path("add_org_admin/", views.add_org_admin, name="add_org_admin"),
     path(
         "assign_organization_access_level/<uuid:organization_id>/<str:admin_email>/<str:current_access_level>",
