@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib import messages
-from database.models import Organization, OrganizationAdmin, Donation
+from database.models import Organization, OrganizationAdmin, Donation, Order
 from donor_dashboard.forms import AddOrganizationForm
 
 
@@ -115,6 +115,61 @@ class DonorDashboardViewsTests(TestCase):
         self.assertEqual(response.status_code, 302)
         self.organization.refresh_from_db()
         self.assertFalse(self.organization.active)
+    
+    def test_view_organization_orders(self):
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(len(response.context["orders"]), 1)
+        self.assertIn(self.order, response.context["orders"])
+    
+    def test_view_organization_no_orders(self):
+        self.organization1 = Organization.objects.create(
+            organization_name="Test Org1",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization1,
+        )
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(len(response.context["orders"]), 0)
 
 
 class DonationTests(TestCase):
