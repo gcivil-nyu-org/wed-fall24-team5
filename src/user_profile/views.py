@@ -21,12 +21,10 @@ def profile_view(request):
                 user_profile.user.save()
                 user_profile.phone_number = phone_number
                 user_profile.save()
-                
+
             messages.success(request, "Profile updated successfully!")
-        except Exception as ex:
-            messages.warning(
-                request, "Some error occured while updating your profile!"
-            )
+        except: # noqa
+            messages.warning(request, "Some error occured while updating your profile!")
         return redirect("user_profile:profile")
 
     return render(request, "user_profile/profile.html", {"user_profile": user_profile})
