@@ -23,7 +23,7 @@ def profile_view(request):
                 user_profile.save()
 
             messages.success(request, "Profile updated successfully!")
-        except: # noqa
+        except:  # noqa
             messages.warning(request, "Some error occured while updating your profile!")
         return redirect("user_profile:profile")
 
