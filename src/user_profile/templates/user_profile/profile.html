@@ -1,0 +1,69 @@
+{% extends "_base.html" %}
+{% load static %}
+
+{% block extra_css %}
+{% endblock extra_css %}
+
+{% block title %}
+    User Profile
+{% endblock title %}
+
+{% block content %}
+{% include "partials/notifications.html" %}
+
+    <form method="post">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-content">
+                <h2 class="subtitle mt-2">
+                    <strong>Manage Profile</strong>
+                </h2>
+                <div class="columns is-multiline">
+                    <div class="column is-full-mobile is-half-tablet">
+                        <div class="field">
+                            <label class="label">First Name</label>
+                            <div class="control">
+                            <input class="input" type="text" placeholder="First Name" name="first_name" value="{{ user_profile.user.first_name }}">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="column is-full-mobile is-half-tablet">
+                        <div class="field">
+                            <label class="label">Last Name</label>
+                            <div class="control">
+                            <input class="input" type="text" placeholder="Last Name" name="last_name" value="{{ user_profile.user.last_name }}">
+                            </div>
+                        </div>
+                    </div>
+                
+                    <div class="column is-full-mobile is-two-thirds-tablet">
+                        <div class="field">
+                            <label class="label">Phone Number</label>
+                            <div class="control">
+                                <input class="input is-danger" type="text" placeholder="Phone Number" name="phone_number" value="{{ user_profile.phone_number }}">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="column is-full-mobile is-half-tablet">
+                        <div class="field"><strong>Email: </strong>{{ user_profile }}</div>
+                    </div>
+                    <div class="column is-full-mobile is-half-tablet">
+                        <div class="field"><strong>Profile Status: </strong>{{ user_profile.active }}</div>
+                    </div>
+                    <div class="column is-full-mobile is-half-tablet">
+                        <div class="field"><strong>Member Since: </strong>{{ user_profile.created_at }} UTC</div>
+                    </div>
+                    <div class="column is-full-mobile is-half-tablet">
+                        <div class="field"><strong>Profile Last Updated At: </strong>{{ user_profile.modified_at }} UTC</div>
+                    </div>
+                </div>
+            </div>
+            <footer class="card-footer">
+                <button id="submit-btn" type="submit" class="card-footer-item">
+                    <strong>Update Profile</strong>
+                </button>
+            </footer>
+        </div>
+    </form>
+{% endblock content %}
