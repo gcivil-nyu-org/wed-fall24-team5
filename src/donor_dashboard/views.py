@@ -11,7 +11,9 @@ from django.contrib import messages
 from donor_dashboard.forms import AddOrganizationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
+from django.http import HttpResponse
 from .helpers import validate_donation
+import csv
 
 
 @login_required
@@ -317,13 +319,43 @@ def manage_order(request, order_id):
     order = get_object_or_404(Order, order_id=order_id, active=True)
     donation = Donation.objects.get(donation_id=order.donation_id)
 
-    order.order_status = "complete" if order.order_status == "pending" else "pending"
+    order.order_status = "picked_up" if order.order_status == "pending" else "pending"
     order.save()
 
     return redirect(
         "donor_dashboard:manage_organization",
         organization_id=donation.organization_id,
     )
+
+
+@login_required
+def download_orders(request, organization_id):
+    organization = Organization.objects.get(organization_id=organization_id)
+    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
+        "donation"
+    )
+    response = HttpResponse(content_type="text/csv")
+    response["Content-Disposition"] = "attachment; filename=orders.csv"
+
+    writer = csv.writer(response)
+    writer.writerow(
+        ["ID", "Donation", "User", "Quantity", "Pickup Date", "Address", "Status"]
+    )
+
+    for order in orders:
+        writer.writerow(
+            [
+                order.order_id,
+                order.donation.food_item,
+                order.user,
+                order.order_quantity,
+                order.donation.pickup_by,
+                organization.address,
+                order.order_status,
+            ]
+        )
+
+    return response
 
 
 @login_required
