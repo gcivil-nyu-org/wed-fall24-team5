@@ -487,3 +487,167 @@ class DonationTests(TestCase):
 
         # Check if the response status code is 404 (Not Found)
         self.assertEqual(response.status_code, 404)
+
+
+class OrganizationAdminViewsTestCase(TestCase):
+    def setUp(self):
+        # Set up users, organization, and admin roles
+        User = get_user_model()
+        self.owner = User.objects.create_user(
+            username="owner@example.com", email="owner@example.com", password="password"
+        )
+        self.admin = User.objects.create_user(
+            username="admin@example.com", email="admin@example.com", password="password"
+        )
+        self.new_admin = User.objects.create_user(
+            username="new_admin@example.com",
+            email="new_admin@example.com",
+            password="password",
+        )
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+
+        # Owner setup
+        OrganizationAdmin.objects.create(
+            user=self.owner, organization=self.organization, access_level="owner"
+        )
+        # Admin setup
+        OrganizationAdmin.objects.create(
+            user=self.admin, organization=self.organization, access_level="admin"
+        )
+        # Log in as owner for tests
+        self.client.login(email="owner@example.com", password="password")
+
+    def test_add_org_admin_as_owner(self):
+        # Simulate adding a new admin
+        response = self.client.post(
+            reverse("donor_dashboard:add_org_admin"),
+            {
+                "organization_id": self.organization.organization_id,
+                "email": self.new_admin.email,
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:organization_details",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+        # Check if new admin was added
+        self.assertTrue(
+            OrganizationAdmin.objects.filter(
+                user=self.new_admin, organization=self.organization
+            ).exists()
+        )
+
+        # Check success message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(str(messages_list[0]), "Admin successfully added.")
+
+    def test_add_org_admin_already_exists(self):
+        # Try to add an admin who is already an admin
+        response = self.client.post(
+            reverse("donor_dashboard:add_org_admin"),
+            {
+                "organization_id": self.organization.organization_id,
+                "email": self.admin.email,
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:organization_details",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+        # Check message for existing admin
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(str(messages_list[0]), "Admin already associated")
+
+    def test_add_org_admin_no_permission(self):
+        # Login as a non-owner
+        self.client.login(email="admin@example.com", password="password")
+
+        response = self.client.post(
+            reverse("donor_dashboard:add_org_admin"),
+            {
+                "organization_id": self.organization.organization_id,
+                "email": self.new_admin.email,
+            },
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+        # Check permission warning
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(
+            str(messages_list[0]), "You Don't have permission to do this action"
+        )
+
+    def test_assign_organization_access_level(self):
+        # Owner changes an admin's access level
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:assign_organization_access_level",
+                args=[self.organization.organization_id, self.admin.email, "admin"],
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:organization_details",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+        # Verify the access level was updated
+        org_admin = OrganizationAdmin.objects.get(
+            user=self.admin, organization=self.organization
+        )
+        self.assertEqual(org_admin.access_level, "owner")
+
+    def test_remove_admin_owner(self):
+        # Remove admin
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:remove_admin_owner",
+                args=[self.organization.organization_id, self.admin.email],
+            )
+        )
+        self.assertRedirects(
+            response,
+            reverse(
+                "donor_dashboard:organization_details",
+                args=[self.organization.organization_id],
+            ),
+        )
+
+        # Ensure the admin was removed
+        self.assertFalse(
+            OrganizationAdmin.objects.filter(
+                user=self.admin, organization=self.organization
+            ).exists()
+        )
+
+        # Check success message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(
+            str(messages_list[0]),
+            "Succesfully remove this org access to email: admin@example.com",
+        )
