@@ -67,7 +67,7 @@ jobs:
         - djlint src/ --lint
         - coverage run --source='src' src/manage.py test src --noinput
         - coverage report
-        - coveralls
+        - coveralls --service=github
         - python src/manage.py collectstatic --noinput
       deploy:
         - provider: elasticbeanstalk
