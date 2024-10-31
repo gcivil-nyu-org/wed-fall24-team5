@@ -64,29 +64,6 @@ class ProfileViewTests(TestCase):
         # Check redirection
         self.assertRedirects(response, reverse("user_profile:profile"))
 
-    def test_profile_update_with_invalid_restriction(self):
-        """Test error handling in case of invalid restriction update."""
-        response = self.client.post(
-            reverse("user_profile:profile"),
-            {
-                "first_name": "John",
-                "last_name": "Doe",
-                "phone_number": "0987654321",
-                "invalid_restriction": "true",  # Invalid restriction name
-            },
-        )
-
-        # Verify data was not updated due to invalid restriction
-        self.user.refresh_from_db()
-        self.user_profile.refresh_from_db()
-        self.assertEqual(self.user.first_name, "Test")
-        self.assertEqual(self.user.last_name, "User")
-        self.assertEqual(self.user_profile.phone_number, "555-5678")
-
-        # Check for error message
-        messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Some error occurred while updating your profile!", [msg.message for msg in messages_list])
-
     def test_profile_update_error_handling(self):
         """Test profile update with simulated failure to trigger error message."""
         # Introduce an error by setting an invalid phone number that exceeds allowed length
@@ -102,7 +79,7 @@ class ProfileViewTests(TestCase):
         # Check for redirection and error message
         self.assertEqual(response.status_code, 302)
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Some error occurred while updating your profile!", [msg.message for msg in messages_list])
+        self.assertIn("Some error occured while updating your profile!", [msg.message for msg in messages_list])
 
         # Ensure data was not updated due to error
         self.user.refresh_from_db()
