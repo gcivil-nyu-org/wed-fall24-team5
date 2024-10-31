@@ -21,6 +21,12 @@
             crossorigin="anonymous"
             referrerpolicy="no-referrer" />
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
+        <style>
+            .hero.is-halfheight .hero-body, .hero.is-fullheight .hero-body, .hero.is-fullheight-with-navbar .hero-body {
+                align-items: normal;
+                display: flex;
+              }
+        </style>
         <script src="{% static 'js/notifications.js' %}"></script>
         {% block extra_head %}
             <!-- Additional CSS or JS can be inserted by child templates -->
