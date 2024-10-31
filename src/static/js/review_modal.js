@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Modify your closeModal function to reset the modal
     function closeModal() {
         resetStars();
         commentInput.value = '';
