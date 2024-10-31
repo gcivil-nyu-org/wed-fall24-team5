@@ -32,8 +32,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Close modal
     function closeModal() {
+        resetStars();
+        commentInput.value = '';
         modal.classList.remove('is-active');
     }
 
