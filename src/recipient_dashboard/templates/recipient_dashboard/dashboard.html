@@ -76,17 +76,12 @@
                                 <div class="content">
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth"
-                                               style="white-space: normal;
-                                                      word-wrap: break-word;
-                                                      display: flex;
-                                                      flex-direction: column;
-                                                      align-items: flex-center"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
-                                               target="_blank"
-                                               rel="noopener noreferrer">
-                                                <span>{{ donation.organization.organization_name }}</span>
-                                                <span>{{ donation.organization.address }}</span>
+                                            <a class="button is-link is-light is-fullwidth" 
+                                            style="white-space: normal; word-wrap: break-word; display: flex; flex-direction: column; align-items: flex-center;"
+                                            href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
+                                            target="_blank" rel="noopener noreferrer">
+                                             <span>{{ donation.organization.organization_name }}</span>
+                                             <span>{{ donation.organization.address }}</span>
                                                 <!-- Rating Stars -->
                                                 <span>
                                                     {% if donation.avg_rating %}
