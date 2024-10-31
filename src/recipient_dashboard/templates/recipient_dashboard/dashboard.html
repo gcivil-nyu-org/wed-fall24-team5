@@ -88,11 +88,11 @@
                                                      {% with ""|center:5 as range %}
                                                          {% for _ in range %}
                                                              {% if forloop.counter <= donation.avg_rating %}
-                                                                 <i class="fas fa-star"></i>
-                                                             {% elif forloop.counter <= donation.avg_rating|add:"0.5" %}
-                                                                 <i class="fas fa-star-half-alt"></i>
+                                                                 <i class="fa fa-star"></i>
+                                                             {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %}
+                                                                <i class="fa fa-star-half-o"></i>
                                                              {% else %}
-                                                                 <i class="far fa-star"></i>
+                                                                 <i class="fa fa-star-o"></i>
                                                              {% endif %}
                                                          {% endfor %}
                                                      {% endwith %}

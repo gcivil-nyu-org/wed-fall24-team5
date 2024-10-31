@@ -32,8 +32,16 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    // Close modal
+    function resetModal() {
+        selectedRating = 0;
+        resetStars();
+        ratingInput.value = '';
+        commentInput.value = '';
+    }
+
+    // Modify your closeModal function to reset the modal
     function closeModal() {
+        resetModal();
         modal.classList.remove('is-active');
     }
 
