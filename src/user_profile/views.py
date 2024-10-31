@@ -15,14 +15,6 @@ def profile_view(request):
         restriction.restriction.lower().replace(" ", "_")
         for restriction in existing_restrictions
     ]
-    custom_restriction = next(
-        (
-            r.restriction
-            for r in existing_restrictions
-            if r.restriction not in user_restrictions
-        ),
-        "",
-    )
 
     # default dietary restrictions
     default_restrictions = [
