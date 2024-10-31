@@ -11,8 +11,18 @@ def profile_view(request):
 
     # Fetch the existing restrictions for the user
     existing_restrictions = DietaryRestriction.objects.filter(user=request.user)
-    user_restrictions = [restriction.restriction.lower().replace(" ", "_") for restriction in existing_restrictions]
-    custom_restriction = next((r.restriction for r in existing_restrictions if r.restriction not in user_restrictions), "")
+    user_restrictions = [
+        restriction.restriction.lower().replace(" ", "_")
+        for restriction in existing_restrictions
+    ]
+    custom_restriction = next(
+        (
+            r.restriction
+            for r in existing_restrictions
+            if r.restriction not in user_restrictions
+        ),
+        "",
+    )
 
     # default dietary restrictions
     default_restrictions = [
@@ -31,7 +41,7 @@ def profile_view(request):
             phone_number = request.POST.get("phone_number")
 
             custom_restriction = request.POST.get("custom_restriction")
-            
+
             with transaction.atomic():  # Begin a new atomic transaction block
                 user_profile.user.first_name = first_name
                 user_profile.user.last_name = last_name
@@ -44,11 +54,11 @@ def profile_view(request):
 
                 # Add new dietary restrictions based on form values
                 for restriction in default_restrictions:
-                    print(restriction['name'])
-                    if request.POST.get(restriction['name']) == "true":
+                    print(restriction["name"])
+                    if request.POST.get(restriction["name"]) == "true":
                         print("hit true")
                         DietaryRestriction.objects.create(
-                            user=request.user, restriction=restriction['name']
+                            user=request.user, restriction=restriction["name"]
                         )
 
                 # Handle custom restriction
@@ -61,9 +71,13 @@ def profile_view(request):
             messages.warning(request, "Some error occured while updating your profile!")
         return redirect("user_profile:profile")
 
-    return render(request, "user_profile/profile.html", {
-        "user_profile": user_profile,
-        "user_restrictions": user_restrictions,
-        "custom_restriction": custom_restriction,
-        "default_restrictions": default_restrictions
-    })
+    return render(
+        request,
+        "user_profile/profile.html",
+        {
+            "user_profile": user_profile,
+            "user_restrictions": user_restrictions,
+            "custom_restriction": custom_restriction,
+            "default_restrictions": default_restrictions,
+        },
+    )

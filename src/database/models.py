@@ -172,8 +172,11 @@ class Order(models.Model):
     def __str__(self):
         return f"Order {self.order_id} - {self.user.get_full_name() if self.user else 'No User'}"
 
+
 class DietaryRestriction(models.Model):
-    restriction_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    restriction_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     user = models.ForeignKey(User, on_delete=models.CASCADE, null=True, blank=True)
     restriction = models.CharField(max_length=40)
     created_at = models.DateTimeField(auto_now_add=True)
