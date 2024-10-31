@@ -2,7 +2,7 @@ from django.test import TestCase
 from django.urls import reverse
 from django.contrib.auth.models import User
 from django.contrib import messages
-from database.models import UserProfile
+from database.models import UserProfile, DietaryRestriction
 from django.db import transaction
 
 
@@ -28,8 +28,8 @@ class ProfileViewTests(TestCase):
         self.assertTemplateUsed(response, "user_profile/profile.html")
         self.assertContains(response, self.user_profile.phone_number)
 
-    def test_profile_view_post_request_successful_update(self):
-        """Test successful profile update via POST request."""
+    def test_profile_view_post_request_successful_update_with_restrictions(self):
+        """Test successful profile update with dietary restrictions via POST request."""
         with transaction.atomic():  # Ensure transaction block for this test
             response = self.client.post(
                 reverse("user_profile:profile"),
@@ -37,37 +37,72 @@ class ProfileViewTests(TestCase):
                     "first_name": "John",
                     "last_name": "Doe",
                     "phone_number": "0987654321",
+                    "gluten_free": "true",
+                    "no_nuts": "true",
+                    "custom_restriction": "No Soy"
                 },
             )
         self.user.refresh_from_db()
         self.user_profile.refresh_from_db()
+        
         # Verify changes were saved
         self.assertEqual(self.user.first_name, "John")
         self.assertEqual(self.user.last_name, "Doe")
         self.assertEqual(self.user_profile.phone_number, "0987654321")
+
+        # Verify dietary restrictions were created
+        restrictions = DietaryRestriction.objects.filter(user=self.user)
+        restriction_names = {restriction.restriction for restriction in restrictions}
+        self.assertIn("gluten_free", restriction_names)
+        self.assertIn("no_nuts", restriction_names)
+        self.assertIn("No Soy", restriction_names)
+
         # Check for success message
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn(
-            "Profile updated successfully!", [msg.message for msg in messages_list]
-        )
+        self.assertIn("Profile updated successfully!", [msg.message for msg in messages_list])
 
         # Check redirection
         self.assertRedirects(response, reverse("user_profile:profile"))
 
+    def test_profile_update_with_invalid_restriction(self):
+        """Test error handling in case of invalid restriction update."""
+        response = self.client.post(
+            reverse("user_profile:profile"),
+            {
+                "first_name": "John",
+                "last_name": "Doe",
+                "phone_number": "0987654321",
+                "invalid_restriction": "true",  # Invalid restriction name
+            },
+        )
+
+        # Verify data was not updated due to invalid restriction
+        self.user.refresh_from_db()
+        self.user_profile.refresh_from_db()
+        self.assertEqual(self.user.first_name, "Test")
+        self.assertEqual(self.user.last_name, "User")
+        self.assertEqual(self.user_profile.phone_number, "555-5678")
+
+        # Check for error message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn("Some error occurred while updating your profile!", [msg.message for msg in messages_list])
+
     def test_profile_update_error_handling(self):
-        """Test profile update with simulated failure to trigger error message"""
+        """Test profile update with simulated failure to trigger error message."""
         # Introduce an error by setting an invalid phone number that exceeds allowed length
         response = self.client.post(
             reverse("user_profile:profile"),
             {
                 "first_name": "ValidFirstName",
                 "last_name": "ValidLastName",
-                "phone_number": "1"
-                * 50,  # This will fail due to max_length=20 in phone_number
+                "phone_number": "1" * 50,  # This will fail due to max_length=20 in phone_number
             },
         )
 
+        # Check for redirection and error message
         self.assertEqual(response.status_code, 302)
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn("Some error occurred while updating your profile!", [msg.message for msg in messages_list])
 
         # Ensure data was not updated due to error
         self.user.refresh_from_db()

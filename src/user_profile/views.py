@@ -15,6 +15,14 @@ def profile_view(request):
         restriction.restriction.lower().replace(" ", "_")
         for restriction in existing_restrictions
     ]
+    custom_restriction = next(
+        (
+            r.restriction
+            for r in existing_restrictions
+            if r.restriction not in user_restrictions
+        ),
+        "",
+    )
 
     # default dietary restrictions
     default_restrictions = [
@@ -46,7 +54,9 @@ def profile_view(request):
 
                 # Add new dietary restrictions based on form values
                 for restriction in default_restrictions:
+                    print(restriction["name"])
                     if request.POST.get(restriction["name"]) == "true":
+                        print("hit true")
                         DietaryRestriction.objects.create(
                             user=request.user, restriction=restriction["name"]
                         )
