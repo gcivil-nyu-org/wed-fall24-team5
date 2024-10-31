@@ -76,31 +76,36 @@
                                 <div class="content">
                                     <div class="columns is-flex-direction-column-mobile">
                                         <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth" 
-                                            style="white-space: normal; word-wrap: break-word; display: flex; flex-direction: column; align-items: flex-center;"
-                                            href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
-                                            target="_blank" rel="noopener noreferrer">
-                                             <span>{{ donation.organization.organization_name }}</span>
-                                             <span>{{ donation.organization.address }}</span>
-                                             <!-- Rating Stars -->
-                                             <span>
-                                                 {% if donation.avg_rating %}
-                                                     {% with ""|center:5 as range %}
-                                                         {% for _ in range %}
-                                                             {% if forloop.counter <= donation.avg_rating %}
-                                                                 <i class="fa fa-star"></i>
-                                                             {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %}
-                                                                <i class="fa fa-star-half-o"></i>
-                                                             {% else %}
-                                                                 <i class="fa fa-star-o"></i>
-                                                             {% endif %}
-                                                         {% endfor %}
-                                                     {% endwith %}
-                                                 {% else %}
-                                                     <span>No ratings</span>
-                                                 {% endif %}
-                                             </span>
-                                         </a>
+                                            <a class="button is-link is-light is-fullwidth"
+                                               style="white-space: normal;
+                                                      word-wrap: break-word;
+                                                      display: flex;
+                                                      flex-direction: column;
+                                                      align-items: flex-center"
+                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
+                                               target="_blank"
+                                               rel="noopener noreferrer">
+                                                <span>{{ donation.organization.organization_name }}</span>
+                                                <span>{{ donation.organization.address }}</span>
+                                                <!-- Rating Stars -->
+                                                <span>
+                                                    {% if donation.avg_rating %}
+                                                        {% with ""|center:5 as range %}
+                                                            {% for _ in range %}
+                                                                {% if forloop.counter <= donation.avg_rating %}
+                                                                    <i class="fa fa-star"></i>
+                                                                {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %}
+                                                                    <i class="fa fa-star-half-o"></i>
+                                                                {% else %}
+                                                                    <i class="fa fa-star-o"></i>
+                                                                {% endif %}
+                                                            {% endfor %}
+                                                        {% endwith %}
+                                                    {% else %}
+                                                        <span>No ratings</span>
+                                                    {% endif %}
+                                                </span>
+                                            </a>
                                         </div>
                                         <div class="column is-one-third has-text-centered">
                                             <strong>Pickup by:</strong>
