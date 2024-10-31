@@ -46,9 +46,7 @@ def profile_view(request):
 
                 # Add new dietary restrictions based on form values
                 for restriction in default_restrictions:
-                    print(restriction["name"])
                     if request.POST.get(restriction["name"]) == "true":
-                        print("hit true")
                         DietaryRestriction.objects.create(
                             user=request.user, restriction=restriction["name"]
                         )
