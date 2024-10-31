@@ -45,6 +45,37 @@
                         </div>
                     </div>
 
+                    <!-- Dietary Restrictions Section -->
+                    <div class="column is-full-mobile is-two-thirds-tablet">
+                        <div class="field">
+                            <label class="label">Dietary Restrictions</label>
+                            <div class="control buttons">
+                                {% for restriction in dietary_restrictions %}
+                                    <button type="button" class="button {% if restriction.name in user_restrictions %}is-success{% endif %}"
+                                            onclick="toggleSelection(this, '{{ restriction.name }}')">
+                                        {{ restriction.label }}
+                                    </button>
+                                {% endfor %}
+                            </div>
+
+                            <!-- Hidden inputs to capture button state for backend -->
+                            {% for restriction in dietary_restrictions %}
+                                <input type="hidden" id="{{ restriction.name }}" name="{{ restriction.name }}" 
+                                    value="{% if restriction.name in user_restrictions %}true{% else %}false{% endif %}">
+                            {% endfor %}
+                        </div>
+
+                        <!-- Custom Dietary Restrictions -->
+                        <div class="field">
+                            <label class="label">Enter custom dietary restrictions:</label>
+                            <div class="control">
+                                <input class="input" type="text" name="custom_restriction" 
+                                    placeholder="Specify custom restriction"
+                                    value="{{ custom_restriction }}">
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="column is-full-mobile is-half-tablet">
                         <div class="field"><strong>Email: </strong>{{ user_profile }}</div>
                     </div>
@@ -66,4 +97,5 @@
             </footer>
         </div>
     </form>
+    <script src="{% static 'js/user_profile.js' %}"></script>
 {% endblock content %}
