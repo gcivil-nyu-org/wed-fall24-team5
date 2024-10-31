@@ -39,12 +39,12 @@ class ProfileViewTests(TestCase):
                     "phone_number": "0987654321",
                     "gluten_free": "true",
                     "no_nuts": "true",
-                    "custom_restriction": "No Soy"
+                    "custom_restriction": "No Soy",
                 },
             )
         self.user.refresh_from_db()
         self.user_profile.refresh_from_db()
-        
+
         # Verify changes were saved
         self.assertEqual(self.user.first_name, "John")
         self.assertEqual(self.user.last_name, "Doe")
@@ -59,7 +59,9 @@ class ProfileViewTests(TestCase):
 
         # Check for success message
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Profile updated successfully!", [msg.message for msg in messages_list])
+        self.assertIn(
+            "Profile updated successfully!", [msg.message for msg in messages_list]
+        )
 
         # Check redirection
         self.assertRedirects(response, reverse("user_profile:profile"))
@@ -72,14 +74,18 @@ class ProfileViewTests(TestCase):
             {
                 "first_name": "ValidFirstName",
                 "last_name": "ValidLastName",
-                "phone_number": "1" * 50,  # This will fail due to max_length=20 in phone_number
+                "phone_number": "1"
+                * 50,  # This will fail due to max_length=20 in phone_number
             },
         )
 
         # Check for redirection and error message
         self.assertEqual(response.status_code, 302)
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertIn("Some error occured while updating your profile!", [msg.message for msg in messages_list])
+        self.assertIn(
+            "Some error occured while updating your profile!",
+            [msg.message for msg in messages_list],
+        )
 
         # Ensure data was not updated due to error
         self.user.refresh_from_db()
