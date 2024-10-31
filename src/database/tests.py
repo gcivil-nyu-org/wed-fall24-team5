@@ -1,6 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import (
+    DietaryRestriction,
     Organization,
     UserProfile,
     OrganizationAdmin,
@@ -146,3 +147,9 @@ class ModelsTestCase(TestCase):
         order.order_status = "canceled"
         order.save()
         self.assertEqual(order.order_status, "canceled")
+
+    def test_restriction_creation(self):
+        restriction = DietaryRestriction.objects.create(user=self.user, restriction="gluten_free")
+        self.assertEqual(restriction.restriction, "gluten_free")
+        self.assertEqual(str(restriction), f"{self.user.username}: {restriction.restriction}")
+        self.assertTrue(isinstance(restriction.restriction_id, uuid.UUID))
