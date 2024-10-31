@@ -50,7 +50,7 @@
                         <div class="field">
                             <label class="label">Dietary Restrictions</label>
                             <div class="control buttons">
-                                {% for restriction in dietary_restrictions %}
+                                {% for restriction in default_restrictions %}
                                     <button type="button" class="button {% if restriction.name in user_restrictions %}is-success{% endif %}"
                                             onclick="toggleSelection(this, '{{ restriction.name }}')">
                                         {{ restriction.label }}
@@ -59,7 +59,7 @@
                             </div>
 
                             <!-- Hidden inputs to capture button state for backend -->
-                            {% for restriction in dietary_restrictions %}
+                            {% for restriction in default_restrictions %}
                                 <input type="hidden" id="{{ restriction.name }}" name="{{ restriction.name }}" 
                                     value="{% if restriction.name in user_restrictions %}true{% else %}false{% endif %}">
                             {% endfor %}

@@ -65,5 +65,5 @@ def profile_view(request):
         "user_profile": user_profile,
         "user_restrictions": user_restrictions,
         "custom_restriction": custom_restriction,
-        "dietary_restrictions": default_restrictions
+        "default_restrictions": default_restrictions
     })
