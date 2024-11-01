@@ -108,7 +108,6 @@ def manage_organization(request, organization_id):
             .order_by("modified_at")
             .values("rating", "comment")
         )
-
         return render(
             request,
             "donor_dashboard/manage_organization.html",

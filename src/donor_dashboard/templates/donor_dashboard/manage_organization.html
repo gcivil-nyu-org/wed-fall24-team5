@@ -101,44 +101,54 @@ Manage Organization
         <div id="orders-content" class="is-hidden">
             <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
             {% if orders %}
-            <div class="table-container">
-                <table class="table order-table is-hoverable is-striped is-fullwidth" style="border-radius: 1rem;">
-                    <thead>
-                        <tr>
-                            <th>Item</th>
-                            <th>User</th>
-                            <th>Quantity</th>
-                            <th>Pickup Date</th>
-                            <th>Address</th>
-                            <th>Status</th>
-                            <th>Mark As</th>
-                            <th></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td>{{ order.donation.food_item }}</td>
-                            <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
-                            <td>{{ order.order_quantity }}</td>
-                            <td>{{ order.donation.pickup_by }}</td>
-                            <td>{{ organization.address }}</td>
-                            <td>{{ order.order_status }}</td>
-                            <td><a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
-                                    class="button is-small is-rounded is-success is-outlined">
-                                    {% if order.order_status == "pending" %}
-                                    Complete
-                                    {% else %}
-                                    Incomplete
-                                    {% endif %}
-                                </a></td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+                {% regroup orders by donation.food_item as food_item_orders %}
+                <div class="orders-container">
+                    {% for group in food_item_orders %}
+                        <div class="orders-dropdown mb-3">
+                            <button class="orders-dropdown-trigger button is-fullwidth is-info is-light" aria-haspopup="true">
+                                <span>{{ group.grouper }}</span>
+                                <span class="icon is-small">
+                                    <i class="fa fa-angle-down"></i>
+                                </span>
+                            </button>
+                            <div class="orders-dropdown-content p-4 mt-2">
+                                <div class="box">
+                                    <table class="table is-fullwidth is-hoverable">
+                                        <thead>
+                                            <tr>
+                                                <th>User</th>
+                                                <th>Quantity</th>
+                                                <th>Pickup Date</th>
+                                                <th>Address</th>
+                                                <th>Status</th>
+                                                <th>Mark As</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            {% for order in group.list %}
+                                            <tr>
+                                                <td>{{ order.user.first_name }} {{ order.user.last_name }}</td>
+                                                <td>{{ order.order_quantity }}</td>
+                                                <td>{{ order.donation.pickup_by }}</td>
+                                                <td>{{ organization.address }}</td>
+                                                <td>{{ order.order_status }}</td>
+                                                <td>
+                                                    <a href="{% url 'donor_dashboard:manage_order' order.order_id %}" 
+                                                    class="button is-small is-rounded {% if order.order_status == 'pending' %}is-success{% else %}is-warning{% endif %} is-outlined">
+                                                        {% if order.order_status == "pending" %}Complete{% else %}Incomplete{% endif %}
+                                                    </a>
+                                                </td>
+                                            </tr>
+                                            {% endfor %}
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
             {% else %}
-            <p class="box">No orders to display.</p>
+                <p class="box">No orders to display.</p>
             {% endif %}
         </div>
 
