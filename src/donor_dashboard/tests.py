@@ -3,7 +3,13 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib import messages
-from database.models import DietaryRestriction, Organization, OrganizationAdmin, Donation, Order
+from database.models import (
+    DietaryRestriction,
+    Organization,
+    OrganizationAdmin,
+    Donation,
+    Order,
+)
 from donor_dashboard.forms import AddOrganizationForm
 
 
@@ -652,6 +658,7 @@ class OrganizationAdminViewsTestCase(TestCase):
             "Succesfully remove this org access to email: admin@example.com",
         )
 
+
 class DietaryRestrictionTests(TestCase):
     def setUp(self):
         # Set up test data
@@ -689,31 +696,31 @@ class DietaryRestrictionTests(TestCase):
             order_status="pending",
             active=True,
         )
-        DietaryRestriction.objects.create(
-            user=self.user, restriction="gluten_free"
-        )
-        DietaryRestriction.objects.create(
-            user=self.user, restriction="nut_free"
-        )
-        
+        DietaryRestriction.objects.create(user=self.user, restriction="gluten_free")
+        DietaryRestriction.objects.create(user=self.user, restriction="nut_free")
+
         # Login for access to views
         self.client.login(email="testuser@example.com", password="password")
 
     def test_access_dietary_restrictions(self):
         response = self.client.get(
-            reverse("donor_dashboard:manage_organization", args=[self.organization.organization_id])
+            reverse(
+                "donor_dashboard:manage_organization",
+                args=[self.organization.organization_id],
+            )
         )
-        
+
         # Check if the view is accessible
         self.assertEqual(response.status_code, 200)
-        
+
         # Check dietary restrictions in the context
         orders = response.context["orders"]
         self.assertEqual(len(orders), 1)
         dietary_restrictions = orders[0].user.dietary_restrictions
-        
+
         # Verify dietary restrictions are correctly formatted
-        formatted_restrictions = [restriction.restriction for restriction in dietary_restrictions]
+        formatted_restrictions = [
+            restriction.restriction for restriction in dietary_restrictions
+        ]
         self.assertIn("Gluten Free", formatted_restrictions)
         self.assertIn("Nut Free", formatted_restrictions)
-        
