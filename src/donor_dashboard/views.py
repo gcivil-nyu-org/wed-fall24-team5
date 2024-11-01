@@ -7,7 +7,7 @@ from database.models import (
     User,
     Donation,
     Order,
-    UserReview
+    UserReview,
 )
 from django.contrib import messages
 from donor_dashboard.forms import AddOrganizationForm
@@ -101,27 +101,31 @@ def manage_organization(request, organization_id):
 
         donations = Donation.objects.filter(
             organization_id=organization.organization_id, active=True
-        ).order_by('donation_id')
+        ).order_by("donation_id")
 
         # Prefetch orders and dietary restrictions for each user
-        orders = Order.objects.filter(
-            donation__organization=organization
-        ).prefetch_related(
-            "donation",
-            "user",
-            Prefetch(
-                "user__dietaryrestriction_set",
-                queryset=DietaryRestriction.objects.all(),
-                to_attr="dietary_restrictions"
+        orders = (
+            Order.objects.filter(donation__organization=organization)
+            .prefetch_related(
+                "donation",
+                "user",
+                Prefetch(
+                    "user__dietaryrestriction_set",
+                    queryset=DietaryRestriction.objects.all(),
+                    to_attr="dietary_restrictions",
+                ),
             )
-        ).order_by('donation__donation_id')
-        
+            .order_by("donation__donation_id")
+        )
+
         # Process dietary restrictions to replace underscores and apply title case
         for order in orders:
             if hasattr(order.user, "dietary_restrictions"):
                 for restriction in order.user.dietary_restrictions:
-                    restriction.restriction = restriction.restriction.replace("_", " ").title()
-        
+                    restriction.restriction = restriction.restriction.replace(
+                        "_", " "
+                    ).title()
+
         status = organization.active
         reviews = (
             UserReview.objects.filter(donation__organization=organization)
