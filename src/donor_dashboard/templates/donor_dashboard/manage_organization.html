@@ -30,14 +30,14 @@ Manage Organization
         <!-- Tab navigation -->
         <div class="tabs is-centered is-toggle is-fullwidth mt-3">
             <ul>
-                <li id="donations-tab" class="is-active"><a>Donations</a></li>
+                <li id="donations-tab"><a>Donations</a></li>
                 <li id="orders-tab"><a>Orders</a></li>
                 <li id="reviews-tab"><a>Reviews</a></li>
             </ul>
         </div>
 
         <!-- Content for List of Donations tab -->
-        <div id="donations-content">
+        <div id="donations-content" class="manage-tab">
             {% if status %}
                 <div class="buttons">
                     <button id="add-donation-button" class="button is-dark">Add Donation</button>
@@ -98,7 +98,7 @@ Manage Organization
         </div>
 
         <!-- Content for Orders Received tab -->
-        <div id="orders-content" class="is-hidden">
+        <div id="orders-content" class="is-hidden manage-tab">
             <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
             {% if orders %}
             <div class="table-container">
@@ -143,7 +143,7 @@ Manage Organization
         </div>
 
         <!-- Content for My Reviews tab -->
-        <div id="reviews-content" class="tab-content is-hidden">
+        <div id="reviews-content" class="tab-content is-hidden manage-tab">
             <h2 class="subtitle mt-3"><strong>My Reviews</strong></h2>
             {% if reviews %}
                 <div class="columns is-multiline is-variable is-3">
