@@ -12,6 +12,7 @@ from donor_dashboard.forms import AddOrganizationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse
+from django.db.models import Avg
 from .helpers import validate_donation
 import csv
 
@@ -108,6 +109,7 @@ def manage_organization(request, organization_id):
             .order_by("modified_at")
             .values("rating", "comment")
         )
+        rating = reviews.aggregate(Avg("rating"))
 
         return render(
             request,
@@ -119,6 +121,7 @@ def manage_organization(request, organization_id):
                 "orders": orders,
                 "owner_access": owner_access,
                 "reviews": reviews,
+                "rating": rating,
             },
         )
     except Exception:
