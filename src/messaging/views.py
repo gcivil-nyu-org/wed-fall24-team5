@@ -1,7 +1,5 @@
-from django.http import JsonResponse
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
-from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from database.models import Room, Organization
 from django.contrib import messages
@@ -75,7 +73,7 @@ def chat_room(request, room_name):
 
         try:
             get_room = Room.objects.get(room_name=room)
-            return redirect("room", room_name=room, username=username)
+            return redirect("room", room_name=get_room, username=username)
 
         except Room.DoesNotExist:
             new_room = Room(room_name=room)
