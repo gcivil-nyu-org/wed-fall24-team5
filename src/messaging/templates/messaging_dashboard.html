@@ -54,7 +54,7 @@
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                     </div>
                     <div class="modal-body">
-                        <form method="POST" action="{% url 'messaging:start_conversation' %}">
+                        <form method="post" action="{% url 'messaging:start_conversation' %}">
                             {% csrf_token %}
 
                             <input type="hidden" name="sender_id" value="{{ user.id }}"> <!-- Pass the sender's ID -->
@@ -113,4 +113,5 @@
                 });
             });
         </script>
+    </div>
 {% endblock content %}
