@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     "recipient_dashboard",  # Custom app for recipient_dashboard
     "recipient_orders",  # View orders placed by a recipient
     "user_profile",  # View user profile
+    "messaging",  # Custom app for Messaging functionality
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
     "compressor",  # Compresses linked and inline JavaScript or CSS into a single cached file # noqa
