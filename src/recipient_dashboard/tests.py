@@ -462,3 +462,85 @@ class SearchFilterDonationTests(TestCase):
 
         # Check that no items are returned
         self.assertEqual(len(response.context["donations"]), 0)
+
+# add test_search_address, test_search_address_radius, test_search_address_no_results
+def test_search_address(self):
+    """Test searching donations by address."""
+    params = {"address": "123 Test St"}
+    url = reverse("recipient_dashboard") + "?" + urlencode(params)
+    response = self.client.get(url)
+    donation_items = [
+        donation.food_item for donation in response.context["donations"]
+    ]
+
+    # Check that the correct number of items are returned
+    self.assertEqual(len(response.context["donations"]), 2)
+
+    # Check that the correct items are returned
+    self.assertIn("Biryani", donation_items)
+    self.assertIn("Shawarma", donation_items)
+    self.assertNotIn("Pasta", donation_items)
+
+def test_search_address_radius(self):
+    """Test searching donations by address and radius."""
+    params = {"address": "123 Test St", "radius": "5"}
+    url = reverse("recipient_dashboard") + "?" + urlencode(params)
+    response = self.client.get(url)
+    donation_items = [
+        donation.food_item for donation in response.context["donations"]
+    ]
+
+    # Check that the correct number of items are returned
+    self.assertEqual(len(response.context["donations"]), 2)
+
+    # Check that the correct items are returned
+    self.assertIn("Biryani", donation_items)
+    self.assertIn("Shawarma", donation_items)
+    self.assertNotIn("Pasta", donation_items)
+
+def test_search_address_no_results(self):
+    """Test searching donations by address with no matches."""
+    params = {"address": "456 Nonexistent St"}
+    url = reverse("recipient_dashboard") + "?" + urlencode(params)
+    response = self.client.get(url)
+
+    # Check that no items are returned
+    self.assertEqual(len(response.context["donations"]), 0)
+
+# In a new test class for utils.py
+
+class UtilsTests(TestCase):
+
+    def setUp(self):
+        # Creating test data similar to RecipientDashboardViewTests
+        ...
+
+    def test_get_coordinates(self):
+        """Test getting coordinates from an address."""
+        address = "123 Test St"
+        latitude, longitude = get_coordinates(address)
+
+        # Check that the correct coordinates are returned
+        self.assertIsInstance(latitude, float)
+        self.assertIsInstance(longitude, float)
+        # You can add more specific assertions if you know the expected coordinates
+
+    def test_get_coordinates_invalid_address(self):
+        """Test getting coordinates from an invalid address."""
+        address = "Nonexistent Address"
+        latitude, longitude = get_coordinates(address)
+
+        # Check that None is returned for invalid addresses
+        self.assertIsNone(latitude)
+        self.assertIsNone(longitude)
+
+    def test_calculate_distance(self):
+        """Test calculating distance between two coordinates."""
+        lat1, lon1 = 40.7128, -74.0060  # New York City
+        lat2, lon2 = 51.5074, -0.1278  # London
+
+        distance = calculate_distance(lat1, lon1, lat2, lon2)
+
+        # Check that the calculated distance is within an expected range
+        self.assertGreater(distance, 3000)  # Distance should be greater than 3000 miles
+        self.assertLess(distance, 4000)  # Distance should be less than 4000 miles
