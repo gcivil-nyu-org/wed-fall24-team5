@@ -7,6 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
+
 @login_required
 def messaging_view(request):
     user_id = request.user.id
@@ -17,6 +18,7 @@ def messaging_view(request):
         "messaging_dashboard.html",
         {"organizations": organizations, "rooms": rooms},
     )
+
 
 @login_required
 def start_conversation(request):
@@ -61,7 +63,5 @@ def start_conversation(request):
             room.save()
             messages.success(request, f"Created a new chat with {receiver}")
 
-        return redirect("messaging:messaging")  
+        return redirect("messaging:messaging")
     return redirect("messaging:messaging")
-
-
