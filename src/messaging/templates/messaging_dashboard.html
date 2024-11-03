@@ -1,0 +1,117 @@
+
+{% extends "_base.html" %}
+{% block title %}
+    Messaging Dashboard
+{% endblock title %}
+{% block content %}
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Select2 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    
+    <style>
+        .select2-container {
+            z-index: 1060 !important;  /* Set higher than Bootstrap modal */
+        }
+    </style>
+    <div class="container">
+        {% include "partials/notifications.html" %}
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Sidebar -->
+                <div class="col-md-3 bg-light p-3">
+                    <h4>Conversations</h4>
+                    <button class="btn btn-primary mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#newConversationModal">
+                        Start New Conversation
+                    </button>
+                    <ul class="list-group" id="room-list">
+                        {% for room in rooms %}
+                            <li class="list-group-item room-item" data-room-name="{{ room.room_name }}" style="cursor:pointer">
+                                {{ room.room_name }}
+                            </li>
+                        {% endfor %}
+                    </ul>
+                </div>
+
+                <!-- Main Messaging Panel -->
+
+                <div class="col-md-9">
+                    <h3 id="room-title">Welcome to Messaging</h3>
+                    <div id="chat-interface" class="chat-box d-none">
+                        <div id="chat-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal for New Conversation -->
+        <div class="modal fade" id="newConversationModal" tabindex="-1" aria-labelledby="newConversationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="newConversationModalLabel">Start New Conversation</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <form method="post" action="{% url 'messaging:start_conversation' %}">
+                            {% csrf_token %}
+
+                            <input type="hidden" name="sender_id" value="{{ user.id }}"> <!-- Pass the sender's ID -->
+                            <input type="hidden" name="sender_type" value="user"> <!-- Set sender type to 'user' -->
+                            <input type="hidden" name="receiver_type" value="organization"> <!-- Set receiver type to 'organization' -->
+
+                            <div class="mb-3">
+                                <label for="organization" class="form-label">Select Organization</label>
+                                <select class="form-select" id="organization" name="receiver_id" style="width: 100%;" required>
+                                    <option value="" disabled selected>Select an organization</option>
+                                    {% for org in organizations %}
+                                        <option value="{{ org.organization_id }}">{{ org.organization_name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+
+                            <button type="submit" class="btn btn-primary">Start Conversation</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- jQuery -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+        <!-- Select2 JS -->
+        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                $('#organization').select2({
+                    placeholder: 'Search and select an organization',
+                    allowClear: true,
+                    width: '100%',
+                    dropdownParent: $('#newConversationModal')  // Attach dropdown to modal
+                });
+
+                $('#newConversationModal').on('shown.bs.modal', function () {
+                    $('#organization').select2('focus');  // Focus Select2 input manually
+                });
+
+                $('.room-item').on('click', function() {
+                    const roomName = $(this).data('room-name');
+                    $('#room-title').text(`${roomName}`);
+                    $('#chat-interface').removeClass('d-none'); // Show chat interface
+
+                    // Load dummy messages into chat
+                    $('#chat-content').html(`
+                        <p><strong>User:</strong> Hi!</p>
+                        <p><strong>Organization:</strong> Hello!</p>
+                    `);
+                });
+            });
+        </script>
+    </div>
+{% endblock content %}
