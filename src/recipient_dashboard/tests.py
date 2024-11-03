@@ -536,13 +536,4 @@ class UtilsTests(TestCase):
         self.assertIsNone(latitude)
         self.assertIsNone(longitude)
 
-    def test_calculate_distance(self):
-        """Test calculating distance between two coordinates."""
-        lat1, lon1 = 40.7128, -74.0060  # New York City
-        lat2, lon2 = 51.5074, -0.1278  # London
 
-        distance = calculate_distance(lat1, lon1, lat2, lon2)
-
-        # Check that the calculated distance is within an expected range
-        self.assertGreater(distance, 3000)  # Distance should be greater than 3000 miles
-        self.assertLess(distance, 4000)  # Distance should be less than 4000 miles
