@@ -8,7 +8,7 @@ from django.contrib.messages import get_messages  # to capture messages
 from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
 from urllib.parse import urlencode  # for encoding URLs with query parameters
-from .utils import get_coordinates, calculate_distance
+from .utils import get_coordinates
 
 
 class RecipientDashboardViewTests(TestCase):
@@ -535,5 +535,3 @@ class UtilsTests(TestCase):
         # Check that None is returned for invalid addresses
         self.assertIsNone(latitude)
         self.assertIsNone(longitude)
-
-
