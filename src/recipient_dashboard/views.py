@@ -7,7 +7,8 @@ from django.utils import timezone
 from .forms import SearchDonationForm
 from django.db.models import Avg
 from .utils import get_coordinates, calculate_distance
-from django.core.cache import cache
+from django.core.cache import cache  # noqa
+
 
 @login_required
 def recipient_dashboard(request):
@@ -29,7 +30,7 @@ def recipient_dashboard(request):
         date = form.cleaned_data.get("date")
         min_quantity = form.cleaned_data.get("min_quantity")
         address = form.cleaned_data.get("address")
-        
+
         try:
             radius = float(form.cleaned_data.get("radius") or 5)
         except (TypeError, ValueError):
@@ -69,36 +70,43 @@ def recipient_dashboard(request):
                         if addr_coords:
                             distance = calculate_distance(coords, addr_coords)
                             if distance is not None and distance <= radius:
-                                donation_distances.append({
-                                    'donation': donation,
-                                    'distance': distance,
-                                    'organization': org
-                                })
-                    
+                                donation_distances.append(
+                                    {
+                                        "donation": donation,
+                                        "distance": distance,
+                                        "organization": org,
+                                    }
+                                )
+
                     # Sort by distance
-                    donation_distances.sort(key=lambda x: x['distance'])
-                    
+                    donation_distances.sort(key=lambda x: x["distance"])
+
                     if not donation_distances:
-                        messages.info(request, f"No donations found within {radius} miles.")
-                        return render(request, "recipient_dashboard/dashboard.html", {
-                            "form": form,
-                            "donations": []
-                        })
-                    
+                        messages.info(
+                            request, f"No donations found within {radius} miles."
+                        )
+                        return render(
+                            request,
+                            "recipient_dashboard/dashboard.html",
+                            {"form": form, "donations": []},
+                        )
+
                     # Create sorted list of donations and distances dictionary
-                    sorted_donations = [item['donation'] for item in donation_distances]
+                    sorted_donations = [item["donation"] for item in donation_distances]
                     distances = {
-                        str(item['organization'].organization_id): item['distance'] 
+                        str(item["organization"].organization_id): item["distance"]
                         for item in donation_distances
                     }
-                    
+
                     # Add everything to context
                     context = {
                         "form": form,
                         "donations": sorted_donations,
-                        "distances": distances
+                        "distances": distances,
                     }
-                    return render(request, "recipient_dashboard/dashboard.html", context)
+                    return render(
+                        request, "recipient_dashboard/dashboard.html", context
+                    )
                 else:
                     messages.warning(request, "Could not find the specified address.")
             except Exception as e:
@@ -108,8 +116,9 @@ def recipient_dashboard(request):
     return render(
         request,
         "recipient_dashboard/dashboard.html",
-        {"form": form, "donations": donations}
+        {"form": form, "donations": donations},
     )
+
 
 @login_required
 def reserve_donation(request, donation_id):

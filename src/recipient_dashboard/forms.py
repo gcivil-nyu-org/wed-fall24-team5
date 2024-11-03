@@ -103,7 +103,7 @@ class SearchDonationForm(forms.Form):
                 border-color: #CCC;
                 border-radius: 6px;
             """,
-                "id": "location-input"
+                "id": "location-input",
             }
         ),
     )
@@ -113,11 +113,11 @@ class SearchDonationForm(forms.Form):
         label="Search Radius",
         initial=5,  # Set default value
         choices=[
-            ('5', "5 miles"),  # Change to strings for better form handling
-            ('10', "10 miles"),
-            ('25', "25 miles"),
-            ('50', "50 miles"),
-            ('100', "100 miles"),
+            ("5", "5 miles"),  # Change to strings for better form handling
+            ("10", "10 miles"),
+            ("25", "25 miles"),
+            ("50", "50 miles"),
+            ("100", "100 miles"),
         ],
         widget=forms.Select(
             attrs={
