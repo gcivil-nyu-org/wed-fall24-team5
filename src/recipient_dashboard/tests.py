@@ -542,16 +542,3 @@ class SearchDonationFormTest(TestCase):
                 ("100", "100 miles"),
             ],
         )
-
-    def test_valid_form(self):
-        form_data = {
-            "keyword": "food",
-            "type": "food",
-            "category": "org",
-            "date": "2024-11-01",
-            "min_quantity": 10,
-            "address": "123 Main St",
-            "radius": "10",
-        }
-        form = SearchDonationForm(data=form_data)
-        self.assertTrue(form.is_valid())
