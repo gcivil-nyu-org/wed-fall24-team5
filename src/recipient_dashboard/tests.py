@@ -8,6 +8,7 @@ from django.contrib.messages import get_messages  # to capture messages
 from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
 from urllib.parse import urlencode  # for encoding URLs with query parameters
+from .utils import get_coordinates, calculate_distance
 
 
 class RecipientDashboardViewTests(TestCase):
@@ -463,15 +464,14 @@ class SearchFilterDonationTests(TestCase):
         # Check that no items are returned
         self.assertEqual(len(response.context["donations"]), 0)
 
+
 # add test_search_address, test_search_address_radius, test_search_address_no_results
 def test_search_address(self):
     """Test searching donations by address."""
     params = {"address": "123 Test St"}
     url = reverse("recipient_dashboard") + "?" + urlencode(params)
     response = self.client.get(url)
-    donation_items = [
-        donation.food_item for donation in response.context["donations"]
-    ]
+    donation_items = [donation.food_item for donation in response.context["donations"]]
 
     # Check that the correct number of items are returned
     self.assertEqual(len(response.context["donations"]), 2)
@@ -480,15 +480,14 @@ def test_search_address(self):
     self.assertIn("Biryani", donation_items)
     self.assertIn("Shawarma", donation_items)
     self.assertNotIn("Pasta", donation_items)
+
 
 def test_search_address_radius(self):
     """Test searching donations by address and radius."""
     params = {"address": "123 Test St", "radius": "5"}
     url = reverse("recipient_dashboard") + "?" + urlencode(params)
     response = self.client.get(url)
-    donation_items = [
-        donation.food_item for donation in response.context["donations"]
-    ]
+    donation_items = [donation.food_item for donation in response.context["donations"]]
 
     # Check that the correct number of items are returned
     self.assertEqual(len(response.context["donations"]), 2)
@@ -497,6 +496,7 @@ def test_search_address_radius(self):
     self.assertIn("Biryani", donation_items)
     self.assertIn("Shawarma", donation_items)
     self.assertNotIn("Pasta", donation_items)
+
 
 def test_search_address_no_results(self):
     """Test searching donations by address with no matches."""
@@ -507,7 +507,9 @@ def test_search_address_no_results(self):
     # Check that no items are returned
     self.assertEqual(len(response.context["donations"]), 0)
 
+
 # In a new test class for utils.py
+
 
 class UtilsTests(TestCase):
 
