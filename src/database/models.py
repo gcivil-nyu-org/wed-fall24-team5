@@ -102,13 +102,20 @@ class Room(models.Model):
     room_name = models.CharField(max_length=255, default="Chat Room")
 
     # Generic foreign key fields for conversors
-    conversor_1_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default=User, related_name='conversor_1')
+    conversor_1_type = models.ForeignKey(
+        ContentType, on_delete=models.CASCADE, default=User, related_name="conversor_1"
+    )
     conversor_1_id = models.CharField(default=uuid.uuid4)
-    conversor_1 = GenericForeignKey('conversor_1_type', 'conversor_1_id')
+    conversor_1 = GenericForeignKey("conversor_1_type", "conversor_1_id")
 
-    conversor_2_type = models.ForeignKey(ContentType, on_delete=models.CASCADE, default=Organization, related_name='conversor_2')
+    conversor_2_type = models.ForeignKey(
+        ContentType,
+        on_delete=models.CASCADE,
+        default=Organization,
+        related_name="conversor_2",
+    )
     conversor_2_id = models.CharField(default=uuid.uuid4)
-    conversor_2 = GenericForeignKey('conversor_2_type', 'conversor_2_id')
+    conversor_2 = GenericForeignKey("conversor_2_type", "conversor_2_id")
 
     def __str__(self):
         return self.room_name
