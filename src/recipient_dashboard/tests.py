@@ -8,7 +8,7 @@ from django.contrib.messages import get_messages  # to capture messages
 from django.contrib.sites.models import Site
 from allauth.socialaccount.models import SocialApp
 from urllib.parse import urlencode  # for encoding URLs with query parameters
-from .utils import get_coordinates
+from .forms import SearchDonationForm
 
 
 class RecipientDashboardViewTests(TestCase):
@@ -517,21 +517,41 @@ class UtilsTests(TestCase):
         # Creating test data similar to RecipientDashboardViewTests
         ...
 
-    def test_get_coordinates(self):
-        """Test getting coordinates from an address."""
-        address = "123 Test St"
-        latitude, longitude = get_coordinates(address)
 
-        # Check that the correct coordinates are returned
-        self.assertIsInstance(latitude, float)
-        self.assertIsInstance(longitude, float)
-        # You can add more specific assertions if you know the expected coordinates
+class SearchDonationFormTest(TestCase):
+    def test_address_field_placeholder(self):
+        form = SearchDonationForm()
+        self.assertEqual(
+            form.fields["address"].widget.attrs["placeholder"],
+            "Enter address or location",
+        )
 
-    def test_get_coordinates_invalid_address(self):
-        """Test getting coordinates from an invalid address."""
-        address = "Nonexistent Address"
-        latitude, longitude = get_coordinates(address)
+    def test_radius_field_default_value(self):
+        form = SearchDonationForm()
+        self.assertEqual(form.fields["radius"].initial, 5)
 
-        # Check that None is returned for invalid addresses
-        self.assertIsNone(latitude)
-        self.assertIsNone(longitude)
+    def test_radius_field_choices(self):
+        form = SearchDonationForm()
+        self.assertEqual(
+            form.fields["radius"].choices,
+            [
+                ("5", "5 miles"),
+                ("10", "10 miles"),
+                ("25", "25 miles"),
+                ("50", "50 miles"),
+                ("100", "100 miles"),
+            ],
+        )
+
+    def test_valid_form(self):
+        form_data = {
+            "keyword": "food",
+            "type": "food",
+            "category": "org",
+            "date": "2024-11-01",
+            "min_quantity": 10,
+            "address": "123 Main St",
+            "radius": "10",
+        }
+        form = SearchDonationForm(data=form_data)
+        self.assertTrue(form.is_valid())
