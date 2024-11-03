@@ -17,10 +17,13 @@ Django==5.1.1
 django-allauth==65.0.2
 django-appconf==1.0.6
 django-compressor==4.5.1
+django-extensions==3.2.3
 djlint==1.35.2
 docopt==0.6.2
 EditorConfig==0.12.4
 flake8==7.1.1
+geographiclib==2.0
+geopy==2.4.1
 html-tag-names==0.1.2
 html-void-elements==0.1.0
 idna==3.10
@@ -37,11 +40,13 @@ oauthlib==3.2.2
 packaging==24.1
 pathspec==0.12.1
 platformdirs==4.3.6
+psycopg2==2.9.9
 psycopg2-binary==2.9.9
 pycodestyle==2.12.1
 pycparser==2.22
 pyflakes==3.2.0
 PyJWT==2.9.0
+pylint==3.3.1
 python-dateutil==2.9.0.post0
 python-decouple==3.8
 python-dotenv==1.0.1
