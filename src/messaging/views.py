@@ -7,7 +7,7 @@ from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
 
-
+@login_required
 def messaging_view(request):
     user_id = request.user.id
     organizations = Organization.objects.all()
@@ -18,7 +18,7 @@ def messaging_view(request):
         {"organizations": organizations, "rooms": rooms},
     )
 
-
+@login_required
 def start_conversation(request):
     if request.method == "POST":
         sender_id = request.POST["sender_id"]
@@ -61,51 +61,7 @@ def start_conversation(request):
             room.save()
             messages.success(request, f"Created a new chat with {receiver}")
 
-        return redirect("messaging:messaging")  # Update with your desired redirect
+        return redirect("messaging:messaging")  
     return redirect("messaging:messaging")
 
 
-@login_required
-def chat_room(request, room_name):
-    if request.method == "POST":
-        username = request.POST["username"]
-        room = request.POST["room"]
-
-        try:
-            get_room = Room.objects.get(room_name=room)
-            return redirect("room", room_name=get_room, username=username)
-
-        except Room.DoesNotExist:
-            new_room = Room(room_name=room)
-            new_room.save()
-            return redirect("room", room_name=room, username=username)
-
-    return render(request, "index.html")
-
-
-def create_room(request):
-    if request.method == "POST":
-        sender = request.POST["sender"]
-        receiver = request.POST["receiver"]
-        sender_type = request.POST["sender_type"]
-        receiver_type = request.POST["receiver_type"]
-        print(sender, sender_type, receiver, receiver_type)
-
-        if sender_type == "user" and receiver_type == "organization":
-            room_name = f"{sender}_{receiver}"
-        elif sender_type == "organization" and receiver_type == "user":
-            room_name = f"{receiver}_{sender}"
-        print(room_name)
-        # try:
-        #     get_room = Room.objects.get(room_name=room_name)
-        # except Room.DoesNotExist:
-        #     new_room = Room(room_name = room_name)
-        #     new_room.save()
-
-        # return redirect('room', room_name=room_name)
-
-    return render(request, "messaging_dashboard.html")
-
-
-def message_view(request, room_name, username):
-    return render(request, "message.html")
