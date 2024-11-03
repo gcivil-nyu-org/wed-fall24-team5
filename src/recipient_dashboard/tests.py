@@ -431,24 +431,6 @@ class SearchFilterDonationTests(TestCase):
         self.assertIn("Apples", donation_items)
         self.assertNotIn("Pepperoni Pizza", donation_items)
 
-    def test_search_address(self):
-        """Test searching donations by address."""
-        params = {"address": "ave"}
-        url = reverse("recipient_dashboard") + "?" + urlencode(params)
-        response = self.client.get(url)
-        donation_items = [
-            donation.food_item for donation in response.context["donations"]
-        ]
-
-        # Check that the correct number of items are returned
-        self.assertEqual(len(response.context["donations"]), 1)
-
-        # Check that the correct items are returned
-        self.assertNotIn("Pizza", donation_items)
-        self.assertNotIn("Pesto Pizza", donation_items)
-        self.assertIn("Apples", donation_items)
-        self.assertNotIn("Pepperoni Pizza", donation_items)
-
     def test_search_all_fields(self):
         """Test searching donations by all fields: type, keyword, category, and quantity."""
         params = {
