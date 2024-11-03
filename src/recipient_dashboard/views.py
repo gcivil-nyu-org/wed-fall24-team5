@@ -6,7 +6,8 @@ from django.db.models import Q
 from django.utils import timezone
 from .forms import SearchDonationForm
 from django.db.models import Avg
-
+from .utils import get_coordinates, calculate_distance
+from django.core.cache import cache
 
 @login_required
 def recipient_dashboard(request):
@@ -16,7 +17,7 @@ def recipient_dashboard(request):
         Q(active=True) & Q(quantity__gt=0) & Q(pickup_by__gte=currdate)
     ).select_related("organization")
 
-    # Annotate each donation with the average rating of its organization by joining UserReview through Donation
+    # Annotate each donation with the average rating
     donations = donations.annotate(
         avg_rating=Avg("organization__donation__userreview__rating")
     ).order_by("created_at")
@@ -28,6 +29,13 @@ def recipient_dashboard(request):
         date = form.cleaned_data.get("date")
         min_quantity = form.cleaned_data.get("min_quantity")
         address = form.cleaned_data.get("address")
+        
+        try:
+            radius = float(form.cleaned_data.get("radius") or 5)
+        except (TypeError, ValueError):
+            radius = 5.0
+
+        # Apply non-location filters first
         if keyword:
             if type == "food":
                 donations = donations.filter(food_item__icontains=keyword)
@@ -46,15 +54,62 @@ def recipient_dashboard(request):
             donations = donations.filter(pickup_by__gte=date)
         if min_quantity:
             donations = donations.filter(quantity__gte=min_quantity)
+
+        # Handle location-based filtering
         if address:
-            donations = donations.filter(organization_id__address__icontains=address)
+            try:
+                # Get coordinates for the search address
+                coords = get_coordinates(address)
+                if coords:
+                    # Prepare address info for each donation
+                    donation_distances = []
+                    for donation in donations:
+                        org = donation.organization
+                        addr_coords = get_coordinates(org.address)
+                        if addr_coords:
+                            distance = calculate_distance(coords, addr_coords)
+                            if distance is not None and distance <= radius:
+                                donation_distances.append({
+                                    'donation': donation,
+                                    'distance': distance,
+                                    'organization': org
+                                })
+                    
+                    # Sort by distance
+                    donation_distances.sort(key=lambda x: x['distance'])
+                    
+                    if not donation_distances:
+                        messages.info(request, f"No donations found within {radius} miles.")
+                        return render(request, "recipient_dashboard/dashboard.html", {
+                            "form": form,
+                            "donations": []
+                        })
+                    
+                    # Create sorted list of donations and distances dictionary
+                    sorted_donations = [item['donation'] for item in donation_distances]
+                    distances = {
+                        str(item['organization'].organization_id): item['distance'] 
+                        for item in donation_distances
+                    }
+                    
+                    # Add everything to context
+                    context = {
+                        "form": form,
+                        "donations": sorted_donations,
+                        "distances": distances
+                    }
+                    return render(request, "recipient_dashboard/dashboard.html", context)
+                else:
+                    messages.warning(request, "Could not find the specified address.")
+            except Exception as e:
+                messages.warning(request, f"Error processing location search: {str(e)}")
+                print(f"Location search error details: {str(e)}")  # For debugging
 
     return render(
         request,
         "recipient_dashboard/dashboard.html",
-        {"form": form, "donations": donations},
+        {"form": form, "donations": donations}
     )
-
 
 @login_required
 def reserve_donation(request, donation_id):
