@@ -20,6 +20,7 @@
             integrity="sha512-SfTiTlX6kk+qitfevl/7LibUOeJWlt9rbyDn92a1DqWOw9vWG2MFoays0sgObmWazO5BQPiFucnnEAjpAB+/Sw=="
             crossorigin="anonymous"
             referrerpolicy="no-referrer" />
+        <!-- <link rel="stylesheet" href="{% static 'bulma/css/bulma.css' %}"> -->
         <link rel="stylesheet" href="{% static 'css/style.css' %}">
         <style>
             .hero.is-halfheight .hero-body, .hero.is-fullheight .hero-body, .hero.is-fullheight-with-navbar .hero-body {
@@ -35,7 +36,7 @@
     </head>
     <body>
         {% include "partials/theader.html" %}
-        <div class="hero is-fullheight is-light mt-5">
+        <div class="hero is-fullheight is-light mt-6">
             <div class="hero-body">
                 {% block content %}
                 {% endblock content %}

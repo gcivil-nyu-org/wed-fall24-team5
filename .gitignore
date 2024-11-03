@@ -35,3 +35,6 @@ staticfiles/
 
 # Qahtan's Notes
 qahtansnotes.txt
+
+package-lock.json
+package.json

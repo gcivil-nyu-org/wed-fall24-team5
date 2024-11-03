@@ -5,7 +5,7 @@
 {% block content %}
     <div class="container">
         {% include "partials/notifications.html" %}
-        <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+        <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
         <form method="get">
             {% csrf_token %}
             <div class="card">
@@ -55,7 +55,7 @@
                 </div>
             </div>
         </form>
-        <h2 class="subtitle mt-3">
+        <h2 class="subtitle mt-5">
             <strong>Available Donations</strong>
         </h2>
         {% if donations %}
@@ -69,7 +69,7 @@
                                         <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
                                     </div>
                                     <div class="media-right mt-2-mobile">
-                                        <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
+                                        <span class="tag is-primary is-light is-medium mt-3">{{ donation.quantity }}
                                         Available</span>
                                     </div>
                                 </div>
@@ -109,7 +109,7 @@
                                     </div>
                                 </div>
                             </div>
-                            <footer class="card-footer">
+                            <footer class="card-footer has-text-weight-semibold has-background-white-ter">
                                 <a href="{% url 'reserve_donation' donation.donation_id %}"
                                    class="card-footer-item">Reserve</a>
                             </footer>

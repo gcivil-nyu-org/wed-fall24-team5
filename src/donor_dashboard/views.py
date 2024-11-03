@@ -110,6 +110,7 @@ def manage_organization(request, organization_id):
             .values("rating", "comment")
         )
         rating = reviews.aggregate(Avg("rating"))
+        num_users = orders.values("user").distinct().count()
 
         return render(
             request,
@@ -122,6 +123,7 @@ def manage_organization(request, organization_id):
                 "owner_access": owner_access,
                 "reviews": reviews,
                 "rating": rating,
+                "num_users": num_users,
             },
         )
     except Exception:
