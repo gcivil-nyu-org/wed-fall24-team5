@@ -45,7 +45,7 @@ load_dotenv()
 SITE_ID = int(os.getenv("SITE_ID", "1"))
 
 INSTALLED_APPS = [
-    # "daphne",
+    "daphne",
     "database",  # Custom app for database models
     "django.contrib.admin",  # Django's built-in admin interface app # pylint: disable=line-too-long
     "django.contrib.auth",  # Authentication system (handles user authentication and permissions) # pylint: disable=line-too-long
@@ -62,7 +62,7 @@ INSTALLED_APPS = [
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
     "compressor",  # Compresses linked and inline JavaScript or CSS into a single cached file # noqa
-    # "channels",  # A library that extends Django to handle WebSocket connections for real-time features like chat.
+    "channels",  # A library that extends Django to handle WebSocket connections for real-time features like chat.
     # Allauth - Third-party library for authentication and social account management
     "allauth",  # Core of django-allauth package (handles signups, logins, etc.)
     "allauth.account",  # Allauth's account module (handles user accounts, registration, etc.) # noqa
@@ -104,8 +104,11 @@ WSGI_APPLICATION = "django_management.wsgi.application"
 ASGI_APPLICATION = "django_management.asgi.application"
 
 CHANNEL_LAYERS = {
-    "default": {"BACKEND": "channels.layers.InMemoryChannelLayer"},
+    "default": {
+        "BACKEND": "channels.layers.InMemoryChannelLayer",
+    },
 }
+
 
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
