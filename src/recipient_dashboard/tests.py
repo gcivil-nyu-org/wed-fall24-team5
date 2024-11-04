@@ -511,16 +511,6 @@ def test_search_address_no_results(self):
     self.assertEqual(len(response.context["donations"]), 0)
 
 
-# In a new test class for utils.py
-
-
-class UtilsTests(TestCase):
-
-    def setUp(self):
-        # Creating test data similar to RecipientDashboardViewTests
-        ...
-
-
 class SearchDonationFormTest(TestCase):
     def test_address_field_placeholder(self):
         form = SearchDonationForm()
