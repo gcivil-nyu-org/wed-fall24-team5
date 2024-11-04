@@ -14,33 +14,69 @@
         .select2-container {
             z-index: 1060 !important;  /* Set higher than Bootstrap modal */
         }
+        .message-item.has-text-right {
+            text-align: right;
+            background-color: #f0f8ff; /* Customize as needed */
+            padding: 10px;
+            border-radius: 8px;
+            margin-left: auto;
+            margin-right: 0;
+            max-width: 70%;
+        }
+
+        .message-item.has-text-left {
+            text-align: left;
+            background-color: #e6f7ff; /* Customize as needed */
+            padding: 10px;
+            border-radius: 8px;
+            margin-right: auto;
+            margin-left: 0;
+            max-width: 70%;
+        }
     </style>
     <div class="container">
-        {% include "partials/notifications.html" %}
         <div class="container-fluid">
             <div class="row">
                 <!-- Sidebar -->
                 <div class="col-md-3 bg-light p-3">
                     <h4>Conversations</h4>
+                    {% if not is_org %}
                     <button class="btn btn-primary mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                         Start New Conversation
                     </button>
+                    {% endif %}
                     <ul class="list-group" id="room-list">
                         {% for room in rooms %}
-                            <li class="list-group-item room-item" data-room-name="{{ room.room_name }}" style="cursor:pointer">
-                                {{ room.room_name }}
+                            <li class="list-group-item" data-room-id="{{ room.id }}">
+                                {{ room.name }}
                             </li>
                         {% endfor %}
-                    </ul>
+                    </ul>                    
                 </div>
 
                 <!-- Main Messaging Panel -->
 
-                <div class="col-md-9">
-                    <h3 id="room-title">Welcome to Messaging</h3>
-                    <div id="chat-interface" class="chat-box d-none">
-                        <div id="chat-content"></div>
-                    </div>
+                <div class="col-md-9">                    
+                        {% if curr_room %}
+                            <p class="box">Chat with {{ curr_room.name }}</p>
+                            <div class="all-message" id="chatContainer">
+                                {% for message in messages %}
+                                    <div class="message-item {% if message.sender_id == user.id or message.sender_id == organization_id %}has-text-right{% else %}has-text-left{% endif %}">
+                                        <p><strong>{{ message.sender_name }}:</strong> {{ message.message_body }}</p>
+                                        <p class="is-size-7 has-text-grey">{{ message.time }}</p>
+                                    </div>
+                                    <hr>
+                                {% endfor %}
+                            </div>
+                            <!-- Message Input Form -->
+                            <form action="#" id="send-message" method="post" style="display: flex; align-items: center;">
+                                {% csrf_token %}
+                                <input type="text" id="message" name="message" class="input" placeholder="Type your message here..." style="flex: 1; margin-right: 0.5rem;" required>
+                                <button type="submit" class="button is-primary">Send</button>
+                            </form>
+                        {% else %}
+                            <p class="box">Select a chat to view messages!</p>
+                        {% endif %}
                 </div>
             </div>
         </div>
@@ -78,6 +114,110 @@
             </div>
         </div>
 
+        <script>
+            function scrollToBottom() {
+                var chatContainer = document.getElementById("chatContainer");
+                chatContainer.scrollTop = chatContainer.scrollHeight;
+            }
+            const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+            const curr_roomId = "{{ curr_room.id }}";
+            const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/chat/${curr_roomId}/`;
+            const socket = new WebSocket(wsEndpoint);
+
+            socket.onopen = (event) => {
+                console.log("WebSocket connection opened!");
+            };
+
+            socket.onclose = (event) => {
+                console.log("WebSocket connection closed!");
+            };
+        
+            document.getElementById('send-message').addEventListener('submit', function(event){
+                event.preventDefault();
+                const message = document.getElementById('message').value;
+                var sender_id = "";
+                if ("{{ is_org }}"){
+                    sender_id = "{{organization_id}}";
+                }else{
+                    sender_id = "{{ user.id }}";
+                }
+                socket.send(
+                        JSON.stringify({
+                            'is_org': "{{is_org}}",
+                            'message': message,
+                            'room_id': "{{ curr_room.id }}",
+                            'sender_id': sender_id,
+                            'receiver_id': "{{curr_room.other_user_id}}",
+                            'sender_name': "{{ curr_room.sender_name }}",
+                        })
+                    )
+            });
+
+            // response from consumer on server
+            socket.addEventListener("message", (event) => {
+                const messageData = JSON.parse(event.data)['message'];
+                console.log(messageData);
+                
+                var sender = messageData['sender_id'];
+                var sender_name = messageData['sender_name'];
+                var message_body = messageData['message_body'];
+                var time = messageData['time'];
+                const options = { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric', 
+                        hour: 'numeric', 
+                        minute: '2-digit', 
+                        hour12: true 
+                    };
+                const targetDate = new Date(time);
+                const formattedDate = targetDate.toLocaleString('en-US', options);
+
+                // empty message input field after message has been sent
+                if (sender == "{{ user.id }}" || sender == "{{ organization_id }}"){
+                    document.getElementById('message').value = '';
+                }
+
+                // Here's where we append the message to the chatbox.
+                
+                var messageDiv = document.querySelector('.all-message');
+                if (sender == "{{ user.id }}" || sender == "{{ organization_id }}"){
+                    messageDiv.innerHTML += '<div class="message-item has-text-right"><p><strong>'+ sender_name +':</strong> ' +message_body +'</p> <p class="is-size-7 has-text-grey">'+ formattedDate +'</p></div><hr>';
+                }else{
+                    messageDiv.innerHTML += '<div class="message-item has-text-left"><p><strong>'+ sender_name +':</strong> ' +message_body +'</p> <p class="is-size-7 has-text-grey">'+ formattedDate +'</p></div><hr>';
+                }
+                
+                console.log(messageDiv.innerHTML)
+                scrollToBottom();
+
+            });
+
+        </script>
+
+        <script>
+            document.addEventListener("DOMContentLoaded", function() {
+                // Get all list items
+
+                const roomItems = document.querySelectorAll("#room-list .list-group-item");
+        
+                roomItems.forEach(item => {
+                    item.addEventListener("click", function() {
+                        // Get room ID from data attribute
+                        const roomId = item.getAttribute("data-room-id");
+                        if ("{{ is_org }}"){
+                            window.location.href = `{% url 'messaging:org_get_messages' room_id='ROOM_ID' organization_id='ORG_ID' %}`
+                                                        .replace("ROOM_ID", roomId)
+                                                        .replace("ORG_ID", "{{organization_id}}");
+                        }else{
+                            window.location.href = `{% url 'messaging:get_messages' room_id='ROOM_ID' %}`.replace("ROOM_ID", roomId);
+                        }
+                        // Redirect to a view with room ID as a parameter
+                        
+                    });
+                });
+            });
+        </script>
+
         <!-- Bootstrap JS -->
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -98,18 +238,6 @@
 
                 $('#newConversationModal').on('shown.bs.modal', function () {
                     $('#organization').select2('focus');  // Focus Select2 input manually
-                });
-
-                $('.room-item').on('click', function() {
-                    const roomName = $(this).data('room-name');
-                    $('#room-title').text(`${roomName}`);
-                    $('#chat-interface').removeClass('d-none'); // Show chat interface
-
-                    // Load dummy messages into chat
-                    $('#chat-content').html(`
-                        <p><strong>User:</strong> Hi!</p>
-                        <p><strong>Organization:</strong> Hello!</p>
-                    `);
                 });
             });
         </script>
