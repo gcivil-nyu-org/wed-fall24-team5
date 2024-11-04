@@ -68,15 +68,14 @@ Manage Organization
                 </div>
             </div>
         </div>
-        <a href="{% url 'donor_dashboard:statistics' organization.organization_id %}"
-            class="column is-full-mobile has-text-centered">
+        <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
                     <p class="heading">Total Orders</p>
                     <p class="title">{{ orders.count }}</p>
                 </div>
             </div>
-        </a>
+        </div>
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">

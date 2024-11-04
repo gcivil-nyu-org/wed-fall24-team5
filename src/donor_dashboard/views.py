@@ -109,44 +109,51 @@ def get_org_list(request):
 @login_required
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
-    # try:
-    organization = Organization.objects.get(organization_id=organization_id)
-    org_user = User.objects.get(email=request.user.email)
-    organization_admin = OrganizationAdmin.objects.get(
-        user=org_user, organization=organization
-    )
-    access_level = organization_admin.access_level
-    if access_level == "owner":
-        owner_access = True
-    else:
-        owner_access = False
-    status = organization.active
+    try:
+        organization = Organization.objects.get(organization_id=organization_id)
+        org_user = User.objects.get(email=request.user.email)
+        organization_admin = OrganizationAdmin.objects.get(
+            user=org_user, organization=organization
+        )
+        access_level = organization_admin.access_level
+        if access_level == "owner":
+            owner_access = True
+        else:
+            owner_access = False
+        donations = Donation.objects.filter(
+            organization_id=organization.organization_id, active=True
+        )
+        orders = Order.objects.filter(
+            donation__organization=organization
+        ).prefetch_related("donation")
+        status = organization.active
+        reviews = (
+            UserReview.objects.filter(donation__organization=organization)
+            .order_by("modified_at")
+            .values("rating", "comment")
+        )
+        rating = reviews.aggregate(Avg("rating"))
+        num_users = orders.values("user").distinct().count()
 
-    donations, orders, reviews, rating, num_users = get_org_info(
-        request, organization_id
-    )
-
-    return render(
-        request,
-        "donor_dashboard/manage_organization.html",
-        {
-            "organization": organization,
-            "donations": donations,
-            "status": status,
-            "orders": orders,
-            "owner_access": owner_access,
-            "reviews": reviews,
-            "rating": rating,
-            "num_users": num_users,
-        },
-    )
-
-
-# except Exception:
-#     messages.warning(request, "You Don't have permission to do this action")
-#     return redirect(
-#         "donor_dashboard:org_list",
-#     )
+        return render(
+            request,
+            "donor_dashboard/manage_organization.html",
+            {
+                "organization": organization,
+                "donations": donations,
+                "status": status,
+                "orders": orders,
+                "owner_access": owner_access,
+                "reviews": reviews,
+                "rating": rating,
+                "num_users": num_users,
+            },
+        )
+    except Exception:
+        messages.warning(request, "You Don't have permission to do this action")
+        return redirect(
+            "donor_dashboard:org_list",
+        )
 
 
 @login_required
