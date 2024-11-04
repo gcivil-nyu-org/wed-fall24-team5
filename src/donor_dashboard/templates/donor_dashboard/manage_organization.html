@@ -126,38 +126,46 @@
                                     <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%;">
                                         <div>
                                             <div class="is-size-5">{{ order.user.first_name }} {{ order.user.last_name }}</div>
-                                            <div class="tag my-3 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved</div>
+                                            <div class="tag my-1 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved</div>
                                             
                                             <!-- Display dietary restrictions -->
-
-                                                <div class="mt-2">
-                                                    <strong>Dietary Restrictions:</strong>
-                                                    {% if order.user.dietary_restrictions %}
+                                            <div class="mt-2">
+                                                <strong>Dietary Restrictions:</strong>
+                                                {% if order.user.dietary_restrictions %}
                                                     <ul>
                                                         {% for restriction in order.user.dietary_restrictions %}
                                                             <li>{{ restriction.restriction }}</li>
                                                         {% endfor %}
                                                     </ul>
-                                                    {% else %}
+                                                {% else %}
                                                     <ul>
-                                                        <li>
-                                                            None
-                                                        </li>
+                                                        <li>None</li>
                                                     </ul>
-                                                    {% endif %}
-                                                </div>
+                                                {% endif %}
+                                            </div>
                                         </div>
-                                        
-                                        <!-- Button aligned to the bottom -->
-                                        <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
-                                           class="button is-small is-rounded {% if order.order_status == 'pending' %}is-success{% else %}is-danger{% endif %} is-outlined mt-4">
-                                            {% if order.order_status == "pending" %}
-                                                Mark as complete
-                                            {% else %}
-                                                Mark as pending
-                                            {% endif %}
-                                        </a>
-                                    </div>
+                                    
+                                        <!-- Status and button at the bottom, with status now above the button -->
+                                        <div>
+                                            <!-- Status moved here, above the button -->
+                                            <div class="tag is-info my-2 is-size-6 is-primary is-light">Current Status: 
+                                                {% if order.order_status == "pending" %}
+                                                    Pending
+                                                {% else %}
+                                                    Complete
+                                                {% endif %}
+                                            </div>
+                                            <br>
+                                            <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
+                                            class="button is-small is-rounded is-info is-light is-outlined">
+                                                {% if order.order_status == "pending" %}
+                                                    Mark as complete
+                                                {% else %}
+                                                    Mark as pending
+                                                {% endif %}
+                                            </a>
+                                        </div>
+                                    </div>  
                                     {% endfor %}
                                 </div>
                             </div>
