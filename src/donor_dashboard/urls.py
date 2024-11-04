@@ -53,4 +53,34 @@ urlpatterns = [
         views.remove_admin_owner,
         name="remove_admin_owner",
     ),
+    path(
+        "statistics/<uuid:organization_id>/",
+        views.organization_statistics,
+        name="organization_statistics",
+    ),
+    path(
+        "statistics/filter_statistics/",
+        views.filter_statistics,
+        name="filter_statistics",
+    ),
+    path(
+        "orders_chart/<uuid:organization_id>/",
+        views.statistics_orders,
+        name="statistics_orders",
+    ),
+    path(
+        "orders_status_chart/<uuid:organization_id>/",
+        views.statistics_orders_status,
+        name="statistics_orders_status",
+    ),
+    path(
+        "donations_chart/<uuid:organization_id>/",
+        views.statistics_donations,
+        name="statistics_donations",
+    ),
+    path(
+        "ratings_chart/<uuid:organization_id>/",
+        views.statistics_ratings,
+        name="statistics_ratings",
+    ),
 ]

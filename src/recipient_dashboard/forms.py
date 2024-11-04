@@ -97,12 +97,36 @@ class SearchDonationForm(forms.Form):
         widget=forms.TextInput(
             attrs={
                 "class": "input",
-                "placeholder": "Address",
+                "placeholder": "Enter address or location",
                 "style": """
                 background-color: transparent;
                 border-color: #CCC;
                 border-radius: 6px;
             """,
+                "id": "location-input",
+            }
+        ),
+    )
+
+    radius = forms.ChoiceField(
+        required=False,
+        label="Search Radius",
+        initial=5,  # Set default value
+        choices=[
+            ("5", "5 miles"),  # Change to strings for better form handling
+            ("10", "10 miles"),
+            ("25", "25 miles"),
+            ("50", "50 miles"),
+            ("100", "100 miles"),
+        ],
+        widget=forms.Select(
+            attrs={
+                "class": "select",
+                "style": """
+                background-color: transparent;
+                border-color: #CCC;
+                border-radius: 6px;
+                """,
             }
         ),
     )

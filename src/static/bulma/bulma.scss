@@ -1,4 +1,26 @@
 @charset "utf-8";
 
 /*! bulma.io v1.0.2 | MIT License | github.com/jgthms/bulma */
-@use "sass";
+// Set your brand colors
+$lilac: #eDeaf5;
+$purple: #57467B;
+$navy: #0081a7;
+$pink: #c1666b;
+$yellow: #fec601;
+$beige-light: #d0d1cd;
+$beige-lighter: #eff0eb;
+
+// Path to Bulma's sass folder
+@use "sass" with (
+  $family-primary: '"Nunito", sans-serif',
+  $primary: $purple,
+  $link: $navy,
+  $danger: $pink,
+  $info: $navy,
+  $warning: $yellow,
+  $tabs-toggle-link-active-background-color: $purple,
+  $tabs-toggle-link-active-color: #fff,
+);
+
+// Import the Google Font
+@import url("https://fonts.googleapis.com/css?family=Nunito:400,700");
