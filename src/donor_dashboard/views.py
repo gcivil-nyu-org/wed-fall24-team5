@@ -43,9 +43,9 @@ def get_org_info(request, organization_id):
     donations = Donation.objects.filter(
         organization_id=organization.organization_id, active=True
     )
-    orders = Order.objects.filter(
-        donation__organization=organization
-    ).prefetch_related("donation")
+    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
+        "donation"
+    )
     reviews = (
         UserReview.objects.filter(donation__organization=organization)
         .order_by("modified_at")
@@ -110,39 +110,43 @@ def get_org_list(request):
 def manage_organization(request, organization_id):
     # Fetch the organization using the organization_id
     # try:
-        organization = Organization.objects.get(organization_id=organization_id)
-        org_user = User.objects.get(email=request.user.email)
-        organization_admin = OrganizationAdmin.objects.get(
-            user=org_user, organization=organization
-        )
-        access_level = organization_admin.access_level
-        if access_level == "owner":
-            owner_access = True
-        else:
-            owner_access = False
-        status = organization.active
-        
-        donations, orders, reviews, rating, num_users = get_org_info(request, organization_id)
+    organization = Organization.objects.get(organization_id=organization_id)
+    org_user = User.objects.get(email=request.user.email)
+    organization_admin = OrganizationAdmin.objects.get(
+        user=org_user, organization=organization
+    )
+    access_level = organization_admin.access_level
+    if access_level == "owner":
+        owner_access = True
+    else:
+        owner_access = False
+    status = organization.active
 
-        return render(
-            request,
-            "donor_dashboard/manage_organization.html",
-            {
-                "organization": organization,
-                "donations": donations,
-                "status": status,
-                "orders": orders,
-                "owner_access": owner_access,
-                "reviews": reviews,
-                "rating": rating,
-                "num_users": num_users,
-            },
-        )
-    # except Exception:
-    #     messages.warning(request, "You Don't have permission to do this action")
-    #     return redirect(
-    #         "donor_dashboard:org_list",
-    #     )
+    donations, orders, reviews, rating, num_users = get_org_info(
+        request, organization_id
+    )
+
+    return render(
+        request,
+        "donor_dashboard/manage_organization.html",
+        {
+            "organization": organization,
+            "donations": donations,
+            "status": status,
+            "orders": orders,
+            "owner_access": owner_access,
+            "reviews": reviews,
+            "rating": rating,
+            "num_users": num_users,
+        },
+    )
+
+
+# except Exception:
+#     messages.warning(request, "You Don't have permission to do this action")
+#     return redirect(
+#         "donor_dashboard:org_list",
+#     )
 
 
 @login_required
@@ -242,40 +246,35 @@ def filter_statistics(request, organization_id):
     donations = Donation.objects.filter(
         organization_id=organization.organization_id, active=True
     )
-    orders = Order.objects.filter(
-        donation__organization=organization
-    ).prefetch_related("donation")
-    reviews = (
-        UserReview.objects.filter(donation__organization=organization)
-        .order_by("modified_at")
-        .values("rating", "comment")
+    grouped_donations = (
+        donations.annotate(month=ExtractMonth("created_at"))
+        .values("month")
+        .order_by("-month")
+        .distinct()
     )
-    grouped_donations = donations.annotate(month=ExtractMonth("created_at")).values("month").order_by("-month").distinct()
     options = [donation["month"] for donation in grouped_donations]
-    return JsonResponse({
-        "options": options,
-    })
+    return JsonResponse(
+        {
+            "options": options,
+        }
+    )
 
 
 @login_required
 def statistics_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    org_user = User.objects.get(email=request.user.email)
-    donations = Donation.objects.filter(
-        organization_id=organization.organization_id, active=True
-    )
-    orders = Order.objects.filter(
-        donation__organization=organization
-    ).prefetch_related("donation")
-    reviews = (
-        UserReview.objects.filter(donation__organization=organization)
-        .order_by("modified_at")
-        .values("rating", "comment")
+    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
+        "donation"
     )
     # today = timezone.now().date()
     # days = [(today - timedelta(days=i)).strftime('%A') for i in range(6, -1, -1)]
-    orders_data = orders.annotate(date=TruncDate("order_created_at")).values("date").annotate(order_count=Count("order_id")).order_by("date")
-    dates = [entry["date"].strftime('%Y-%m-%d') for entry in orders_data]
+    orders_data = (
+        orders.annotate(date=TruncDate("order_created_at"))
+        .values("date")
+        .annotate(order_count=Count("order_id"))
+        .order_by("date")
+    )
+    dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
     # for i in range(6, -1, -1):
     #     day = today - timedelta(days=i)
@@ -283,26 +282,34 @@ def statistics_orders(request, organization_id):
     #     order_count = orders.filter(order_created_at=day).count()
     #     orders_data.append(order_count)
 
-    return JsonResponse(data={
-        "labels": dates,
-        "data": orders_counts,
-    })
+    return JsonResponse(
+        data={
+            "labels": dates,
+            "data": orders_counts,
+        }
+    )
 
 
 @login_required
 def statistics_orders_status(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(
-        donation__organization=organization
-    ).prefetch_related("donation")
-    orders_status_data = orders.values("order_status").annotate(order_count=Count("order_id")).order_by("order_status")
+    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
+        "donation"
+    )
+    orders_status_data = (
+        orders.values("order_status")
+        .annotate(order_count=Count("order_id"))
+        .order_by("order_status")
+    )
     statuses = [entry["order_status"] for entry in orders_status_data]
     orders_status_counts = [entry["order_count"] for entry in orders_status_data]
 
-    return JsonResponse(data={
-        "labels": statuses,
-        "data": orders_status_counts,
-    })
+    return JsonResponse(
+        data={
+            "labels": statuses,
+            "data": orders_status_counts,
+        }
+    )
 
 
 @login_required
@@ -311,14 +318,21 @@ def statistics_donations(request, organization_id):
     donations = Donation.objects.filter(
         organization_id=organization.organization_id, active=True
     )
-    donations_data = donations.annotate(date=TruncDate("created_at")).values("date").annotate(order_count=Count("donation_id")).order_by("date")
-    dates = [entry["date"].strftime('%Y-%m-%d') for entry in donations_data]
+    donations_data = (
+        donations.annotate(date=TruncDate("created_at"))
+        .values("date")
+        .annotate(order_count=Count("donation_id"))
+        .order_by("date")
+    )
+    dates = [entry["date"].strftime("%Y-%m-%d") for entry in donations_data]
     donations_counts = [entry["order_count"] for entry in donations_data]
 
-    return JsonResponse(data={
-        "labels": dates,
-        "data": donations_counts,
-    })
+    return JsonResponse(
+        data={
+            "labels": dates,
+            "data": donations_counts,
+        }
+    )
 
 
 @login_required
@@ -329,40 +343,48 @@ def statistics_ratings(request, organization_id):
         .order_by("modified_at")
         .values("rating", "comment")
     )
-    ratings_data = reviews.values("rating").annotate(rating_count=Count("review_id")).order_by("rating")
+    ratings_data = (
+        reviews.values("rating")
+        .annotate(rating_count=Count("review_id"))
+        .order_by("rating")
+    )
     ratings = [entry["rating"] for entry in ratings_data]
     ratings_counts = [entry["rating_count"] for entry in ratings_data]
 
-    return JsonResponse(data={
-        "labels": ratings,
-        "data": ratings_counts,
-    })
+    return JsonResponse(
+        data={
+            "labels": ratings,
+            "data": ratings_counts,
+        }
+    )
 
 
 @login_required
 def organization_statistics(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations, orders, reviews, rating, num_users = get_org_info(request, organization_id)
+    donations, orders, reviews, rating, num_users = get_org_info(
+        request, organization_id
+    )
     orders = orders.annotate(created_date=F("order_created_at"), type=Value("Order"))
-    review_data = UserReview.objects.filter(donation__organization=organization).annotate(created_date=F("created_at"), type=Value("Review"))
+    review_data = UserReview.objects.filter(
+        donation__organization=organization
+    ).annotate(created_date=F("created_at"), type=Value("Review"))
     activity_feed = sorted(
-        chain(orders, review_data),
-        key=attrgetter("created_date"),
-        reverse=True
+        chain(orders, review_data), key=attrgetter("created_date"), reverse=True
     )
     return render(
-            request,
-            "donor_dashboard/statistics.html",
-            {
-                "organization": organization,
-                "donations": donations,
-                "orders": orders,
-                "reviews": reviews,
-                "rating": rating,
-                "num_users": num_users,
-                "activity_feed": activity_feed,
-            },
-        )
+        request,
+        "donor_dashboard/statistics.html",
+        {
+            "organization": organization,
+            "donations": donations,
+            "orders": orders,
+            "reviews": reviews,
+            "rating": rating,
+            "num_users": num_users,
+            "activity_feed": activity_feed,
+        },
+    )
 
 
 @login_required
