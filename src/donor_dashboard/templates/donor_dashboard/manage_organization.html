@@ -8,8 +8,19 @@ Manage Organization
 <script src="{% static 'js/manage_organization.js' %}"></script>
 <div class="container">
     {% include "partials/notifications.html" %}
+    <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{% url 'donor_dashboard:org_list' %}">
+                    <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                    <span>Organizations</span>
+                </a></li>
+            <li class="is-active">
+                <a href="#" aria-current="page">{{ organization.organization_name }}</a>
+            </li>
+        </ul>
+    </nav>
     <div class="flex-container is-justify-content-space-between is-align-items-center">
-        <h1 class="title mt-5">
+        <h1 class="title mt-3">
             <strong>{{ organization.organization_name }}</strong>
         </h1>
         <div id="organization-id" hidden>{{ organization.organization_id }}</div>
@@ -25,18 +36,22 @@ Manage Organization
         </div>
         {% endif %}
     </div>
-    <nav class="breadcrumb" aria-label="breadcrumbs">
-        <ul>
-            <li><a href="{% url 'donor_dashboard:org_list' %}">
-                    <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
-                    <span>Organizations</span>
-                </a></li>
-            <li class="is-active">
-                <a href="#" aria-current="page">{{ organization.organization_name }}</a>
-            </li>
-        </ul>
-    </nav>
     <!-- Statistics -->
+    <nav class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="subtitle"><strong>Statistics</strong></h2>
+            </div>
+            <div class="level-item ml-3">
+                <a href="{% url 'donor_dashboard:statistics' organization.organization_id %}" class="icon-text has-text-link">
+                    <span>View All</span>
+                    <span class="icon">
+                        <i class="fa fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
     <nav class="columns is-variable is-4">
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
@@ -46,14 +61,15 @@ Manage Organization
                 </div>
             </div>
         </div>
-        <div class="column is-full-mobile has-text-centered">
+        <a href="{% url 'donor_dashboard:statistics' organization.organization_id %}"
+            class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
                     <p class="heading">Total Orders</p>
                     <p class="title">{{ orders.count }}</p>
                 </div>
             </div>
-        </div>
+        </a>
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
