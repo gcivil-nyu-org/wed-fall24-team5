@@ -9,9 +9,7 @@ from django.db.models import Q
 
 
 def get_rooms(id):
-    filtered_rooms = Room.objects.filter(
-        Q(conversor_1_id=id) | Q(conversor_2_id=id)
-    )
+    filtered_rooms = Room.objects.filter(Q(conversor_1_id=id) | Q(conversor_2_id=id))
 
     rooms = []
     for room in filtered_rooms:
@@ -23,6 +21,7 @@ def get_rooms(id):
             rooms.append({"name": room.conversor_1_name, "id": room.room_id})
 
     return rooms
+
 
 def get_messages_from_room_id(room_id):
     filtered_messages = Message.objects.filter(room_id=room_id)
@@ -68,7 +67,7 @@ def get_curr_room(room_id, user_or_org_id):
         "other_user_id": curr_room_other_id,
     }
     return curr_room
-    
+
 
 @login_required
 def messaging_view(request):

@@ -40,11 +40,11 @@
                 <!-- Sidebar -->
                 <div class="col-md-3 bg-light p-3">
                     <h4>Conversations</h4>
-                    {%if not is_org %}
+                    {% if not is_org %}
                     <button class="btn btn-primary mt-3 mb-3" data-bs-toggle="modal" data-bs-target="#newConversationModal">
                         Start New Conversation
                     </button>
-                    {% endif%}
+                    {% endif %}
                     <ul class="list-group" id="room-list">
                         {% for room in rooms %}
                             <li class="list-group-item" data-room-id="{{ room.id }}">
@@ -58,7 +58,7 @@
 
                 <div class="col-md-9">                    
                         {% if curr_room %}
-                            <p class="box">Chat with {{curr_room.name}}</p>
+                            <p class="box">Chat with {{ curr_room.name }}</p>
                             <div class="all-message" id="chatContainer">
                                 {% for message in messages %}
                                     <div class="message-item {% if message.sender_id == user.id or message.sender_id == organization_id %}has-text-right{% else %}has-text-left{% endif %}">
