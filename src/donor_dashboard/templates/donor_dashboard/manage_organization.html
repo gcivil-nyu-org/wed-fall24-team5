@@ -44,6 +44,21 @@ Manage Organization
         {% endif %}
     </div>
     <!-- Statistics -->
+    <nav class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="subtitle"><strong>Statistics</strong></h2>
+            </div>
+            <div class="level-item ml-3">
+                <a href="{% url 'donor_dashboard:organization_statistics' organization.organization_id %}" class="icon-text has-text-link">
+                    <span>View All</span>
+                    <span class="icon">
+                        <i class="fa fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
     <nav class="columns is-variable is-4">
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">

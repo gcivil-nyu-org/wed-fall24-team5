@@ -3,7 +3,7 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib import messages
-from database.models import Organization, OrganizationAdmin, Donation, Order
+from database.models import Organization, OrganizationAdmin, Donation, Order, UserReview
 from donor_dashboard.forms import AddOrganizationForm
 
 
@@ -651,3 +651,114 @@ class OrganizationAdminViewsTestCase(TestCase):
             str(messages_list[0]),
             "Succesfully remove this org access to email: admin@example.com",
         )
+
+
+class DonorDashboardStatsTests(TestCase):
+    def setUp(self):
+        # Set up test data
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="password",
+        )
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user, organization=self.organization, access_level="owner"
+        )
+        self.client.login(email="testuser@example.com", password="password")
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        self.review = UserReview.objects.create(
+            donation=self.donation,
+            user=self.user,
+            rating=4,
+            comment="Test review",
+            active=True,
+        )
+
+    def test_stat_view(self):
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:organization_statistics",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "donor_dashboard/statistics.html")
+        self.assertEqual(response.context["organization"], self.organization)
+        self.assertEqual(len(response.context["reviews"]), 1)
+        self.assertEqual(response.context["num_users"], 1)
+        self.assertEqual(len(response.context["activity_feed"]), 2)
+
+    def test_stat_orders(self):
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:statistics_orders",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(
+            response_data["labels"][0], self.order.order_created_at.strftime("%Y-%m-%d")
+        )
+        self.assertEqual(response_data["data"][0], 1)
+
+    def test_stat_orders_status(self):
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:statistics_orders_status",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data["labels"][0], self.order.order_status)
+        self.assertEqual(response_data["data"][0], 1)
+
+    def test_stat_donations(self):
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:statistics_donations",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(
+            response_data["labels"][0], self.donation.created_at.strftime("%Y-%m-%d")
+        )
+        self.assertEqual(response_data["data"][0], 1)
+
+    def test_stat_ratings(self):
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:statistics_ratings",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(response_data["labels"][0], self.review.rating)
+        self.assertEqual(response_data["data"][0], 1)
