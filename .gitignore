@@ -32,3 +32,6 @@ staticfiles/
 
 # Coverage
 .coverage
+
+package-lock.json
+package.json
