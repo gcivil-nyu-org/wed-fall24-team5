@@ -56,7 +56,7 @@ urlpatterns = [
     path(
         "statistics/<uuid:organization_id>/",
         views.organization_statistics,
-        name="statistics",
+        name="organization_statistics",
     ),
     path(
         "statistics/filter_statistics/",
