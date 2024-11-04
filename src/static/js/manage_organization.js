@@ -37,34 +37,49 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 document.addEventListener("DOMContentLoaded", function () {
-    // Handle the tab switching logic
     const tabs = document.querySelectorAll('.tabs ul li');
-    const donationsContent = document.getElementById('donations-content');
-    const ordersContent = document.getElementById('orders-content');
-    const reviewsContent = document.getElementById('reviews-content');
+    const tabContents = document.querySelectorAll('.manage-tab');
 
-    function clearActiveTabs() {
-        tabs.forEach(tab => {
+    // Retrieve the active tab from localStorage or default to 'donations-tab'
+    const savedTab = localStorage.getItem('activeTab') || 'donations-tab';
+
+    // Check if the savedTab matches any tab, otherwise default to 'donations-tab'
+    let activeTabExists = false;
+    tabs.forEach((tab, index) => {
+        if (tab.id === savedTab) {
+            tab.classList.add('is-active');
+            tabContents[index].classList.remove('is-hidden');
+            activeTabExists = true;
+        } else {
             tab.classList.remove('is-active');
-        });
-        donationsContent.classList.add('is-hidden');
-        ordersContent.classList.add('is-hidden');
-        reviewsContent.classList.add('is-hidden');
+            tabContents[index].classList.add('is-hidden');
+        }
+    });
+
+    // If no matching tab was found, set 'donations-tab' as the default active tab and show its content
+    if (!activeTabExists) {
+        const defaultTab = document.getElementById('donations-tab');
+        const defaultContent = document.getElementById('donations-content');
+
+        if (defaultTab && defaultContent) {
+            defaultTab.classList.add('is-active');
+            defaultContent.classList.remove('is-hidden');
+        }
     }
 
-    // Add event listeners for the tabs
-    tabs.forEach(tab => {
-        tab.addEventListener('click', function () {
-            clearActiveTabs();
-            this.classList.add('is-active');
-            // Show the content based on the clicked tab's id
-            if (this.id === 'donations-tab') {
-                donationsContent.classList.remove('is-hidden');
-            } else if (this.id === 'orders-tab') {
-                ordersContent.classList.remove('is-hidden');
-            } else if (this.id === 'reviews-tab') {
-                reviewsContent.classList.remove('is-hidden');
-            }
+    // Add click event listeners to tabs
+    tabs.forEach((tab, index) => {
+        tab.addEventListener('click', () => {
+            // Remove active class from all tabs and hide all tab contents
+            tabs.forEach(t => t.classList.remove('is-active'));
+            tabContents.forEach(content => content.classList.add('is-hidden'));
+
+            // Activate the selected tab and show the corresponding content
+            tab.classList.add('is-active');
+            tabContents[index].classList.remove('is-hidden');
+
+            // Save the selected tab in localStorage
+            localStorage.setItem('activeTab', tab.id);
         });
     });
 

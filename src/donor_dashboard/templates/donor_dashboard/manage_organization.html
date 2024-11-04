@@ -15,6 +15,8 @@
             <div id="organization-id" hidden>{{ organization.organization_id }}</div>
             {% if owner_access %}
                 <div class="buttons is-inline-block">
+                    <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                       class="button is-info">Messages</a>
                     <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
                        class="button is-info">Manage Organization</a>
                     <form id="delete-form"
@@ -25,24 +27,23 @@
                         <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
                     </form>
                 </div>
+            {% else %}
+            <div class="buttons is-inline-block">
+                <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                   class="button is-info">Messages</a>
+            </div>
             {% endif %}
         </div>
         <!-- Tab navigation -->
         <div class="tabs is-centered is-toggle is-fullwidth mt-3">
             <ul>
-                <li id="donations-tab" class="is-active">
-                    <a>Donations</a>
-                </li>
-                <li id="orders-tab">
-                    <a>Orders</a>
-                </li>
-                <li id="reviews-tab">
-                    <a>Reviews</a>
-                </li>
+                <li id="donations-tab"><a>Donations</a></li>
+                <li id="orders-tab"><a>Orders</a></li>
+                <li id="reviews-tab"><a>Reviews</a></li>
             </ul>
         </div>
         <!-- Content for List of Donations tab -->
-        <div id="donations-content">
+        <div id="donations-content" class="manage-tab">
             {% if status %}
                 <div class="buttons">
                     <button id="add-donation-button" class="button is-dark">Add Donation</button>
@@ -102,7 +103,8 @@
             {% endif %}
         </div>
         <!-- Content for Orders Received tab -->
-        <div id="orders-content" class="is-hidden">
+        <div id="orders-content" class="is-hidden manage-tab">
+            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
             {% if orders %}
                 {% regroup orders by donation.donation_id as food_item_orders %}
                 {% for group in food_item_orders %}
@@ -167,10 +169,8 @@
             {% endif %}
         </div>
         <!-- Content for My Reviews tab -->
-        <div id="reviews-content" class="tab-content is-hidden">
-            <h2 class="subtitle mt-3">
-                <strong>My Reviews</strong>
-            </h2>
+        <div id="reviews-content" class="tab-content is-hidden manage-tab">
+            <h2 class="subtitle mt-3"><strong>My Reviews</strong></h2>
             {% if reviews %}
                 <div class="columns is-multiline is-variable is-3">
                     {% for review in reviews %}

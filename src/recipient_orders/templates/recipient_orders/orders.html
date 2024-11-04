@@ -58,7 +58,7 @@
         <h2 class="subtitle mt-3">Your reservations:</h2>
         <div class="tabs is-centered is-toggle is-fullwidth">
             <ul>
-                <li class="is-active" id="pending-tab">
+                <li id="pending-tab">
                     <a><span>Pending</span></a>
                 </li>
                 <li id="picked-up-tab">
@@ -248,53 +248,6 @@
             {% endif %}
         </div>
     </div>
-    <script>
-    // Tab switching functionality
-    document.addEventListener('DOMContentLoaded', () => {
-        const tabs = document.querySelectorAll('.tabs ul li');
-        const orderLists = document.querySelectorAll('.order-list');
-
-        tabs.forEach((tab, index) => {
-            tab.addEventListener('click', () => {
-                tabs.forEach(t => t.classList.remove('is-active'));
-                orderLists.forEach(list => list.classList.add('is-hidden'));
-
-                tab.classList.add('is-active');
-                orderLists[index].classList.remove('is-hidden');
-            });
-        });
-        
-        // Modal functionality
-        const modal = document.getElementById('modifyOrderModal');
-        const closeButtons = modal.querySelectorAll('.delete, .modal-background');
-        
-        closeButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                closeModifyModal();
-            });
-        });
-    });
-
-    // Modal functions
-    function openModifyModal(orderId, currentQuantity, availableQuantity, foodItem) {
-        const modal = document.getElementById('modifyOrderModal');
-        const maxAllowed = Math.min(3, parseInt(availableQuantity) + parseInt(currentQuantity));
-        
-        document.getElementById('order_id').value = orderId;
-        document.getElementById('current_quantity').value = currentQuantity;
-        document.getElementById('available_quantity').value = availableQuantity;
-        document.getElementById('food_item').value = foodItem;
-        document.getElementById('new_quantity').max = maxAllowed;
-        document.getElementById('max_allowed').textContent = maxAllowed;
-        document.getElementById('new_quantity').value = currentQuantity;
-
-        modal.classList.add('is-active');
-    }
-
-    function closeModifyModal() {
-        const modal = document.getElementById('modifyOrderModal');
-        modal.classList.remove('is-active');
-    }
-    </script>
+    <script src="{% static 'js/recipient_orders.js' %}"></script>
     <script src="{% static 'js/review_modal.js' %}"></script>
 {% endblock content %}
