@@ -62,7 +62,7 @@
                 {% endif %}
                 <div class="navbar-item">
                     {% if user.is_authenticated %}
-                        <a class="button is-outlined is-dark" href="#"><span>Messages</span></a>
+                        <a class="button is-outlined is-dark" href="{% url 'messaging:messaging' %}"><span>Messages</span></a>
                         <a class="button is-dark ml-3" href="{% url 'accounts:logout' %}"><span>Log Out</span></a>
                     {% else %}
                         <a class="button is-outlined is-dark" href="{% url 'accounts:login' %}"><span>Log In</span></a>
