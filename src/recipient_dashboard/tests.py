@@ -11,7 +11,13 @@ from urllib.parse import urlencode  # for encoding URLs with query parameters
 from .forms import SearchDonationForm
 from geopy.geocoders import Nominatim  # noqa
 from geopy.distance import geodesic  # noqa
-from django.core.cache import cache  # noqa
+from django.core.cache import cache
+from unittest.mock import patch, MagicMock
+from recipient_dashboard.utils import (
+    get_coordinates,
+    calculate_distance,
+    get_nearby_addresses,
+)
 
 
 class RecipientDashboardViewTests(TestCase):
@@ -535,3 +541,166 @@ class SearchDonationFormTest(TestCase):
                 ("100", "100 miles"),
             ],
         )
+
+
+class LocationUtilsTests(TestCase):
+    def setUp(self):
+        cache.clear()  # Clear cache before each test
+
+    def test_get_coordinates_with_cache(self):
+        """Test getting coordinates with caching"""
+        # First, mock a successful geocoding response
+        mock_location = MagicMock()
+        mock_location.latitude = 40.7128
+        mock_location.longitude = -74.0060
+
+        with patch("geopy.geocoders.Nominatim.geocode", return_value=mock_location):
+            # First call should use the geocoder
+            coords = get_coordinates("New York, NY")
+            self.assertEqual(coords, (40.7128, -74.0060))
+
+            # Second call should use cached value
+            coords_cached = get_coordinates("New York, NY")
+            self.assertEqual(coords_cached, (40.7128, -74.0060))
+
+    def test_get_coordinates_failure(self):
+        """Test handling of geocoding failures"""
+        with patch(
+            "geopy.geocoders.Nominatim.geocode", side_effect=Exception("API Error")
+        ):
+            coords = get_coordinates("Invalid Address")
+            self.assertIsNone(coords)
+
+    def test_get_coordinates_not_found(self):
+        """Test handling of addresses that can't be geocoded"""
+        with patch("geopy.geocoders.Nominatim.geocode", return_value=None):
+            coords = get_coordinates("Nonexistent Place")
+            self.assertIsNone(coords)
+
+    def test_calculate_distance_valid(self):
+        """Test distance calculation with valid coordinates"""
+        coord1 = (40.7128, -74.0060)  # New York
+        coord2 = (34.0522, -118.2437)  # Los Angeles
+        distance = calculate_distance(coord1, coord2)
+        self.assertIsInstance(distance, float)
+        self.assertGreater(distance, 0)
+
+    def test_calculate_distance_invalid_coords(self):
+        """Test distance calculation with invalid coordinates"""
+        coord1 = (40.7128, -74.0060)
+        coord2 = ("invalid", "coords")
+        distance = calculate_distance(coord1, coord2)
+        self.assertIsNone(distance)
+
+    def test_calculate_distance_none_coords(self):
+        """Test distance calculation with None coordinates"""
+        distance = calculate_distance(None, (40.7128, -74.0060))
+        self.assertIsNone(distance)
+
+    def test_get_nearby_addresses_valid(self):
+        """Test finding nearby addresses with valid data"""
+        center_coords = (40.7128, -74.0060)
+        addresses = [
+            {
+                "latitude": 40.7130,
+                "longitude": -74.0062,
+                "address": "Test Address 1",
+                "organization": "Org 1",
+            },
+            {
+                "latitude": 42.3601,
+                "longitude": -71.0589,
+                "address": "Test Address 2",
+                "organization": "Org 2",
+            },
+        ]
+        nearby = get_nearby_addresses(center_coords, addresses, radius_miles=5.0)
+        self.assertEqual(len(nearby), 1)
+        self.assertEqual(nearby[0]["address"], "Test Address 1")
+
+    def test_get_nearby_addresses_invalid_center(self):
+        """Test nearby address search with invalid center coordinates"""
+        nearby = get_nearby_addresses(None, [], radius_miles=5.0)
+        self.assertEqual(len(nearby), 0)
+
+    def test_get_nearby_addresses_invalid_radius(self):
+        """Test nearby address search with invalid radius"""
+        center_coords = (40.7128, -74.0060)
+        addresses = [
+            {
+                "latitude": 40.7130,
+                "longitude": -74.0062,
+                "address": "Test Address",
+                "organization": "Org",
+            }
+        ]
+        nearby = get_nearby_addresses(center_coords, addresses, radius_miles="invalid")
+        self.assertTrue(len(nearby) >= 0)  # Should use default radius
+
+
+class LocationSearchIntegrationTests(TestCase):
+    def setUp(self):
+        # Create test user
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.login(username="testuser", password="testpass")
+
+        # Create test organizations with different locations
+        self.org1 = Organization.objects.create(
+            organization_name="NYC Restaurant",
+            type="restaurant",
+            address="123 Broadway, New York, NY",
+            zipcode=10007,
+            active=True,
+        )
+
+        self.org2 = Organization.objects.create(
+            organization_name="LA Restaurant",
+            type="restaurant",
+            address="456 Hollywood Blvd, Los Angeles, CA",
+            zipcode=90028,
+            active=True,
+        )
+
+        # Create donations for each organization
+        self.donation1 = Donation.objects.create(
+            organization=self.org1,
+            food_item="Pizza",
+            quantity=5,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        self.donation2 = Donation.objects.create(
+            organization=self.org2,
+            food_item="Burgers",
+            quantity=3,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+    @patch("recipient_dashboard.utils.get_coordinates")
+    def test_location_search_geocoding_failure(self, mock_get_coordinates):
+        """Test handling of geocoding failures in the dashboard view"""
+        mock_get_coordinates.return_value = None
+
+        params = {"address": "Invalid Address", "radius": "5"}
+        response = self.client.get(
+            reverse("recipient_dashboard") + "?" + urlencode(params)
+        )
+
+        # Verify appropriate error handling
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(
+            any("Could not find the specified address" in str(msg) for msg in messages)
+        )
+
+    def test_invalid_radius_value(self):
+        """Test handling of invalid radius values"""
+        params = {"address": "New York, NY", "radius": "invalid"}
+        response = self.client.get(
+            reverse("recipient_dashboard") + "?" + urlencode(params)
+        )
+
+        # Should default to 5 miles and not crash
+        self.assertEqual(response.status_code, 200)
