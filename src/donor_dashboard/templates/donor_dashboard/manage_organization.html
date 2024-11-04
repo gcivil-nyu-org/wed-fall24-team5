@@ -26,6 +26,8 @@ Manage Organization
         <div id="organization-id" hidden>{{ organization.organization_id }}</div>
         {% if owner_access %}
         <div class="buttons is-inline-block">
+            <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                class="button is-info">Messages</a>
             <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
                 class="button is-info">Manage Organization</a>
             <form id="delete-form" class="is-inline-block"
@@ -33,6 +35,11 @@ Manage Organization
                 {% csrf_token %}
                 <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
             </form>
+        </div>
+        {% else %}
+        <div class="buttons is-inline-block">
+            <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                class="button is-info">Messages</a>
         </div>
         {% endif %}
     </div>
@@ -98,7 +105,7 @@ Manage Organization
     </div>
 
     <!-- Content for List of Donations tab -->
-    <div id="donations-content">
+    <div id="donations-content" class="manage-tab">
         <div class="flex-container">
             <h2 class="subtitle mt-3"><strong>Donations</strong></h2>
             {% if status %}
@@ -158,7 +165,7 @@ Manage Organization
     </div>
 
     <!-- Content for Orders Received tab -->
-    <div id="orders-content" class="is-hidden">
+    <div id="orders-content" class="is-hidden manage-tab">
         <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
         {% if orders %}
         <div class="table-container">
@@ -203,7 +210,7 @@ Manage Organization
     </div>
 
     <!-- Content for My Reviews tab -->
-    <div id="reviews-content" class="tab-content is-hidden">
+    <div id="reviews-content" class="tab-content is-hidden manage-tab">
         <h2 class="subtitle mt-3"><strong>My Reviews</strong></h2>
         {% if reviews %}
         <div class="columns is-multiline is-variable is-3">
@@ -238,7 +245,6 @@ Manage Organization
         <p class="box">No reviews available at the moment.</p>
         {% endif %}
     </div>
-
 </div>
 
 <div id="addDonationModal" class="modal">

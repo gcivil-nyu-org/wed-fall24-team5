@@ -107,6 +107,7 @@ class Room(models.Model):
     )
     conversor_1_id = models.CharField(default=uuid.uuid4)
     conversor_1 = GenericForeignKey("conversor_1_type", "conversor_1_id")
+    conversor_1_name = models.CharField(max_length=255, null=True, blank=True)
 
     conversor_2_type = models.ForeignKey(
         ContentType,
@@ -116,6 +117,7 @@ class Room(models.Model):
     )
     conversor_2_id = models.CharField(default=uuid.uuid4)
     conversor_2 = GenericForeignKey("conversor_2_type", "conversor_2_id")
+    conversor_2_name = models.CharField(max_length=255, null=True, blank=True)
 
     def __str__(self):
         return self.room_name
