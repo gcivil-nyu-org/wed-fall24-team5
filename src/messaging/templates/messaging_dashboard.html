@@ -122,7 +122,7 @@
                 var chatContainer = document.getElementById("chatContainer");
                 chatContainer.scrollTop = chatContainer.scrollHeight;
             }
-            const websocketProtocol = window.location.protocol === "https:" ? "wss" : "ws";
+            const websocketProtocol = window.location.protocol === "https:" ? "ws" : "ws";
             const curr_roomId = "{{ curr_room.id }}";
             const wsEndpoint = `${websocketProtocol}://${window.location.host}/ws/chat/${curr_roomId}/`;
             const socket = new WebSocket(wsEndpoint);
