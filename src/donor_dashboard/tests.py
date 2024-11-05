@@ -3,7 +3,14 @@ from django.urls import reverse
 from django.contrib.auth import get_user_model
 from django.utils import timezone
 from django.contrib import messages
-from database.models import Organization, OrganizationAdmin, Donation, Order, UserReview, DietaryRestriction
+from database.models import (
+    Organization,
+    OrganizationAdmin,
+    Donation,
+    Order,
+    UserReview,
+    DietaryRestriction,
+)
 from donor_dashboard.forms import AddOrganizationForm
 
 
@@ -652,6 +659,7 @@ class OrganizationAdminViewsTestCase(TestCase):
             "Succesfully remove this org access to email: admin@example.com",
         )
 
+
 class DonorDashboardStatsTests(TestCase):
     def setUp(self):
         # Set up test data
@@ -762,8 +770,9 @@ class DonorDashboardStatsTests(TestCase):
         self.assertEqual(response_data["labels"][0], self.review.rating)
         self.assertEqual(response_data["data"][0], 1)
 
+
 class DietaryRestrictionTests(TestCase):
-     def setUp(self):
+    def setUp(self):
         # Set up test data
         User = get_user_model()
         self.user = User.objects.create_user(
