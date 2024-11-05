@@ -5,7 +5,7 @@ from django.contrib import messages
 from django.db.models import Q
 from django.utils import timezone
 from .forms import SearchDonationForm
-from django.db.models import Avg
+from django.db.models import Avg, Sum
 from .utils import get_coordinates, calculate_distance
 from django.core.cache import cache  # noqa
 
@@ -21,7 +21,7 @@ def recipient_dashboard(request):
     # Annotate each donation with the average rating
     donations = donations.annotate(
         avg_rating=Avg("organization__donation__userreview__rating")
-    ).order_by("created_at")
+    ).order_by("pickup_by")
 
     if form.is_valid():
         keyword = form.cleaned_data.get("keyword")
@@ -93,6 +93,8 @@ def recipient_dashboard(request):
 
                     # Create sorted list of donations and distances dictionary
                     sorted_donations = [item["donation"] for item in donation_distances]
+                    org_count = len(set(item.organization for item in sorted_donations))
+                    total_items = sum(item.quantity for item in sorted_donations)
                     distances = {
                         str(item["organization"].organization_id): item["distance"]
                         for item in donation_distances
@@ -103,6 +105,8 @@ def recipient_dashboard(request):
                         "form": form,
                         "donations": sorted_donations,
                         "distances": distances,
+                        "org_count": org_count,
+                        "total_items": total_items,
                     }
                     return render(
                         request, "recipient_dashboard/dashboard.html", context
@@ -113,10 +117,18 @@ def recipient_dashboard(request):
                 messages.warning(request, f"Error processing location search: {str(e)}")
                 print(f"Location search error details: {str(e)}")  # For debugging
 
+        org_count = donations.values("organization_id").distinct().count()
+        total_items = donations.aggregate(total=Sum("quantity"))["total"]
+
     return render(
         request,
         "recipient_dashboard/dashboard.html",
-        {"form": form, "donations": donations},
+        {
+            "form": form,
+            "donations": donations,
+            "org_count": org_count,
+            "total_items": total_items,
+        },
     )
 
 

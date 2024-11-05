@@ -2,77 +2,76 @@
 {% load dashboard_filters %}
 
 {% block title %}
-    Donation Dashboard
+Donation Dashboard
 {% endblock title %}
 
 {% block content %}
-    <div class="container">
-        {% include "partials/notifications.html" %}
-        <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <form method="get">
-            {% csrf_token %}
-            <div class="card">
-                <div class="card-content">
-                    <div class="columns is-multiline is-centered">
-                        <div class="column is-three-quarters">
-                            <div class="field has-addons has-addons-centered">
-                                <div class="control">{{ form.type }}</div>
-                                <div class="control is-expanded">{{ form.keyword }}</div>
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+    <form method="get">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-content">
+                <div class="columns is-multiline is-centered">
+                    <div class="column is-three-quarters">
+                        <div class="field has-addons has-addons-centered">
+                            <div class="control">{{ form.type }}</div>
+                            <div class="control is-expanded">{{ form.keyword }}</div>
+                        </div>
+                    </div>
+                    <div class="column is-one-quarter">
+                        <div class="field is-grouped is-grouped-centered">
+                            <div class="control">
+                                <button class="button is-info" type="submit">Search</button>
+                            </div>
+                            <div class="control">
+                                <a href="{% url 'recipient_dashboard' %}" class="button is-danger">Clear all</a>
                             </div>
                         </div>
-                        <div class="column is-one-quarter">
-                            <div class="field is-grouped is-grouped-centered">
-                                <div class="control">
-                                    <button class="button is-info" type="submit">Search</button>
-                                </div>
-                                <div class="control">
-                                    <a href="{% url 'recipient_dashboard' %}" class="button is-danger">Clear all</a>
-                                </div>
-                            </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Organization Type</label>
+                            <div class="control is-expanded">{{ form.category }}</div>
                         </div>
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Organization Type</label>
-                                <div class="control is-expanded">{{ form.category }}</div>
-                            </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Pickup Date After</label>
+                            <div class="control">{{ form.date }}</div>
                         </div>
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Pickup Date After</label>
-                                <div class="control">{{ form.date }}</div>
-                            </div>
+                    </div>
+                    <div class="column">
+                        <div class="field">
+                            <label class="label">Quantity Available</label>
+                            <div class="control">{{ form.min_quantity }}</div>
                         </div>
-                        <div class="column">
-                            <div class="field">
-                                <label class="label">Quantity Available</label>
-                                <div class="control">{{ form.min_quantity }}</div>
-                            </div>
-                        </div>
-                        <div class="column is-half">
-                            <div class="field">
-                                <label class="label">Location</label>
-                                <div class="columns is-mobile is-gapless mb-0">
-                                    <div class="column">
-                                        <div class="field has-addons">
-                                            <div class="control is-expanded">
-                                                {{ form.address }}
-                                            </div>
+                    </div>
+                    <div class="column is-half">
+                        <div class="field">
+                            <label class="label">Location</label>
+                            <div class="columns is-mobile is-gapless mb-0">
+                                <div class="column">
+                                    <div class="field has-addons">
+                                        <div class="control is-expanded">
+                                            {{ form.address }}
                                         </div>
                                     </div>
-                                    <div class="column is-narrow ml-3">
-                                        <button type="button" class="button is-info is-light" onclick="getUserLocation()">
-                                            <span class="icon">
-                                                <i class="fa fa-location-arrow"></i>
-                                            </span>
-                                            <span>Use My Location</span>
-                                        </button>
-                                    </div>
-                                    <div class="column is-narrow ml-3" style="margin-top: -33px;">
-                                        <div class="field">
-                                            <div class="control">
-                                                <label class="label">Radius</label>
-                                                {{ form.radius }}
-                                            </div>
+                                </div>
+                                <div class="column is-narrow ml-3">
+                                    <button type="button" class="button is-info is-light" onclick="getUserLocation()">
+                                        <span class="icon">
+                                            <i class="fa fa-location-arrow"></i>
+                                        </span>
+                                        <span>Use My Location</span>
+                                    </button>
+                                </div>
+                                <div class="column is-narrow ml-3" style="margin-top: -33px;">
+                                    <div class="field">
+                                        <div class="control">
+                                            <label class="label">Radius</label>
+                                            {{ form.radius }}
                                         </div>
                                     </div>
                                 </div>
@@ -81,117 +80,148 @@
                     </div>
                 </div>
             </div>
-        </form>
-        <h2 class="subtitle mt-5">
-            <strong>Available Donations</strong>
-        </h2>
-        {% if donations %}
-            <div class="columns is-multiline is-variable is-4">
-                {% for donation in donations %}
-                    <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                        <div class="card mb-5">
-                            <div class="card-content">
-                                <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                    <div class="media-content">
-                                        <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
-                                    </div>
-                                    <div class="media-right mt-2-mobile">
-                                        <span class="tag is-primary is-light is-medium mt-3">{{ donation.quantity }}
-                                        Available</span>
-                                    </div>
-                                </div>
-                                <div class="content">
-                                    <div class="columns is-flex-direction-column-mobile">
-                                        <div class="column is-two-thirds">
-                                            <a class="button is-link is-light is-fullwidth" 
-                                               style="white-space: normal; word-wrap: break-word; display: flex; flex-direction: column; align-items: flex-center;"
-                                               href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
-                                               target="_blank" rel="noopener noreferrer">
-                                                <span>{{ donation.organization.organization_name }}</span>
-                                                <span>{{ donation.organization.address }}</span>
-                                                {% if distances %}
-                                                    <span class="mt-1 has-text-weight-normal">
-                                                        <i class="fa fa-map-marker"></i>
-                                                        {{ distances|get_item:donation.organization.organization_id|floatformat:1 }} miles away
-                                                    </span>
-                                                {% endif %}
-                                                <!-- Rating Stars -->
-                                                <span class="mt-1">
-                                                    {% if donation.avg_rating %}
-                                                        {% with ""|center:5 as range %}
-                                                            {% for _ in range %}
-                                                                {% if forloop.counter <= donation.avg_rating %}
-                                                                    <i class="fa fa-star has-text-warning"></i>
-                                                                {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %}
-                                                                    <i class="fa fa-star-half-o has-text-warning"></i>
-                                                                {% else %}
-                                                                    <i class="fa fa-star-o has-text-warning"></i>
-                                                                {% endif %}
-                                                            {% endfor %}
-                                                        {% endwith %}
-                                                    {% else %}
-                                                        <span class="has-text-grey-light">
-                                                            <i class="fa fa-star-o"></i>
-                                                            No ratings
-                                                        </span>
-                                                    {% endif %}
-                                                </span>
-                                            </a>
-                                        </div>
-                                        <div class="column is-one-third has-text-centered">
-                                            <strong>Pickup by:</strong>
-                                            <p>{{ donation.pickup_by }}</p>
-                                        </div>
-                                    </div>
-                                </div>
+        </div>
+    </form>
+    <h2 class="subtitle mt-5">
+        <strong>Available Donations</strong>
+    </h2>
+    {% if donations %}
+    <nav class="columns is-variable is-3">
+        <div class="column is-full-mobile has-text-centered">
+            <div class="card pt-2 pb-2">
+                <div class="card-content">
+                    <p class="heading">Organizations</p>
+                    <p class="title">{{ org_count }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="column is-full-mobile has-text-centered">
+            <div class="card pt-2 pb-2">
+                <div class="card-content">
+                    <p class="heading">Donations</p>
+                    <p class="title">{{ donations|length }}</p>
+                </div>
+            </div>
+        </div>
+        <div class="column is-full-mobile has-text-centered">
+            <div class="card pt-2 pb-2">
+                <div class="card-content">
+                    <p class="heading">Total Items</p>
+                    <p class="title">{{ total_items }}</p>
+                </div>
+            </div>
+        </div>
+    </nav>
+    <div class="columns is-multiline is-variable is-4">
+        {% for donation in donations %}
+        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+            <div class="card mb-5">
+                <div class="card-content">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item">
+                                <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
                             </div>
-                            <footer class="card-footer has-text-weight-semibold has-background-white-ter">
-                                <a href="{% url 'reserve_donation' donation.donation_id %}"
-                                   class="card-footer-item">Reserve</a>
-                            </footer>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <span class="tag is-primary is-light is-medium mt-3">{{ donation.quantity }}
+                                    Available</span>
+                            </div>
                         </div>
                     </div>
-                {% endfor %}
+                    <div class="content">
+                        <div class="columns is-flex-direction-column-mobile">
+                            <div class="column is-two-thirds">
+                                <a class="button is-link is-light is-fullwidth"
+                                    style="white-space: normal; word-wrap: break-word; display: flex; flex-direction: column; align-items: flex-center;"
+                                    href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
+                                    target="_blank" rel="noopener noreferrer">
+                                    <span>{{ donation.organization.organization_name }}</span>
+                                    <span>{{ donation.organization.address }}</span>
+                                    {% if distances %}
+                                    <span class="mt-1 has-text-weight-normal">
+                                        <i class="fa fa-map-marker"></i>
+                                        {{ distances|get_item:donation.organization.organization_id|floatformat:1 }}
+                                        miles away
+                                    </span>
+                                    {% endif %}
+                                    <!-- Rating Stars -->
+                                    <span class="mt-1">
+                                        {% if donation.avg_rating %}
+                                        {% with ""|center:5 as range %}
+                                        {% for _ in range %}
+                                        {% if forloop.counter <= donation.avg_rating %} <i
+                                            class="fa fa-star has-text-warning"></i>
+                                            {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %} <i
+                                                class="fa fa-star-half-o has-text-warning"></i>
+                                                {% else %}
+                                                <i class="fa fa-star-o has-text-warning"></i>
+                                                {% endif %}
+                                                {% endfor %}
+                                                {% endwith %}
+                                                {% else %}
+                                                <span class="has-text-grey-light">
+                                                    <i class="fa fa-star-o"></i>
+                                                    No ratings
+                                                </span>
+                                                {% endif %}
+                                    </span>
+                                </a>
+                            </div>
+                            <div class="column is-one-third has-text-centered">
+                                <strong>Pickup by:</strong>
+                                <p>{{ donation.pickup_by }}</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <footer class="card-footer has-text-weight-semibold has-background-white-ter">
+                    <a href="{% url 'reserve_donation' donation.donation_id %}" class="card-footer-item">Reserve</a>
+                </footer>
             </div>
-        {% else %}
-            <p class="box">No donations available at the moment.</p>
-        {% endif %}
+        </div>
+        {% endfor %}
     </div>
+    {% else %}
+    <p class="box">No donations available at the moment.</p>
+    {% endif %}
+</div>
 
-    <script>
-        function getUserLocation() {
-            if ("geolocation" in navigator) {
-                navigator.geolocation.getCurrentPosition(function(position) {
-                    // Use reverse geocoding to get address from coordinates
-                    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`)
-                        .then(response => response.json())
-                        .then(data => {
-                            const addressInput = document.querySelector('input[name="address"]');
-                            if (addressInput) {
-                                addressInput.value = data.display_name;
-                                // Submit the form to update results
-                                addressInput.form.submit();
-                            }
-                        })
-                        .catch(error => {
-                            console.error('Error:', error);
-                            alert('Unable to get your location. Please enter an address manually.');
-                        });
-                }, function(error) {
-                    console.error('Error:', error);
-                    alert('Unable to get your location. Please enter an address manually.');
-                });
-            } else {
-                alert('Geolocation is not supported by your browser. Please enter an address manually.');
-            }
+<script>
+    function getUserLocation() {
+        if ("geolocation" in navigator) {
+            navigator.geolocation.getCurrentPosition(function (position) {
+                // Use reverse geocoding to get address from coordinates
+                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const addressInput = document.querySelector('input[name="address"]');
+                        if (addressInput) {
+                            addressInput.value = data.display_name;
+                            // Submit the form to update results
+                            addressInput.form.submit();
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error:', error);
+                        alert('Unable to get your location. Please enter an address manually.');
+                    });
+            }, function (error) {
+                console.error('Error:', error);
+                alert('Unable to get your location. Please enter an address manually.');
+            });
+        } else {
+            alert('Geolocation is not supported by your browser. Please enter an address manually.');
         }
+    }
 
-        // Auto-get location on page load if no address is entered
-        document.addEventListener('DOMContentLoaded', function() {
-            const addressInput = document.querySelector('input[name="address"]');
-            if (addressInput && !addressInput.value) {
-                getUserLocation();
-            }
-        });
-    </script>
+    // Auto-get location on page load if no address is entered
+    document.addEventListener('DOMContentLoaded', function () {
+        const addressInput = document.querySelector('input[name="address"]');
+        if (addressInput && !addressInput.value) {
+            getUserLocation();
+        }
+    });
+</script>
 {% endblock content %}

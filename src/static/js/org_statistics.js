@@ -62,7 +62,12 @@ function renderOrderStatusChart() {
                     labels: data.labels,
                     datasets: [{
                         label: 'Order Statuses',
-                        data: data.data
+                        data: data.data,
+                        backgroundColor: [
+                            'rgb(75, 192, 192)',
+                            'rgb(255, 205, 86)',
+                            'rgb(255, 99, 132)'
+                        ]
                     }]
                 },
                 options: {
@@ -73,7 +78,7 @@ function renderOrderStatusChart() {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(data) {
+                                label: function (data) {
                                     return `${data.label}: ${data.raw}`;
                                 }
                             }
@@ -142,20 +147,30 @@ function renderRatingsChart() {
                     labels: data.labels,
                     datasets: [{
                         label: 'Ratings',
-                        data: data.data
+                        data: data.data,
+                        backgroundColor: [
+                            'rgb(201, 203, 207)',
+                            'rgb(255, 99, 132)',
+                            'rgb(255, 205, 86)',
+                            'rgb(54, 162, 235)',
+                            'rgb(75, 192, 192)'
+                        ]
                     }]
                 },
                 options: {
                     responsive: true,
                     scales: {
                         r: {
-                          pointLabels: {
-                            display: true,
-                            centerPointLabels: true,
-                            font: {
-                              size: 14
+                            pointLabels: {
+                                display: true,
+                                centerPointLabels: true,
+                                font: {
+                                    size: 14
+                                }
+                            },
+                            ticks: {
+                                beginAtZero: true
                             }
-                          }
                         }
                     },
                     plugins: {
@@ -164,8 +179,8 @@ function renderRatingsChart() {
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(data) {
-                                    return `${data.label}: ${data.raw}`;
+                                label: function (data) {
+                                    return `Rating ${data.label}: ${data.raw}`;
                                 }
                             }
                         }

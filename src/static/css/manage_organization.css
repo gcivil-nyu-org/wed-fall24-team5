@@ -59,3 +59,8 @@
     border-radius: 1rem;
     padding: 8px;
 }
+
+.cell-content {
+    max-height: 350px;
+    overflow-y: scroll;
+}
