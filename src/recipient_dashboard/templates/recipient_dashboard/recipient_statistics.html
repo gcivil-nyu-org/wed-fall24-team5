@@ -1,0 +1,88 @@
+{% extends "_base.html" %}
+{% block title %}
+User Statistics
+{% endblock title %}
+{% load static %}
+{% block content %}
+<div class="container">
+    <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{% url 'recipient_dashboard' %}">
+                    <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                    <span>Dashboard</span>
+                </a></li>
+            <li class="is-active">
+                <a href="#" aria-current="page">Statistics Dashboard</a>
+            </li>
+        </ul>
+    </nav>
+    <h1 class="title mt-3">
+        <strong>Welcome, {{ user.first_name }} {{ user.last_name }}!</strong>
+    </h1>
+    <h2 class="subtitle mt-2">Your Statistics Dashboard</h2>
+    <div class="fixed-grid has-4-cols has-2-cols-mobile is-gap-3">
+        <div class="grid">
+            <div class="cell has-text-centered">
+                <div class="card pt-2 pb-2">
+                    <div class="card-content">
+                        <p class="heading">Your Total Orders</p>
+                        <p class="title">{{ orders.count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cell has-text-centered">
+                <div class="card pt-2 pb-2">
+                    <div class="card-content">
+                        <p class="heading">Your Organizations</p>
+                        <p class="title">{{ organizations.count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cell has-text-centered">
+                <div class="card pt-2 pb-2">
+                    <div class="card-content">
+                        <p class="heading">Average Rating Given</p>
+                        <p class="title">{{ rating }} / 5</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cell has-text-centered">
+                <div class="card pt-2 pb-2">
+                    <div class="card-content">
+                        <p class="heading">Your Donations</p>
+                        <p class="title">{{ donations.count }}</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cell is-col-span-2">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title is-size-5">Total Orders</p>
+                    </header>
+                    <div class="card-content">
+                        <canvas id="userOrdersChart"
+                            data-url="{% url 'statistics_user_orders' %}"
+                            width="75%"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="cell is-col-span-2">
+                <div class="card">
+                    <header class="card-header">
+                        <p class="card-header-title is-size-5">Total Donations</p>
+                    </header>
+                    <div class="card-content">
+                        <canvas id="userDonationsChart"
+                            data-url="{% url 'statistics_user_donations' %}"
+                            width="75%"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="{% static 'js/user_statistics.js' %}"></script>
+{% endblock content %}

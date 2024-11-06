@@ -46,7 +46,7 @@ Organization Statistics
                 <div class="card pt-2 pb-2">
                     <div class="card-content">
                         <p class="heading">Average Rating</p>
-                        <p class="title">{{ rating.rating__avg }} / 5</p>
+                        <p class="title">{{ rating|floatformat }} / 5</p>
                     </div>
                 </div>
             </div>
@@ -61,7 +61,9 @@ Organization Statistics
             <div class="cell is-col-span-2">
                 <div class="card">
                     <header class="card-header">
-                        <p class="card-header-title is-size-5">Total Orders</p>
+                        <p class="card-header-title is-size-5">
+                            Total Orders <span class="tag is-info is-rounded ml-3">{{ orders.count }}</span>
+                        </p>
                     </header>
                     <div class="card-content">
                         <canvas id="ordersChart"
@@ -87,7 +89,7 @@ Organization Statistics
                     <header class="card-header">
                         <p class="card-header-title is-size-5">Recent Activity</p>
                     </header>
-                    <div class="card-content">
+                    <div class="card-content" style="max-height: 750px; overflow-y: scroll;">
                         {% if activity_feed %}
                         {% for activity in activity_feed %}
                         <article class="media">
@@ -121,7 +123,15 @@ Organization Statistics
                             <div class="media-content">
                                 <div class="content">
                                     <p>
-                                        <strong>Review left for <span class="has-text-primary">{{ activity.donation.food_item }}</span></strong>
+                                        <strong>
+                                            <span class="icon-text">
+                                            <span>{{ activity.rating }}</span>
+                                            <span class="icon"><i class="fa fa-star"></i></span>
+                                        </span> Review left for
+                                            <span class="has-text-primary">
+                                                {{ activity.donation.food_item }}
+                                            </span>
+                                        </strong>
                                         <br/>
                                         <small>{{ activity.created_at }}</small>
                                     </p>
@@ -139,7 +149,9 @@ Organization Statistics
             <div class="cell is-col-span-2">
                 <div class="card">
                     <header class="card-header">
-                        <p class="card-header-title is-size-5">Total Donations</p>
+                        <p class="card-header-title is-size-5">
+                            Total Donations <span class="tag is-info is-rounded ml-3">{{ donations.count }}</span>
+                        </p>
                     </header>
                     <div class="card-content">
                         <canvas id="donationsChart"
@@ -151,7 +163,9 @@ Organization Statistics
             <div class="cell">
                 <div class="card">
                     <header class="card-header">
-                        <p class="card-header-title is-size-5">Ratings</p>
+                        <p class="card-header-title is-size-5">
+                            Ratings <span class="tag is-info is-rounded ml-3">{{ reviews.count }}</span>
+                        </p>
                     </header>
                     <div class="card-content">
                         <canvas id="ratingsChart"

@@ -1,11 +1,19 @@
-from database.models import Donation, Order
+from database.models import (
+    Donation,
+    Order,
+    User,
+    Organization,
+    UserReview,
+    OrganizationAdmin,
+)
 from django.shortcuts import get_object_or_404, render, redirect
+from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from django.db.models import Q
+from django.db.models import Q, Avg, Sum, Count
+from django.db.models.functions import TruncDate
 from django.utils import timezone
 from .forms import SearchDonationForm
-from django.db.models import Avg
 from .utils import get_coordinates, calculate_distance
 from django.core.cache import cache  # noqa
 
@@ -21,7 +29,7 @@ def recipient_dashboard(request):
     # Annotate each donation with the average rating
     donations = donations.annotate(
         avg_rating=Avg("organization__donation__userreview__rating")
-    ).order_by("created_at")
+    ).order_by("pickup_by")
 
     if form.is_valid():
         keyword = form.cleaned_data.get("keyword")
@@ -93,6 +101,8 @@ def recipient_dashboard(request):
 
                     # Create sorted list of donations and distances dictionary
                     sorted_donations = [item["donation"] for item in donation_distances]
+                    org_count = len(set(item.organization for item in sorted_donations))
+                    total_items = sum(item.quantity for item in sorted_donations)
                     distances = {
                         str(item["organization"].organization_id): item["distance"]
                         for item in donation_distances
@@ -103,6 +113,8 @@ def recipient_dashboard(request):
                         "form": form,
                         "donations": sorted_donations,
                         "distances": distances,
+                        "org_count": org_count,
+                        "total_items": total_items,
                     }
                     return render(
                         request, "recipient_dashboard/dashboard.html", context
@@ -113,10 +125,18 @@ def recipient_dashboard(request):
                 messages.warning(request, f"Error processing location search: {str(e)}")
                 print(f"Location search error details: {str(e)}")  # For debugging
 
+    org_count = donations.values("organization_id").distinct().count()
+    total_items = donations.aggregate(total=Sum("quantity"))["total"]
+
     return render(
         request,
         "recipient_dashboard/dashboard.html",
-        {"form": form, "donations": donations},
+        {
+            "form": form,
+            "donations": donations,
+            "org_count": org_count,
+            "total_items": total_items,
+        },
     )
 
 
@@ -156,3 +176,70 @@ def reserve_donation(request, donation_id):
     except Exception:
         messages.warning(request, "Unable to reserve donation. Try again later.")
         return redirect("recipient_dashboard")
+
+
+@login_required
+def recipient_stats(request):
+    user = User.objects.get(email=request.user.email)
+    organizations = Organization.objects.filter(organizationadmin__user=user)
+    reviews = UserReview.objects.filter(user=user)
+    donations = Donation.objects.filter(organization__in=organizations)
+    orders = Order.objects.filter(user=user)
+    rating = reviews.aggregate(avg=Avg("rating"))["avg"]
+    return render(
+        request,
+        "recipient_dashboard/recipient_statistics.html",
+        {
+            "organizations": organizations,
+            "donations": donations,
+            "orders": orders,
+            "reviews": reviews,
+            "rating": rating,
+        },
+    )
+
+
+@login_required
+def statistics_user_orders(request):
+    user = User.objects.get(email=request.user.email)
+    orders = Order.objects.filter(user=user)
+    orders_data = (
+        orders.annotate(date=TruncDate("order_created_at"))
+        .values("date")
+        .annotate(order_count=Count("order_id"))
+        .order_by("date")
+    )
+    dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
+    orders_counts = [entry["order_count"] for entry in orders_data]
+
+    return JsonResponse(
+        data={
+            "labels": dates,
+            "data": orders_counts,
+        }
+    )
+
+
+@login_required
+def statistics_user_donations(request):
+    user = User.objects.get(email=request.user.email)
+    org_admins = OrganizationAdmin.objects.filter(user=user).values_list(
+        "organization", flat=True
+    )
+    organizations = Organization.objects.filter(organization_id__in=org_admins)
+    donations = Donation.objects.filter(organization__in=organizations)
+    donations_data = (
+        donations.annotate(date=TruncDate("created_at"))
+        .values("date")
+        .annotate(donation_count=Count("donation_id"))
+        .order_by("date")
+    )
+    dates = [entry["date"].strftime("%Y-%m-%d") for entry in donations_data]
+    donations_counts = [entry["donation_count"] for entry in donations_data]
+
+    return JsonResponse(
+        data={
+            "labels": dates,
+            "data": donations_counts,
+        }
+    )

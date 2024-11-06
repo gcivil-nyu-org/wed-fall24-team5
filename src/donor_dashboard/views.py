@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Avg, Count, F, Value
-from django.db.models.functions import ExtractMonth, TruncDate
+from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
 from .helpers import validate_donation
 import csv
 from itertools import chain
@@ -53,7 +53,7 @@ def get_org_info(request, organization_id):
         .order_by("modified_at")
         .values("rating", "comment")
     )
-    rating = reviews.aggregate(Avg("rating"))
+    rating = reviews.aggregate(avg=Avg("rating"))["avg"]
     num_users = orders.values("user").distinct().count()
 
     return donations, orders, reviews, rating, num_users
@@ -162,7 +162,7 @@ def manage_organization(request, organization_id):
             .order_by("modified_at")
             .values("rating", "comment")
         )
-        rating = reviews.aggregate(Avg("rating"))
+        rating = reviews.aggregate(avg=Avg("rating"))["avg"]
         num_users = orders.values("user").distinct().count()
         return render(
             request,
@@ -302,8 +302,6 @@ def statistics_orders(request, organization_id):
     orders = Order.objects.filter(donation__organization=organization).prefetch_related(
         "donation"
     )
-    # today = timezone.now().date()
-    # days = [(today - timedelta(days=i)).strftime('%A') for i in range(6, -1, -1)]
     orders_data = (
         orders.annotate(date=TruncDate("order_created_at"))
         .values("date")
@@ -312,11 +310,6 @@ def statistics_orders(request, organization_id):
     )
     dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
-    # for i in range(6, -1, -1):
-    #     day = today - timedelta(days=i)
-    #     # Orders for each day in the past week
-    #     order_count = orders.filter(order_created_at=day).count()
-    #     orders_data.append(order_count)
 
     return JsonResponse(
         data={
@@ -332,18 +325,25 @@ def statistics_orders_status(request, organization_id):
     orders = Order.objects.filter(donation__organization=organization).prefetch_related(
         "donation"
     )
-    orders_status_data = (
-        orders.values("order_status")
-        .annotate(order_count=Count("order_id"))
-        .order_by("order_status")
+    statuses = {
+        "picked_up": "Picked Up",
+        "pending": "Pending",
+        "canceled": "Canceled",
+    }
+    orders_status_data = orders.values("order_status").annotate(
+        order_count=Count("order_id")
     )
-    statuses = [entry["order_status"] for entry in orders_status_data]
-    orders_status_counts = [entry["order_count"] for entry in orders_status_data]
+
+    status_counts_dict = {
+        item["order_status"]: item["order_count"] for item in orders_status_data
+    }
+    order_statuses = [statuses[status] for status in statuses.keys()]
+    data = [status_counts_dict.get(order_status, 0) for order_status in statuses.keys()]
 
     return JsonResponse(
         data={
-            "labels": statuses,
-            "data": orders_status_counts,
+            "labels": order_statuses,
+            "data": data,
         }
     )
 
@@ -381,16 +381,21 @@ def statistics_ratings(request, organization_id):
     )
     ratings_data = (
         reviews.values("rating")
-        .annotate(rating_count=Count("review_id"))
+        .annotate(rating_count=Coalesce(Count("review_id"), Value(0)))
         .order_by("rating")
     )
-    ratings = [entry["rating"] for entry in ratings_data]
-    ratings_counts = [entry["rating_count"] for entry in ratings_data]
+    # ratings = [entry["rating"] for entry in ratings_data]
+    # ratings_counts = [entry["rating_count"] for entry in ratings_data]
+    all_ratings = {i: 0 for i in range(1, 6)}
+    for entry in ratings_data:
+        rating = entry["rating"]
+        count = entry["rating_count"]
+        all_ratings[rating] = count
 
     return JsonResponse(
         data={
-            "labels": ratings,
-            "data": ratings_counts,
+            "labels": list(all_ratings.keys()),
+            "data": list(all_ratings.values()),
         }
     )
 

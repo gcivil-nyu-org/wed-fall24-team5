@@ -69,6 +69,10 @@
     padding: 8px;
 }
 
+.cell-content {
+    max-height: 350px;
+    overflow-y: scroll;
+
 /***** Orders dropdown styles *****/
 .orders-dropdown {
     position: relative;
