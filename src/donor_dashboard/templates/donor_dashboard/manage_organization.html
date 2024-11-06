@@ -1,86 +1,83 @@
 {% extends "_base.html" %}
 {% block title %}
-    Manage Organization
+Manage Organization
 {% endblock title %}
 {% load static %}
 {% block content %}
-    <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
-    <script src="{% static 'js/manage_organization.js' %}"></script>
-    <div class="container">
-        {% include "partials/notifications.html" %}
-        <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
-            <ul>
-                <li>
-                    <a href="{% url 'donor_dashboard:org_list' %}">
-                        <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
-                        <span>Organizations</span>
-                    </a>
-                </li>
-                <li class="is-active">
-                    <a href="#" aria-current="page">{{ organization.organization_name }}</a>
-                </li>
-            </ul>
-        </nav>
-        <div class="flex-container is-justify-content-space-between is-align-items-center">
-            <h2 class="subtitle mt-5">
-                <strong>{{ organization.organization_name }}</strong>
-            </h2>
-            <div id="organization-id" hidden>{{ organization.organization_id }}</div>
-            {% if owner_access %}
-                <div class="buttons is-inline-block">
-                    <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
-                       class="button is-info">Messages</a>
-                    <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
-                       class="button is-info">Manage Organization</a>
-                    <form id="delete-form"
-                          class="is-inline-block"
-                          action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}"
-                          method="post">
-                        {% csrf_token %}
-                        <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
-                    </form>
-                </div>
-            {% else %}
-                <div class="buttons is-inline-block">
-                    <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
-                       class="button is-info">Messages</a>
-                </div>
-            {% endif %}
+<link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
+<script src="{% static 'js/manage_organization.js' %}"></script>
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
+        <ul>
+            <li>
+                <a href="{% url 'donor_dashboard:org_list' %}">
+                    <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                    <span>Organizations</span>
+                </a>
+            </li>
+            <li class="is-active">
+                <a href="#" aria-current="page">{{ organization.organization_name }}</a>
+            </li>
+        </ul>
+    </nav>
+    <div class="flex-container is-justify-content-space-between is-align-items-center">
+        <h2 class="subtitle mt-5">
+            <strong>{{ organization.organization_name }}</strong>
+        </h2>
+        <div id="organization-id" hidden>{{ organization.organization_id }}</div>
+        {% if owner_access %}
+        <div class="buttons is-inline-block">
+            <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                class="button is-info">Messages</a>
+            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
+                class="button is-info">Manage Organization</a>
+            <form id="delete-form" class="is-inline-block"
+                action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
+                {% csrf_token %}
+                <button type="button" class="button is-danger" onclick="confirmDelete()">Delete Organization</button>
+            </form>
         </div>
-        <!-- Statistics -->
-        <nav class="level">
-            <div class="level-left">
-                <div class="level-item">
-                    <h2 class="subtitle">
-                        <strong>Statistics</strong>
-                    </h2>
-                </div>
-                <div class="level-item ml-3">
-                    <a href="{% url 'donor_dashboard:organization_statistics' organization.organization_id %}"
-                       class="icon-text has-text-link">
-                        <span>View All</span>
-                        <span class="icon">
-                            <i class="fa fa-arrow-right"></i>
-                        </span>
-                    </a>
+        {% else %}
+        <div class="buttons is-inline-block">
+            <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                class="button is-info">Messages</a>
+        </div>
+        {% endif %}
+    </div>
+    <!-- Statistics -->
+    <nav class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="subtitle">
+                    <strong>Statistics</strong>
+                </h2>
+            </div>
+            <div class="level-item ml-3">
+                <a href="{% url 'donor_dashboard:organization_statistics' organization.organization_id %}"
+                    class="icon-text has-text-link">
+                    <span>View All</span>
+                    <span class="icon">
+                        <i class="fa fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <nav class="columns is-variable is-4">
+        <div class="column is-full-mobile has-text-centered">
+            <div class="card pt-2 pb-2">
+                <div class="card-content">
+                    <p class="heading">Total Donations</p>
+                    <p class="title">{{ donations.count }}</p>
                 </div>
             </div>
-        </nav>
-        <nav class="columns is-variable is-4">
-            <div class="column is-full-mobile has-text-centered">
-                <div class="card pt-2 pb-2">
-                    <div class="card-content">
-                        <p class="heading">Total Donations</p>
-                        <p class="title">{{ donations.count }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="column is-full-mobile has-text-centered">
-                <div class="card pt-2 pb-2">
-                    <div class="card-content">
-                        <p class="heading">Total Orders</p>
-                        <p class="title">{{ orders.count }}</p>
-                    </div>
+        </div>
+        <div class="column is-full-mobile has-text-centered">
+            <div class="card pt-2 pb-2">
+                <div class="card-content">
+                    <p class="heading">Total Orders</p>
+                    <p class="title">{{ orders.count }}</p>
                 </div>
             </div>
         </div>
@@ -91,262 +88,259 @@
                     <p class="title">{{ rating|floatformat }} / 5</p>
                 </div>
             </div>
-            <div class="column is-full-mobile has-text-centered">
-                <div class="card pt-2 pb-2">
-                    <div class="card-content">
-                        <p class="heading">Unique Orderers</p>
-                        <p class="title">{{ num_users }}</p>
-                    </div>
+        </div>
+        <div class="column is-full-mobile has-text-centered">
+            <div class="card pt-2 pb-2">
+                <div class="card-content">
+                    <p class="heading">Unique Orderers</p>
+                    <p class="title">{{ num_users }}</p>
                 </div>
             </div>
-        </nav>
-        <!-- Tab navigation -->
-        <div class="tabs is-centered is-toggle is-fullwidth mt-3">
-            <ul>
-                <li id="donations-tab">
-                    <a>Donations</a>
-                </li>
-                <li id="orders-tab">
-                    <a>Orders</a>
-                </li>
-                <li id="reviews-tab">
-                    <a>Reviews</a>
-                </li>
-            </ul>
         </div>
-        <!-- Content for List of Donations tab -->
-        <div id="donations-content" class="manage-tab">
-            {% if status %}
-                <div class="buttons">
-                    <button id="add-donation-button" class="button is-dark">Add Donation</button>
-                </div>
-            {% else %}
-                <div class="media-right">
-                    <span class="tag is-primary is-light is-medium mt-1">In Active</span>
-                </div>
-            {% endif %}
-            {% if donations %}
-                <div class="columns is-multiline is-variable is-4">
-                    {% for donation in donations %}
-                        <div class="column is-full-mobile is-half-tablet is-half-desktop">
-                            <div class="card mb-5">
-                                <div class="card-content">
-                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                        <div class="media-content">
-                                            <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
-                                        </div>
-                                        <div class="media-right mt-2-mobile">
-                                            <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }} Available</span>
-                                        </div>
-                                    </div>
-                                    <div class="content">
-                                        <div class="columns is-flex-direction-column-mobile">
-                                            <div class="column is-one-third has-text-centered">
-                                                <strong>Pickup by:</strong>
-                                                <p>{{ donation.pickup_by }}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <footer class="card-footer">
-                                    <a href="#"
-                                       class="card-footer-item edit-link"
-                                       data-id="{{ donation.donation_id }}"
-                                       data-food-item="{{ donation.food_item }}"
-                                       data-quantity="{{ donation.quantity }}"
-                                       data-pickup-by="{{ donation.pickup_by|date:'Y-m-d' }}"
-                                       data-organization-id="{{ donation.organization.organization_id }}">Modify</a>
-                                    <form class="card-footer-item"
-                                          method="post"
-                                          action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}"
-                                          id="delete-form-{{ donation.donation_id }}">
-                                        {% csrf_token %}
-                                        <a class="delete-link is-danger"
-                                           onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
-                                    </form>
-                                </footer>
-                            </div>
-                        </div>
-                    {% endfor %}
-                </div>
-            {% else %}
-                <p class="box">No donations available at the moment.</p>
-            {% endif %}
-        </div>
-        <!-- Content for Orders Received tab -->
-        <div id="orders-content" class="is-hidden manage-tab">
-            {% if orders %}
-                {% regroup orders by donation.donation_id as food_item_orders %}
-                {% for group in food_item_orders %}
-                    <div class="orders-dropdown mb-3">
-                        <button class="orders-dropdown-trigger button is-fullwidth is-info is-light"
-                                aria-haspopup="true">
-                            <span class="is-flex is-align-items-center is-flex-wrap-wrap">
-                                <h3 class="mr-2 is-size-5">{{ group.list.0.donation.food_item }}</h3>
-                                <span class="tag is-white is-size-6">Deadline: {{ group.list.0.donation.pickup_by }}</span>
-                            </span>
-                            <span class="icon is-small">
-                                <i class="fa fa-angle-down"></i>
-                            </span>
-                        </button>
-                        <div class="orders-dropdown-content p-4 mt-2">
-                            <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
-                                <div class="grid">
-                                    {% for order in group.list %}
-                                        <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between"
-                                             style="height: 100%">
-                                            <div>
-                                                <div class="is-size-5">{{ order.user.first_name }} {{ order.user.last_name }}</div>
-                                                <div class="tag my-1 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved</div>
-                                                <!-- Display dietary restrictions -->
-                                                <div class="mt-2">
-                                                    <strong>Dietary Restrictions:</strong>
-                                                    {% if order.user.dietary_restrictions %}
-                                                        <ul>
-                                                            {% for restriction in order.user.dietary_restrictions %}<li>{{ restriction.restriction }}</li>{% endfor %}
-                                                        </ul>
-                                                    {% else %}
-                                                        <ul>
-                                                            <li>None</li>
-                                                        </ul>
-                                                    {% endif %}
-                                                </div>
-                                            </div>
-                                            <!-- Status and button at the bottom -->
-                                            <div>
-                                                <div class="tag is-info my-2 is-size-6 is-primary is-light">
-                                                    Current Status:
-                                                    {% if order.order_status == "pending" %}
-                                                        Pending
-                                                    {% else %}
-                                                        Complete
-                                                    {% endif %}
-                                                </div>
-                                                <br>
-                                                <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
-                                                   class="button is-small is-rounded is-info is-light is-outlined">
-                                                    {% if order.order_status == "pending" %}
-                                                        Mark as complete
-                                                    {% else %}
-                                                        Mark as pending
-                                                    {% endif %}
-                                                </a>
-                                            </div>
-                                        </div>
-                                    {% endfor %}
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                {% endfor %}
-            {% else %}
-                <p class="box">No orders to display.</p>
-            {% endif %}
-        </div>
-        <!-- Content for My Reviews tab -->
-        <div id="reviews-content" class="tab-content is-hidden manage-tab">
-            {% if donations %}
-                {% for donation in donations %}
-                    {% if donation.userreview_set.all %}
-                        <div class="donation-dropdown mb-3">
-                            <button class="donation-dropdown-trigger button is-fullwidth is-info is-light"
-                                    aria-haspopup="true">
-                                <span class="is-flex is-align-items-center is-flex-wrap-wrap">
-                                    <h3 class="mr-2 is-size-5">{{ donation.food_item }}</h3>
-                                    <span class="tag is-white is-size-6">Pickup By: {{ donation.pickup_by }}</span>
-                                </span>
-                                <span class="icon is-small">
-                                    <i class="fa fa-angle-down"></i>
-                                </span>
-                            </button>
-                            <!-- dropdown content -->
-                            <div class="donation-dropdown-content p-4 mt-2 is-hidden">
-                                <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
-                                    <div class="grid">
-                                        {% for review in donation.userreview_set.all %}
-                                            <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between"
-                                                 style="height: 100%">
-                                                <div>
-                                                    <div class="tag my-1 is-size-6 is-primary is-light">
-                                                        <!-- Rating Stars -->
-                                                        {% if review.rating %}
-                                                            {% with ""|center:5 as range %}
-                                                                {% for _ in range %}
-                                                                    {% if forloop.counter <= review.rating %}
-                                                                        <i class="fa fa-star has-text-warning"></i>
-                                                                    {% else %}
-                                                                        <i class="fa fa-star-o has-text-warning"></i>
-                                                                    {% endif %}
-                                                                {% endfor %}
-                                                            {% endwith %}
-                                                        {% else %}
-                                                            <span class="has-text-grey-light">
-                                                                <i class="fa fa-star-o"></i>
-                                                                No ratings
-                                                            </span>
-                                                        {% endif %}
-                                                    </div>
-                                                    <div class="mt-2">
-                                                        <strong>Comment:</strong>
-                                                        <p>{{ review.comment }}</p>
-                                                    </div>
-                                                </div>
-                                                <div>
-                                                    <div class="tag is-info my-2 is-size-6 is-primary is-light">Reviewed on: {{ review.created_at|date:"F j, Y" }}</div>
-                                                </div>
-                                            </div>
-                                        {% endfor %}
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% endfor %}
-            {% else %}
-                <p class="box">No donations to display.</p>
-            {% endif %}
-        </div>
-        <div id="addDonationModal" class="modal">
-            <div class="modal-content">
-                <span class="close" name="modal-close" id="closeModal">X</span>
-                <h2 id="modal-header">Add a Donation</h2>
-                <hr>
-                <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
-                    {% csrf_token %}
-                    <!-- Donation Form Fields -->
-                    <div class="field">
-                        <label class="label">Food Item</label>
-                        <div class="control">
-                            <input class="input" type="text" name="food_item" placeholder="Food item">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Quantity</label>
-                        <div class="control">
-                            <input class="input" type="number" name="quantity" placeholder="Quantity">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <label class="label">Pickup By</label>
-                        <div class="control">
-                            <input class="input" type="date" name="pickup_by">
-                        </div>
-                    </div>
-                    <div class="field" hidden>
-                        <label class="label">Organization</label>
-                        <div class="control">
-                            <input type="hidden"
-                                   name="organization"
-                                   value="{{ organization.organization_id }}">
-                        </div>
-                    </div>
-                    <div class="field">
-                        <div class="control">
-                            <button type="submit" class="button is-primary">Submit</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
-        </div>
-    {% endblock content %}
+    </nav>
+    <!-- Tab navigation -->
+    <div class="tabs is-centered is-toggle is-fullwidth mt-3">
+        <ul>
+            <li id="donations-tab">
+                <a>Donations</a>
+            </li>
+            <li id="orders-tab">
+                <a>Orders</a>
+            </li>
+            <li id="reviews-tab">
+                <a>Reviews</a>
+            </li>
+        </ul>
     </div>
+    <!-- Content for List of Donations tab -->
+    <div id="donations-content" class="manage-tab">
+        {% if status %}
+        <div class="buttons">
+            <button id="add-donation-button" class="button is-dark">Add Donation</button>
+        </div>
+        {% else %}
+        <div class="media-right">
+            <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+        </div>
+        {% endif %}
+        {% if donations %}
+        <div class="columns is-multiline is-variable is-4">
+            {% for donation in donations %}
+            <div class="column is-full-mobile is-half-tablet is-half-desktop">
+                <div class="card mb-5">
+                    <div class="card-content">
+                        <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
+                            <div class="media-content">
+                                <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                            </div>
+                            <div class="media-right mt-2-mobile">
+                                <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
+                                    Available</span>
+                            </div>
+                        </div>
+                        <div class="content">
+                            <div class="columns is-flex-direction-column-mobile">
+                                <div class="column is-one-third has-text-centered">
+                                    <strong>Pickup by:</strong>
+                                    <p>{{ donation.pickup_by }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <footer class="card-footer">
+                        <a href="#" class="card-footer-item edit-link" data-id="{{ donation.donation_id }}"
+                            data-food-item="{{ donation.food_item }}" data-quantity="{{ donation.quantity }}"
+                            data-pickup-by="{{ donation.pickup_by|date:'Y-m-d' }}"
+                            data-organization-id="{{ donation.organization.organization_id }}">Modify</a>
+                        <form class="card-footer-item" method="post"
+                            action="{% url 'donor_dashboard:delete_donation' donation.donation_id %}"
+                            id="delete-form-{{ donation.donation_id }}">
+                            {% csrf_token %}
+                            <a class="delete-link is-danger"
+                                onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
+                        </form>
+                    </footer>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <p class="box">No donations available at the moment.</p>
+        {% endif %}
+    </div>
+    <!-- Content for Orders Received tab -->
+    <div id="orders-content" class="is-hidden manage-tab">
+        {% if orders %}
+        {% regroup orders by donation.donation_id as food_item_orders %}
+        {% for group in food_item_orders %}
+        <div class="orders-dropdown mb-3">
+            <button class="orders-dropdown-trigger button is-fullwidth is-info is-light" aria-haspopup="true">
+                <span class="is-flex is-align-items-center is-flex-wrap-wrap">
+                    <h3 class="mr-2 is-size-5">{{ group.list.0.donation.food_item }}</h3>
+                    <span class="tag is-white is-size-6">Deadline: {{ group.list.0.donation.pickup_by }}</span>
+                </span>
+                <span class="icon is-small">
+                    <i class="fa fa-angle-down"></i>
+                </span>
+            </button>
+            <div class="orders-dropdown-content p-4 mt-2">
+                <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
+                    <div class="grid">
+                        {% for order in group.list %}
+                        <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between"
+                            style="height: 100%">
+                            <div>
+                                <div class="is-size-5">{{ order.user.first_name }} {{ order.user.last_name }}</div>
+                                <div class="tag my-1 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved
+                                </div>
+                                <!-- Display dietary restrictions -->
+                                <div class="mt-2">
+                                    <strong>Dietary Restrictions:</strong>
+                                    {% if order.user.dietary_restrictions %}
+                                    <ul>
+                                        {% for restriction in order.user.dietary_restrictions %}<li>{{
+                                            restriction.restriction }}</li>{% endfor %}
+                                    </ul>
+                                    {% else %}
+                                    <ul>
+                                        <li>None</li>
+                                    </ul>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <!-- Status and button at the bottom -->
+                            <div>
+                                <div class="tag is-info my-2 is-size-6 is-primary is-light">
+                                    Current Status:
+                                    {% if order.order_status == "pending" %}
+                                    Pending
+                                    {% else %}
+                                    Complete
+                                    {% endif %}
+                                </div>
+                                <br>
+                                <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
+                                    class="button is-small is-rounded is-info is-light is-outlined">
+                                    {% if order.order_status == "pending" %}
+                                    Mark as complete
+                                    {% else %}
+                                    Mark as pending
+                                    {% endif %}
+                                </a>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p class="box">No orders to display.</p>
+        {% endif %}
+    </div>
+    <!-- Content for My Reviews tab -->
+    <div id="reviews-content" class="tab-content is-hidden manage-tab">
+        {% if donations %}
+        {% for donation in donations %}
+        {% if donation.userreview_set.all %}
+        <div class="donation-dropdown mb-3">
+            <button class="donation-dropdown-trigger button is-fullwidth is-info is-light" aria-haspopup="true">
+                <span class="is-flex is-align-items-center is-flex-wrap-wrap">
+                    <h3 class="mr-2 is-size-5">{{ donation.food_item }}</h3>
+                    <span class="tag is-white is-size-6">Pickup By: {{ donation.pickup_by }}</span>
+                </span>
+                <span class="icon is-small">
+                    <i class="fa fa-angle-down"></i>
+                </span>
+            </button>
+            <!-- dropdown content -->
+            <div class="donation-dropdown-content p-4 mt-2 is-hidden">
+                <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
+                    <div class="grid">
+                        {% for review in donation.userreview_set.all %}
+                        <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between"
+                            style="height: 100%">
+                            <div>
+                                <div class="tag my-1 is-size-6 is-primary is-light">
+                                    <!-- Rating Stars -->
+                                    {% if review.rating %}
+                                    {% with ""|center:5 as range %}
+                                    {% for _ in range %}
+                                    {% if forloop.counter <= review.rating %} <i class="fa fa-star has-text-warning">
+                                        </i>
+                                        {% else %}
+                                        <i class="fa fa-star-o has-text-warning"></i>
+                                        {% endif %}
+                                        {% endfor %}
+                                        {% endwith %}
+                                        {% else %}
+                                        <span class="has-text-grey-light">
+                                            <i class="fa fa-star-o"></i>
+                                            No ratings
+                                        </span>
+                                        {% endif %}
+                                </div>
+                                <div class="mt-2">
+                                    <strong>Comment:</strong>
+                                    <p>{{ review.comment }}</p>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="tag is-info my-2 is-size-6 is-primary is-light">Reviewed on: {{
+                                    review.created_at|date:"F j, Y" }}</div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <p class="box">No donations to display.</p>
+        {% endif %}
+    </div>
+    <div id="addDonationModal" class="modal">
+        <div class="modal-content">
+            <span class="close" name="modal-close" id="closeModal">X</span>
+            <h2 id="modal-header">Add a Donation</h2>
+            <hr>
+            <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
+                {% csrf_token %}
+                <!-- Donation Form Fields -->
+                <div class="field">
+                    <label class="label">Food Item</label>
+                    <div class="control">
+                        <input class="input" type="text" name="food_item" placeholder="Food item">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Quantity</label>
+                    <div class="control">
+                        <input class="input" type="number" name="quantity" placeholder="Quantity">
+                    </div>
+                </div>
+                <div class="field">
+                    <label class="label">Pickup By</label>
+                    <div class="control">
+                        <input class="input" type="date" name="pickup_by">
+                    </div>
+                </div>
+                <div class="field" hidden>
+                    <label class="label">Organization</label>
+                    <div class="control">
+                        <input type="hidden" name="organization" value="{{ organization.organization_id }}">
+                    </div>
+                </div>
+                <div class="field">
+                    <div class="control">
+                        <button type="submit" class="button is-primary">Submit</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock content %}
