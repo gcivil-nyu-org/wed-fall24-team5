@@ -128,8 +128,8 @@ def manage_organization(request, organization_id):
             organization_id=organization.organization_id, active=True
         ).prefetch_related(
             Prefetch(
-                'userreview_set',
-                queryset=UserReview.objects.filter(active=True).order_by('modified_at')
+                "userreview_set",
+                queryset=UserReview.objects.filter(active=True).order_by("modified_at"),
             )
         )
 
