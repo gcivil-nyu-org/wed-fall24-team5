@@ -1,41 +1,3 @@
-// Handle the dropdowns
-document.addEventListener('DOMContentLoaded', function () {
-    // Get all dropdown buttons
-    const dropdownButtons = document.querySelectorAll('.orders-dropdown-trigger');
-
-    dropdownButtons.forEach(button => {
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            const dropdownContent = this.closest('.orders-dropdown').querySelector('.orders-dropdown-content');
-
-            // Close all other dropdowns
-            document.querySelectorAll('.orders-dropdown-content').forEach(content => {
-                if (content !== dropdownContent) {
-                    content.classList.remove('is-active');
-                }
-            });
-
-            // Toggle current dropdown
-            dropdownContent.classList.toggle('is-active');
-
-            // Toggle button active state
-            this.classList.toggle('is-active');
-        });
-    });
-
-    // Close dropdowns when clicking outside
-    document.addEventListener('click', function (e) {
-        if (!e.target.closest('.orders-dropdown')) {
-            document.querySelectorAll('.orders-dropdown-content').forEach(content => {
-                content.classList.remove('is-active');
-            });
-            document.querySelectorAll('.orders-dropdown-trigger').forEach(trigger => {
-                trigger.classList.remove('is-active');
-            });
-        }
-    });
-});
-
 document.addEventListener("DOMContentLoaded", function () {
     const tabs = document.querySelectorAll('.tabs ul li');
     const tabContents = document.querySelectorAll('.manage-tab');
@@ -82,6 +44,21 @@ document.addEventListener("DOMContentLoaded", function () {
             localStorage.setItem('activeTab', tab.id);
         });
     });
+
+    // Toggle dropdowns for donations with reviews
+    const donationDropdowns = document.querySelectorAll('.donation-dropdown-trigger');
+
+    donationDropdowns.forEach(trigger => {
+        trigger.addEventListener('click', function () {
+            const content = this.nextElementSibling;
+            const icon = this.querySelector('.icon i');
+
+            content.classList.toggle('is-hidden');
+            icon.classList.toggle('fa-angle-down');
+            icon.classList.toggle('fa-angle-up');
+        });
+    });
+
 
     // Existing code for modals, delete confirmation, etc.
     var addDonationButton = document.getElementById("add-donation-button");
