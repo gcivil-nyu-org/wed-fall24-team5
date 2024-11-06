@@ -1,7 +1,7 @@
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from django.urls import reverse
-from database.models import Donation, Organization, Order
+from database.models import Donation, Organization, Order, OrganizationAdmin, UserReview
 from django.utils import timezone  # for pickup date being tomorrow in tests
 from datetime import timedelta  # for pickup date being tomorrow in tests
 from django.contrib.messages import get_messages  # to capture messages
@@ -704,3 +704,78 @@ class LocationSearchIntegrationTests(TestCase):
 
         # Should default to 5 miles and not crash
         self.assertEqual(response.status_code, 200)
+
+
+class RecipientDashboardStatsTests(TestCase):
+    def setUp(self):
+        # Set up test data
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="password",
+        )
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user, organization=self.organization, access_level="owner"
+        )
+        self.client.login(email="testuser@example.com", password="password")
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        self.review = UserReview.objects.create(
+            donation=self.donation,
+            user=self.user,
+            rating=4,
+            comment="Test review",
+            active=True,
+        )
+
+    def test_stat_view(self):
+        response = self.client.get(reverse("recipient_stats"))
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(
+            response, "recipient_dashboard/recipient_statistics.html"
+        )
+        self.assertEqual(response.context["organizations"][0], self.organization)
+        self.assertEqual(response.context["donations"][0], self.donation)
+        self.assertEqual(response.context["reviews"][0], self.review)
+        self.assertEqual(response.context["orders"][0], self.order)
+        self.assertEqual(response.context["rating"], self.review.rating)
+
+    def test_stat_orders(self):
+        response = self.client.get(reverse("statistics_user_orders"))
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(
+            response_data["labels"][0], self.order.order_created_at.strftime("%Y-%m-%d")
+        )
+        self.assertEqual(response_data["data"][0], 1)
+
+    def test_stat_donations(self):
+        response = self.client.get(reverse("statistics_user_donations"))
+        self.assertEqual(response.status_code, 200)
+        response_data = response.json()
+        self.assertEqual(
+            response_data["labels"][0], self.donation.created_at.strftime("%Y-%m-%d")
+        )
+        self.assertEqual(response_data["data"][0], 1)
