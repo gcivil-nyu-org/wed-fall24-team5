@@ -15,7 +15,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Avg, Count, F, Value
-from django.db.models.functions import ExtractWeek, ExtractMonth, TruncDate, Coalesce
+from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
 from .helpers import validate_donation
 import csv
 from itertools import chain
