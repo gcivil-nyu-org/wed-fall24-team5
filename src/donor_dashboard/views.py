@@ -13,7 +13,7 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Avg, Count, F, Value
-from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
+from django.db.models.functions import ExtractWeek, ExtractMonth, TruncDate, Coalesce
 from .helpers import validate_donation
 import csv
 from itertools import chain
@@ -273,8 +273,6 @@ def statistics_orders(request, organization_id):
     orders = Order.objects.filter(donation__organization=organization).prefetch_related(
         "donation"
     )
-    # today = timezone.now().date()
-    # days = [(today - timedelta(days=i)).strftime('%A') for i in range(6, -1, -1)]
     orders_data = (
         orders.annotate(date=TruncDate("order_created_at"))
         .values("date")
@@ -283,11 +281,6 @@ def statistics_orders(request, organization_id):
     )
     dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
-    # for i in range(6, -1, -1):
-    #     day = today - timedelta(days=i)
-    #     # Orders for each day in the past week
-    #     order_count = orders.filter(order_created_at=day).count()
-    #     orders_data.append(order_count)
 
     return JsonResponse(
         data={
@@ -327,6 +320,34 @@ def statistics_orders_status(request, organization_id):
 
 
 @login_required
+def statistics_donations_orders(request, organization_id):
+    organization = Organization.objects.get(organization_id=organization_id)
+    donations = (
+        Donation.objects.filter(
+            organization_id=organization.organization_id, active=True
+        )
+        .annotate(order_count=Count("order"), date=TruncDate("created_at"))
+        .order_by("food_item")
+    )
+    names = [donation.food_item for donation in donations]
+    data = [donation.order_count for donation in donations]
+
+    return JsonResponse(
+        {
+            "data": {
+                "labels": names,
+                "datasets": [
+                    {
+                        "label": "Amount",
+                        "data": data,
+                    }
+                ],
+            },
+        }
+    )
+
+
+@login_required
 def statistics_donations(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
     donations = Donation.objects.filter(
@@ -344,6 +365,48 @@ def statistics_donations(request, organization_id):
     return JsonResponse(
         data={
             "labels": dates,
+            "data": donations_counts,
+        }
+    )
+
+
+@login_required
+def statistics_filter(request, organization_id):
+    filter_type = request.GET.get("filter", "all")
+    organization = Organization.objects.get(organization_id=organization_id)
+    donations = Donation.objects.filter(
+        organization_id=organization.organization_id, active=True
+    )
+    if filter_type == "month":
+        donations_data = (
+            donations.annotate(period=ExtractMonth("created_at"))
+            .values("month")
+            .annotate(donation_count=Count("donation_id"))
+            .values("month", "donation_count")
+            .order_by("month")
+        )
+    elif filter_type == "week":
+        donations_data = (
+            donations.annotate(period=ExtractWeek("created_at"))
+            .values("week")
+            .annotate(donation_count=Count("donation_id"))
+            .values("week", "donation_count")
+            .order_by("week")
+        )
+    else:
+        donations_data = (
+            donations.annotate(period=TruncDate("created_at"))
+            .values("period")
+            .annotate(donation_count=Count("donation_id"))
+            .order_by("period")
+        )
+
+    periods = [entry["period"].strftime("%Y-%m-%d") for entry in donations_data]
+    donations_counts = [entry["donation_count"] for entry in donations_data]
+
+    return JsonResponse(
+        data={
+            "labels": periods,
             "data": donations_counts,
         }
     )

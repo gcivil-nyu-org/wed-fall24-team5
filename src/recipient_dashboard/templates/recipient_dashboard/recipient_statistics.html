@@ -1,19 +1,15 @@
 {% extends "_base.html" %}
 {% block title %}
-Organization Statistics
+User Statistics
 {% endblock title %}
 {% load static %}
 {% block content %}
 <div class="container">
     <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
         <ul>
-            <li><a href="{% url 'donor_dashboard:org_list' %}">
-                    <span class="icon is-small"><i class="fa fa-angle-double-left" aria-hidden="true"></i></span>
-                    <span>Organizations</span>
-                </a></li>
-            <li><a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}">
+            <li><a href="{% url 'recipient_dashboard' %}">
                     <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
-                    <span>{{ organization.organization_name }}</span>
+                    <span>Dashboard</span>
                 </a></li>
             <li class="is-active">
                 <a href="#" aria-current="page">Statistics Dashboard</a>
@@ -21,23 +17,15 @@ Organization Statistics
         </ul>
     </nav>
     <h1 class="title mt-3">
-        <strong>{{ organization.organization_name }}</strong>
+        <strong>Welcome, {{ user.first_name }} {{ user.last_name }}!</strong>
     </h1>
-    <h2 class="subtitle mt-2">Statistics Dashboard</h2>
+    <h2 class="subtitle mt-2">Your Statistics Dashboard</h2>
     <div class="fixed-grid has-4-cols has-2-cols-mobile is-gap-3">
         <div class="grid">
             <div class="cell has-text-centered">
                 <div class="card pt-2 pb-2">
                     <div class="card-content">
-                        <p class="heading">Total Donations</p>
-                        <p class="title">{{ donations.count }}</p>
-                    </div>
-                </div>
-            </div>
-            <div class="cell has-text-centered">
-                <div class="card pt-2 pb-2">
-                    <div class="card-content">
-                        <p class="heading">Total Orders</p>
+                        <p class="heading">Your Total Orders</p>
                         <p class="title">{{ orders.count }}</p>
                     </div>
                 </div>
@@ -45,16 +33,24 @@ Organization Statistics
             <div class="cell has-text-centered">
                 <div class="card pt-2 pb-2">
                     <div class="card-content">
-                        <p class="heading">Average Rating</p>
-                        <p class="title">{{ rating.rating__avg }} / 5</p>
+                        <p class="heading">Your Organizations</p>
+                        <p class="title">{{ organizations.count }}</p>
                     </div>
                 </div>
             </div>
             <div class="cell has-text-centered">
                 <div class="card pt-2 pb-2">
                     <div class="card-content">
-                        <p class="heading">Unique Customers</p>
-                        <p class="title">{{ num_users }}</p>
+                        <p class="heading">Average Rating Given</p>
+                        <p class="title">{{ rating }} / 5</p>
+                    </div>
+                </div>
+            </div>
+            <div class="cell has-text-centered">
+                <div class="card pt-2 pb-2">
+                    <div class="card-content">
+                        <p class="heading">Your Donations</p>
+                        <p class="title">{{ donations.count }}</p>
                     </div>
                 </div>
             </div>
@@ -64,75 +60,9 @@ Organization Statistics
                         <p class="card-header-title is-size-5">Total Orders</p>
                     </header>
                     <div class="card-content">
-                        <canvas id="ordersChart"
-                            data-url="{% url 'donor_dashboard:statistics_orders' organization.organization_id %}"
+                        <canvas id="userOrdersChart"
+                            data-url="{% url 'statistics_user_orders' %}"
                             width="75%"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="cell">
-                <div class="card pb-5">
-                    <header class="card-header">
-                        <p class="card-header-title is-size-5">Order Statuses</p>
-                    </header>
-                    <div class="card-content">
-                        <canvas id="orderSuccessChart"
-                            data-url="{% url 'donor_dashboard:statistics_orders_status' organization.organization_id %}"
-                            width="75%"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="cell is-row-span-2">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title is-size-5">Recent Activity</p>
-                    </header>
-                    <div class="card-content">
-                        {% if activity_feed %}
-                        {% for activity in activity_feed %}
-                        <article class="media">
-                            {% if activity.type == "Order" %}
-                            <figure class="media-left">
-                                <span class="icon is-medium has-text-primary">
-                                    <span class="fa-stack fa-sm">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-tag fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </span>
-                            </figure>
-                            <div class="media-content">
-                                <div class="content">
-                                    <p>
-                                        <strong>Order placed for <span class="has-text-primary">{{ activity.donation.food_item }}</span></strong>
-                                        <br/>
-                                        <small>{{ activity.order_created_at }}</small>
-                                    </p>
-                                </div>
-                            </div>
-                            {% elif activity.type == "Review" %}
-                            <figure class="media-left">
-                                <span class="icon is-medium has-text-primary">
-                                    <span class="fa-stack fa-sm">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-comment fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </span>
-                            </figure>
-                            <div class="media-content">
-                                <div class="content">
-                                    <p>
-                                        <strong>Review left for <span class="has-text-primary">{{ activity.donation.food_item }}</span></strong>
-                                        <br/>
-                                        <small>{{ activity.created_at }}</small>
-                                    </p>
-                                </div>
-                            </div>
-                            {% endif %}
-                        </article>
-                        {% endfor %}
-                        {% else %}
-                        <p>No activity yet...</p>
-                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -142,20 +72,8 @@ Organization Statistics
                         <p class="card-header-title is-size-5">Total Donations</p>
                     </header>
                     <div class="card-content">
-                        <canvas id="donationsChart"
-                            data-url="{% url 'donor_dashboard:statistics_donations' organization.organization_id %}"
-                            width="75%"></canvas>
-                    </div>
-                </div>
-            </div>
-            <div class="cell">
-                <div class="card">
-                    <header class="card-header">
-                        <p class="card-header-title is-size-5">Ratings</p>
-                    </header>
-                    <div class="card-content">
-                        <canvas id="ratingsChart"
-                            data-url="{% url 'donor_dashboard:statistics_ratings' organization.organization_id %}"
+                        <canvas id="userDonationsChart"
+                            data-url="{% url 'statistics_user_donations' %}"
                             width="75%"></canvas>
                     </div>
                 </div>
@@ -166,5 +84,5 @@ Organization Statistics
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
-<script src="{% static 'js/org_statistics.js' %}"></script>
+<script src="{% static 'js/user_statistics.js' %}"></script>
 {% endblock content %}

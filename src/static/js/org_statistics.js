@@ -1,17 +1,25 @@
 $(document).ready(function () {
-    renderOrdersChart();
-    renderOrderStatusChart();
-    renderDonationsChart();
-    renderRatingsChart();
+    ordersChart = renderOrdersChart();
+    orderStatusChart = renderOrderStatusChart();
+    donationsChart = renderDonationsChart();
+    ratingsChart = renderRatingsChart();
+
+    $("#donationsFilter").on("change", (event) => {
+        event.preventDefault();
+    
+        const filter = this.value;
+        const organization_id = this.getAttribute("data-org-id");
+        updateChart(donationsChart, filter, organization_id);
+    });
 });
 
 function renderOrdersChart() {
-    var $ordersChart = $("#ordersChart");
+    var $ordersChartCtx = $("#ordersChart");
     $.ajax({
-        url: $ordersChart.data("url"),
+        url: $ordersChartCtx.data("url"),
         success: function (data) {
-            var ctx = $ordersChart[0].getContext("2d");
-            new Chart(ctx, {
+            var ctx = $ordersChartCtx[0].getContext("2d");
+            return new Chart(ctx, {
                 type: "bar",
                 data: {
                     labels: data.labels,
@@ -51,12 +59,12 @@ function renderOrdersChart() {
 }
 
 function renderOrderStatusChart() {
-    var $orderSuccessChart = $("#orderSuccessChart");
+    var $orderStatusChartCtx = $("#orderSuccessChart");
     $.ajax({
-        url: $orderSuccessChart.data("url"),
+        url: $orderStatusChartCtx.data("url"),
         success: function (data) {
-            var ctx = $orderSuccessChart[0].getContext("2d");
-            new Chart(ctx, {
+            var ctx = $orderStatusChartCtx[0].getContext("2d");
+            return new Chart(ctx, {
                 type: "doughnut",
                 data: {
                     labels: data.labels,
@@ -91,12 +99,12 @@ function renderOrderStatusChart() {
 }
 
 function renderDonationsChart() {
-    var $donationsChart = $("#donationsChart");
+    var $donationsChartCtx = $("#donationsChart");
     $.ajax({
-        url: $donationsChart.data("url"),
+        url: $donationsChartCtx.data("url"),
         success: function (data) {
-            var ctx = $donationsChart[0].getContext("2d");
-            new Chart(ctx, {
+            var ctx = $donationsChartCtx[0].getContext("2d");
+            return new Chart(ctx, {
                 type: "bar",
                 data: {
                     labels: data.labels,
@@ -136,12 +144,12 @@ function renderDonationsChart() {
 }
 
 function renderRatingsChart() {
-    var $ratingsChart = $("#ratingsChart");
+    var $ratingsChartCtx = $("#ratingsChart");
     $.ajax({
-        url: $ratingsChart.data("url"),
+        url: $ratingsChartCtx.data("url"),
         success: function (data) {
-            var ctx = $ratingsChart[0].getContext("2d");
-            new Chart(ctx, {
+            var ctx = $ratingsChartCtx[0].getContext("2d");
+            return new Chart(ctx, {
                 type: "polarArea",
                 data: {
                     labels: data.labels,
@@ -191,60 +199,23 @@ function renderRatingsChart() {
     });
 }
 
-// const organization_id = "{{ organization_id }}";
+function updateChart(chart, filter, organization_id) {
+    params = {"filter": filter}
+    endpoint = reverse("donor_dashboard:statistics_filter", args=[organization_id]) + "?" + urlencode(params)
+    $.ajax({
+        url: endpoint,
+        success: function (data) {
+            chart.data.labels = [];
+            chart.data.datasets = [];
+            chart.data.labels = data.labels;
+            chart.data.datasets[0].data = data.data;
+            chart.update();
+        }
+    })
+}
 
-// $(document).ready(function () {
-//     $.ajax({
-//         url: "/donor_dashboard/statistics/filter_statistics/",
-//         type: "GET",
-//         dataType: "json",
-//         success: (jsonResponse) => {
-//             // Load all the options
-//             jsonResponse.options.forEach(option => {
-//                 $("#month").append(new Option(option, option));
-//             });
-//             // Load data for the first option
-//             loadAllCharts($("#month").children().first().val());
-//         },
-//         error: () => console.log("Failed to fetch chart filter options!")
-//     });
-// });
-
-// $("#filterForm").on("submit", (event) => {
-//     event.preventDefault();
-
-//     const month = $("#month").val();
-//     loadAllCharts(month)
-// });
-
-// function loadChart(chart, endpoint) {
-//     $.ajax({
-//         url: endpoint,
-//         type: "GET",
-//         dataType: "json",
-//         success: (jsonResponse) => {
-//             // Extract data from the response
-//             const title = jsonResponse.title;
-//             const labels = jsonResponse.data.labels;
-//             const datasets = jsonResponse.data.datasets;
-
-//             // Reset the current chart
-//             chart.data.datasets = [];
-//             chart.data.labels = [];
-
-//             // Load new data into the chart
-//             chart.options.title.text = title;
-//             chart.options.title.display = true;
-//             chart.data.labels = labels;
-//             datasets.forEach(dataset => {
-//                 chart.data.datasets.push(dataset);
-//             });
-//             chart.update();
-//         },
-//         error: () => console.log("Failed to fetch chart data from " + endpoint + "!")
-//     });
-// }
-
-// function loadAllCharts(month) {
-//     loadChart(ordersChart, `/donor_dashboard/statistics/${organization_id}/orders/${month}/`);
-// }
+document.getElementById("donationsFilter").addEventListener("change", function() {
+    const filter = this.value;
+    const organization_id = this.getAttribute("data-org-id");
+    updateChart(donationsChart, filter, organization_id);
+});

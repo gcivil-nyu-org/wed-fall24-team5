@@ -82,9 +82,21 @@ Donation Dashboard
             </div>
         </div>
     </form>
-    <h2 class="subtitle mt-5">
-        <strong>Available Donations</strong>
-    </h2>
+    <nav class="level mt-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h2 class="subtitle"><strong>Available Donations</strong></h2>
+            </div>
+            <div class="level-item ml-3">
+                <a href="{% url 'recipient_stats' %}" class="icon-text has-text-link">
+                    <span>View My Stats</span>
+                    <span class="icon">
+                        <i class="fa fa-arrow-right"></i>
+                    </span>
+                </a>
+            </div>
+        </div>
+    </nav>
     {% if donations %}
     <nav class="columns is-variable is-3">
         <div class="column is-full-mobile has-text-centered">
