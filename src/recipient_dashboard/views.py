@@ -125,8 +125,8 @@ def recipient_dashboard(request):
                 messages.warning(request, f"Error processing location search: {str(e)}")
                 print(f"Location search error details: {str(e)}")  # For debugging
 
-        org_count = donations.values("organization_id").distinct().count()
-        total_items = donations.aggregate(total=Sum("quantity"))["total"]
+    org_count = donations.values("organization_id").distinct().count()
+    total_items = donations.aggregate(total=Sum("quantity"))["total"]
 
     return render(
         request,

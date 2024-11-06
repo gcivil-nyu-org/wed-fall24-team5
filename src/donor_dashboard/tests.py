@@ -734,8 +734,9 @@ class DonorDashboardStatsTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
-        self.assertEqual(response_data["labels"][0], self.order.order_status)
-        self.assertEqual(response_data["data"][0], 1)
+        labels = ["Picked Up", "Pending", "Canceled"]
+        self.assertEqual(response_data["labels"], labels)
+        self.assertEqual(response_data["data"][1], 1)
 
     def test_stat_donations(self):
         response = self.client.get(
@@ -760,5 +761,6 @@ class DonorDashboardStatsTests(TestCase):
         )
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
-        self.assertEqual(response_data["labels"][0], self.review.rating)
-        self.assertEqual(response_data["data"][0], 1)
+        labels = [1, 2, 3, 4, 5]
+        self.assertEqual(response_data["labels"], labels)
+        self.assertEqual(response_data["data"][3], 1)
