@@ -114,7 +114,6 @@
                     <span class="tag is-primary is-light is-medium mt-1">In Active</span>
                 </div>
             {% endif %}
-            <h2 class="subtitle mt-3">List of Donations:</h2>
             {% if donations %}
                 <div class="columns is-multiline is-variable is-4">
                     {% for donation in donations %}
@@ -165,7 +164,6 @@
         </div>
         <!-- Content for Orders Received tab -->
         <div id="orders-content" class="is-hidden manage-tab">
-            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
             {% if orders %}
                 {% regroup orders by donation.donation_id as food_item_orders %}
                 {% for group in food_item_orders %}
@@ -239,42 +237,50 @@
         </div>
         <!-- Content for My Reviews tab -->
         <div id="reviews-content" class="tab-content is-hidden manage-tab">
-            <h2 class="subtitle mt-3"><strong>My Reviews</strong></h2>
-            {% if reviews %}
-                <div class="columns is-multiline is-variable is-3">
-                    {% for review in reviews %}
-                        <div class="column">
-                            <div class="card mb-5">
-                                <div class="card-content">
-                                    <div class="media is-flex is-justify-content-space-between is-flex-direction-column-mobile">
-                                        <div class="media-content">
-                                            <p class="is-5 is-clipped">{{ review.comment }}</p>
-                                        </div>
-                                        <div class="media-right mt-2-mobile">
-                                            <span class="tag is-primary is-light is-medium mt-1">
-                                                <!-- Rating Stars -->
-                                                {% with ""|center:5 as range %}
-                                                    {% for _ in range %}
-                                                        {% if forloop.counter <= review.rating %}
-                                                            <i class="fa fa-star"></i>
-                                                        {% else %}
-                                                            <i class="fa fa-star-o"></i>
-                                                        {% endif %}
-                                                    {% endfor %}
-                                                {% endwith %}
-                                            </span>
-                                        </div>
+            {% if donations %}
+                {% for donation in donations %}
+                    {% if donation.userreview_set.all %}
+                        <div class="donation-dropdown mb-3">
+                            <button class="donation-dropdown-trigger button is-fullwidth is-info is-light"
+                                    aria-haspopup="true">
+                                <span class="is-flex is-align-items-center is-flex-wrap-wrap">
+                                    <h3 class="mr-2 is-size-5">{{ donation.food_item }}</h3>
+                                    <span class="tag is-white is-size-6">Pickup By: {{ donation.pickup_by }}</span>
+                                </span>
+                                <span class="icon is-small">
+                                    <i class="fa fa-angle-down"></i>
+                                </span>
+                            </button>
+                            <!-- dropdown content -->
+                            <div class="donation-dropdown-content p-4 mt-2 is-hidden">
+                                <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
+                                    <div class="grid">
+                                        {% for review in donation.userreview_set.all %}
+                                            <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%;">
+                                                <div>
+                                                    <div class="is-size-5">{{ review.user.first_name }} {{ review.user.last_name }}</div>
+                                                    <div class="tag my-1 is-size-6 is-primary is-light">Rating: {{ review.rating }}</div>
+                                                    
+                                                    <div class="mt-2">
+                                                        <strong>Comment:</strong>
+                                                        <p>{{ review.comment }}</p>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <div class="tag is-info my-2 is-size-6 is-primary is-light">Reviewed on: {{ review.created_at|date:"F j, Y" }}</div>
+                                                </div>
+                                            </div>
+                                        {% endfor %}
                                     </div>
                                 </div>
                             </div>
                         </div>
-                    {% endfor %}
-                </div>
+                    {% endif %}
+                {% endfor %}
             {% else %}
-                <p class="box">No reviews available at the moment.</p>
-            {% endif %}
+                <p class="box">No donations to display.</p>
+            {% endif %}      
         </div>
-    </div>
     <div id="addDonationModal" class="modal">
         <div class="modal-content">
             <span class="close" name="modal-close" id="closeModal">X</span>

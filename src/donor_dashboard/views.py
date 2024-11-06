@@ -123,9 +123,15 @@ def manage_organization(request, organization_id):
         else:
             owner_access = False
 
+        # Fetch donations with related reviews
         donations = Donation.objects.filter(
             organization_id=organization.organization_id, active=True
-        ).order_by("donation_id")
+        ).prefetch_related(
+            Prefetch(
+                'userreview_set',
+                queryset=UserReview.objects.filter(active=True).order_by('modified_at')
+            )
+        )
 
         # Prefetch orders and dietary restrictions for each user
         orders = (

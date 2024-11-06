@@ -117,3 +117,21 @@
 .table th:not(:last-child) {
     padding-right: 1.5em;
 }
+
+/***** Reviews dropdown styles *****/
+.donation-dropdown {
+    position: relative;
+    width: 100%;
+}
+
+.donation-dropdown-trigger {
+    width: 100%;
+    text-align: left;
+    justify-content: space-between;
+    padding: 1rem;
+}
+
+.donation-dropdown-trigger.is-active {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+}
