@@ -45,6 +45,21 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     });
 
+    // Toggle dropdowns for donations with reviews
+    const donationDropdowns = document.querySelectorAll('.donation-dropdown-trigger');
+
+    donationDropdowns.forEach(trigger => {
+        trigger.addEventListener('click', function () {
+            const content = this.nextElementSibling;
+            const icon = this.querySelector('.icon i');
+
+            content.classList.toggle('is-hidden');
+            icon.classList.toggle('fa-angle-down');
+            icon.classList.toggle('fa-angle-up');
+        });
+    });
+
+
     // Existing code for modals, delete confirmation, etc.
     var addDonationButton = document.getElementById("add-donation-button");
     if (addDonationButton) {

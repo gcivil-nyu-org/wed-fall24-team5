@@ -1,5 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404  # noqa
+from django.db.models import Prefetch
 from database.models import (
+    DietaryRestriction,
     Organization,
     OrganizationAdmin,
     User,
@@ -120,12 +122,40 @@ def manage_organization(request, organization_id):
             owner_access = True
         else:
             owner_access = False
+
+        # Fetch donations with related reviews
         donations = Donation.objects.filter(
             organization_id=organization.organization_id, active=True
+        ).prefetch_related(
+            Prefetch(
+                "userreview_set",
+                queryset=UserReview.objects.filter(active=True).order_by("modified_at"),
+            )
         )
-        orders = Order.objects.filter(
-            donation__organization=organization
-        ).prefetch_related("donation")
+
+        # Prefetch orders and dietary restrictions for each user
+        orders = (
+            Order.objects.filter(donation__organization=organization)
+            .prefetch_related(
+                "donation",
+                "user",
+                Prefetch(
+                    "user__dietaryrestriction_set",
+                    queryset=DietaryRestriction.objects.all(),
+                    to_attr="dietary_restrictions",
+                ),
+            )
+            .order_by("donation__donation_id")
+        )
+
+        # Process dietary restrictions to replace underscores and apply title case
+        for order in orders:
+            if hasattr(order.user, "dietary_restrictions"):
+                for restriction in order.user.dietary_restrictions:
+                    restriction.restriction = restriction.restriction.replace(
+                        "_", " "
+                    ).title()
+
         status = organization.active
         reviews = (
             UserReview.objects.filter(donation__organization=organization)
@@ -134,7 +164,6 @@ def manage_organization(request, organization_id):
         )
         rating = reviews.aggregate(avg=Avg("rating"))["avg"]
         num_users = orders.values("user").distinct().count()
-
         return render(
             request,
             "donor_dashboard/manage_organization.html",
