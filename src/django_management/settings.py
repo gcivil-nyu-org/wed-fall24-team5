@@ -106,7 +106,10 @@ ASGI_APPLICATION = "django_management.asgi.application"
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "channels.layers.InMemoryChannelLayer",
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("YOUR_REDIS_ENDPOINT", 6379)],  # replace with your Redis endpoint
+        },
     },
 }
 
