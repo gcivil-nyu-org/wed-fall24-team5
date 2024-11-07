@@ -22,7 +22,7 @@ Manage Organization
         </ul>
     </nav>
     <div class="flex-container is-justify-content-space-between is-align-items-center">
-        <h2 class="subtitle mt-5">
+        <h2 class="title mt-5">
             <strong>{{ organization.organization_name }}</strong>
         </h2>
         <div id="organization-id" hidden>{{ organization.organization_id }}</div>
@@ -183,12 +183,11 @@ Manage Organization
                     <i class="fa fa-angle-down"></i>
                 </span>
             </button>
-            <div class="orders-dropdown-content p-4 mt-2">
+            <div class="orders-dropdown-content p-4 mt-2 is-hidden">
                 <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
                     <div class="grid">
                         {% for order in group.list %}
-                        <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between"
-                            style="height: 100%">
+                        <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%">
                             <div>
                                 <div class="is-size-5">{{ order.user.first_name }} {{ order.user.last_name }}</div>
                                 <div class="tag my-1 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved
@@ -198,8 +197,9 @@ Manage Organization
                                     <strong>Dietary Restrictions:</strong>
                                     {% if order.user.dietary_restrictions %}
                                     <ul>
-                                        {% for restriction in order.user.dietary_restrictions %}<li>{{
-                                            restriction.restriction }}</li>{% endfor %}
+                                        {% for restriction in order.user.dietary_restrictions %}
+                                        <li>{{ restriction.restriction }}</li>
+                                        {% endfor %}
                                     </ul>
                                     {% else %}
                                     <ul>
@@ -287,8 +287,9 @@ Manage Organization
                                 </div>
                             </div>
                             <div>
-                                <div class="tag is-info my-2 is-size-6 is-primary is-light">Reviewed on: {{
-                                    review.created_at|date:"F j, Y" }}</div>
+                                <div class="tag is-info my-2 is-size-6 is-primary is-light">
+                                    Reviewed on: {{ review.created_at|date:"F j, Y" }}
+                                </div>
                             </div>
                         </div>
                         {% endfor %}

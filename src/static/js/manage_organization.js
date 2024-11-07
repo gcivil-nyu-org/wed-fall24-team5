@@ -5,21 +5,32 @@ document.addEventListener('DOMContentLoaded', function () {
 
     dropdownButtons.forEach(button => {
         button.addEventListener('click', function (e) {
+            const isCurr = this.classList.contains('is-active');
             e.preventDefault();
+            dropdownButtons.forEach(b => b.classList.remove('is-active'));
             const dropdownContent = this.closest('.orders-dropdown').querySelector('.orders-dropdown-content');
 
             // Close all other dropdowns
             document.querySelectorAll('.orders-dropdown-content').forEach(content => {
                 if (content !== dropdownContent) {
                     content.classList.remove('is-active');
+                    content.classList.add('is-hidden');
                 }
             });
 
-            // Toggle current dropdown
-            dropdownContent.classList.toggle('is-active');
+            if (isCurr) {
+                // Close active dropdown
+                dropdownContent.classList.remove('is-active');
+                dropdownContent.classList.add('is-hidden');
+                this.classList.remove('is-active');
+            } else {
+                // Toggle current dropdown
+                dropdownContent.classList.remove('is-hidden');
+                dropdownContent.classList.add('is-active');
 
-            // Toggle button active state
-            this.classList.toggle('is-active');
+                // Toggle button active state
+                this.classList.add('is-active');
+            }
         });
     });
 
@@ -28,6 +39,7 @@ document.addEventListener('DOMContentLoaded', function () {
         if (!e.target.closest('.orders-dropdown')) {
             document.querySelectorAll('.orders-dropdown-content').forEach(content => {
                 content.classList.remove('is-active');
+                content.classList.add('is-hidden');
             });
             document.querySelectorAll('.orders-dropdown-trigger').forEach(trigger => {
                 trigger.classList.remove('is-active');
