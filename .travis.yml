@@ -6,6 +6,7 @@ python:
 
 branches:
   only:
+    - test
     - develop
     - main
 
@@ -15,11 +16,31 @@ install:
 services:
   - postgresql
 
-# Add a new job that handles the CRON job (merging develop into main)
 jobs:
   include:
+    # Test environment
+    - stage: test-environment
+      branches:
+        only:
+          - test
+      before_script:
+        - python src/manage.py makemigrations
+        - python src/manage.py migrate
+        - python src/manage.py collectstatic --noinput
+      deploy:
+        - provider: elasticbeanstalk
+          access_key_id: $AWS_ACCESS_KEY_ID
+          secret_access_key: $AWS_SECRET_ACCESS_KEY
+          region: "us-east-1"
+          app: "wed-fall24-team5"
+          env: "food-donation-swe-test"
+          bucket_name: "elasticbeanstalk-us-east-1-149536460878"
+          on:
+            repo: gcivil-nyu-org/wed-fall24-team5
+            branch: test
+    # Main deployment via cron
     - stage: merge-develop-into-main
-      if: "type = cron"
+      if: type = cron
       branches:
         only:
           - main
@@ -53,6 +74,7 @@ jobs:
           on:
             repo: gcivil-nyu-org/wed-fall24-team5
             branch: main
+    # Develop deployment
     - stage: test-and-send-to-dev
       branches:
         only:
