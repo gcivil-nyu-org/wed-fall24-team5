@@ -32,6 +32,7 @@ DEBUG = os.getenv("DJANGO_DEBUG", "False") == "True"
 ALLOWED_HOSTS = [
     "food-donation-swe-dev.us-east-1.elasticbeanstalk.com",
     "food-donation-swe-prod.us-east-1.elasticbeanstalk.com",
+    "food-donation-swe-test.eba-km8nsjsa.us-east-1.elasticbeanstalk.com",
     "fooddonation-dev.com",
     "fooddonation-prod.com",
     "172.31.30.180",  # PostGres
