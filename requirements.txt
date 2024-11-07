@@ -7,7 +7,7 @@ Automat==24.8.1
 black==24.10.0
 certifi==2024.8.30
 cffi==1.17.1
-channels-redis==4.2.0
+channels==4.1.0
 charset-normalizer==3.3.2
 click==8.1.7
 colorama==0.4.6
@@ -43,7 +43,6 @@ markdown-it-py==3.0.0
 MarkupSafe==3.0.0
 mccabe==0.7.0
 mdurl==0.1.2
-msgpack==1.1.0
 mypy-extensions==1.0.0
 oauthlib==3.2.2
 packaging==24.1
@@ -64,7 +63,6 @@ python-dotenv==1.0.1
 python3-openid==3.2.0
 PyYAML==6.0.2
 rcssmin==1.1.2
-redis==5.2.0
 regex==2024.9.11
 requests==2.32.3
 requests-oauthlib==2.0.0
