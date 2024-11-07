@@ -108,7 +108,7 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("YOUR_REDIS_ENDPOINT", 6379)],  # replace with your Redis endpoint
+            "hosts": [("127.0.0.1", 6379)],  # replace with your Redis endpoint
         },
     },
 }
