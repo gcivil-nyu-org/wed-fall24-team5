@@ -228,7 +228,7 @@ ACCOUNT_EMAIL_VERIFICATION = "none"
 # ******** HTTPS Setups ********#
 # Redirect HTTP to HTTPS
 # To allow local development to not redirect to HTTPS. Default to HTTPS
-SECURE_SSL_REDIRECT = os.getenv("SSL_REDIRECT", "True") == "True"
+SECURE_SSL_REDIRECT = "True" #os.getenv("SSL_REDIRECT", "True") == "True"
 # Enforce HTTP Strict Transport Security (HSTS) for 1 year
 SECURE_HSTS_SECONDS = 31536000
 # Allow site to be included in browsers' HSTS preload lists
