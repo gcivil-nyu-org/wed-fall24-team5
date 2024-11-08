@@ -22,7 +22,6 @@ class ChatConsumer(AsyncWebsocketConsumer):
 
     # Receive message from WebSocket
     async def receive(self, text_data):
-        print("kjsdn vlskjd ")
         text_data_json = json.loads(text_data)
         message = text_data_json
         message_id = str(uuid.uuid4())
@@ -33,12 +32,10 @@ class ChatConsumer(AsyncWebsocketConsumer):
             "message_id": message_id,
             "created_at": created_at,
         }
-        print(event)
         await self.channel_layer.group_send(self.room_id, event)
 
     # Receive message from room group
     async def send_message(self, event):
-        print("Sdilwekjbflsdkj")
         data = event["message"]
 
         message_id = event["message_id"]
