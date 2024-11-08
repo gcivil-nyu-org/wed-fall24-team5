@@ -37,6 +37,7 @@ ALLOWED_HOSTS = [
     "fooddonation-prod.com",
     "172.31.30.180",  # PostGres
     "34.202.22.62",  # PostGres
+    "172.31.47.228",
     "127.0.0.1",
     "localhost",
 ]
