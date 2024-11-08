@@ -4,6 +4,7 @@ Organization Statistics
 {% endblock title %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/statistics.css' %}">
 <div class="container">
     <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
         <ul>
@@ -62,8 +63,13 @@ Organization Statistics
                 <div class="card">
                     <header class="card-header">
                         <p class="card-header-title is-size-5">
-                            Total Orders <span class="tag is-info is-rounded ml-3">{{ orders.count }}</span>
+                            Total Orders
+                            <span class="tag is-info is-rounded ml-3">{{ orders.count }}</span>
                         </p>
+                        <button class="card-header-icon tooltip">
+                            <span class="icon ml-3"><i class="fa fa-info-circle"></i></span>
+                            <span class="tooltiptext">Total orders placed for all active donations by this organization</span>
+                        </button>
                     </header>
                     <div class="card-content">
                         <canvas id="ordersChart"
@@ -73,9 +79,13 @@ Organization Statistics
                 </div>
             </div>
             <div class="cell">
-                <div class="card pb-5">
+                <div class="card pb-5 pb-0-mobile">
                     <header class="card-header">
                         <p class="card-header-title is-size-5">Order Statuses</p>
+                        <button class="card-header-icon tooltip">
+                            <span class="icon ml-3"><i class="fa fa-info-circle"></i></span>
+                            <span class="tooltiptext">Order status distribution</span>
+                        </button>
                     </header>
                     <div class="card-content">
                         <canvas id="orderSuccessChart"
@@ -89,7 +99,7 @@ Organization Statistics
                     <header class="card-header">
                         <p class="card-header-title is-size-5">Recent Activity</p>
                     </header>
-                    <div class="card-content" style="max-height: 750px; overflow-y: scroll;">
+                    <div class="card-content" style="max-height: 770px; overflow-y: scroll;">
                         {% if activity_feed %}
                         {% for activity in activity_feed %}
                         <article class="media">
@@ -152,6 +162,10 @@ Organization Statistics
                         <p class="card-header-title is-size-5">
                             Total Donations <span class="tag is-info is-rounded ml-3">{{ donations.count }}</span>
                         </p>
+                        <button class="card-header-icon tooltip">
+                            <span class="icon ml-3"><i class="fa fa-info-circle"></i></span>
+                            <span class="tooltiptext">Total donations made by this organization (active and inactive)</span>
+                        </button>
                     </header>
                     <div class="card-content">
                         <canvas id="donationsChart"
@@ -161,11 +175,15 @@ Organization Statistics
                 </div>
             </div>
             <div class="cell">
-                <div class="card">
+                <div class="card pb-5 pb-0-mobile">
                     <header class="card-header">
                         <p class="card-header-title is-size-5">
                             Ratings <span class="tag is-info is-rounded ml-3">{{ reviews.count }}</span>
                         </p>
+                        <button class="card-header-icon tooltip">
+                            <span class="icon ml-3"><i class="fa fa-info-circle"></i></span>
+                            <span class="tooltiptext">Ratings distribution</span>
+                        </button>
                     </header>
                     <div class="card-content">
                         <canvas id="ratingsChart"
