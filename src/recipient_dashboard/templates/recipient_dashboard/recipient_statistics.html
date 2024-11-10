@@ -42,7 +42,11 @@ User Statistics
                 <div class="card pt-2 pb-2">
                     <div class="card-content">
                         <p class="heading">Average Rating Given</p>
+                        {% if rating is None %}
+                        <p class="title has-text-grey">No ratings</p>
+                        {% else %}
                         <p class="title">{{ rating }} / 5</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
