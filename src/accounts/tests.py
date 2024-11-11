@@ -66,11 +66,13 @@ class ViewTests(TestCase):
             reverse("accounts:register"),
             {
                 "email": "newuser@example.com",
+                "first_name": "first_name",
+                "last_name": "last_name",
                 "password1": "strongpassword123",
                 "password2": "strongpassword123",
             },
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("accounts:profile"))
         self.assertTrue(
             get_user_model().objects.filter(username="newuser@example.com").exists()
@@ -91,6 +93,8 @@ class ViewTests(TestCase):
             reverse("accounts:register"),
             {
                 "email": "existing@example.com",
+                "first_name": "first_name",
+                "last_name": "last_name",
                 "password1": "newpassword123",
                 "password2": "newpassword123",
             },
@@ -117,11 +121,20 @@ class ViewTests(TestCase):
     )
     def test_login_view_post_success(self, mock_provider_login_url):
         """Test successful login"""
+        get_user_model().objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="testpassword",
+        )
         response = self.client.post(
             reverse("accounts:login"),
-            {"username": "testuser", "password": "testpassword"},
+            {
+                "email": "testuser@example.com",
+                "username": "testuser",
+                "password": "testpassword",
+            },
         )
-        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, reverse("accounts:profile"))
 
     @patch(
@@ -130,9 +143,18 @@ class ViewTests(TestCase):
     )
     def test_login_view_post_incorrect_credentials(self, mock_provider_login_url):  # f
         """Test login with incorrect credentials"""
+        get_user_model().objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="testpassword",
+        )
         response = self.client.post(
             reverse("accounts:login"),
-            {"username": "testuser", "password": "wrongpassword"},
+            {
+                "email": "testuser@example.com",
+                "username": "testuser",
+                "password": "wrongpassword",
+            },
         )
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
