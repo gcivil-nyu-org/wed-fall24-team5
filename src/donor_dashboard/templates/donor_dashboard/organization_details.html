@@ -128,13 +128,14 @@ Organization Details
                         method="post" class="card-footer-item">
                         {% csrf_token %}
                         <button type="submit" class="has-text-success">
-                            {% if admin.access_level == "owner" %}
+                            {% if admin.access_level == "owner" and multiple_owners %}
                             Make Admin
                             {% else %}
                             Make Owner
                             {% endif %}
                         </button>
                     </form>
+                    {% if multiple_owners %}
                     <form
                         action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}"
                         method="post" class="card-footer-item">
@@ -143,6 +144,7 @@ Organization Details
                             Remove
                         </button>
                     </form>
+                    {% endif %}
                 </footer>
             </div>
         </div>

@@ -1,6 +1,6 @@
 // Function to confirm deletion of an organization
 function confirmDelete() {
-    if (confirm("Are you sure you want to delete this organization?")) {
+    if (confirm("Are you sure you want to make this organization inactive? All the donations and orders under this organization will also be inactive!!")) {
         // If confirmed, submit the form
         document.getElementById('delete-form').submit();
     }
