@@ -104,7 +104,7 @@
                                     <h3 class="title is-4">{{ admin.name }}</h3>
                                 </div>
                                 <div class="column is-full-mobile is-one-third-tablet">
-                                    {% if admin.access_level == "owner" %}
+                                    {% if admin.access_level == "owner" and multiple_owners %}
                                         <!-- djlint:off -->
                                         <form action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" method="post" style="display: inline;">
                                             {% csrf_token %}
@@ -112,7 +112,7 @@
                                                 Make as admin
                                             </button>
                                         </form>
-                                    {% else %}
+                                    {% elif admin.access_level == "admin" %}
                                         <form action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" method="post" style="display: inline;">
                                                 {% csrf_token %}
                                             <button type="submit" style="color: green; background: none; border: none; cursor: pointer;">
@@ -130,6 +130,7 @@
                         <strong>Role:</strong> {{ admin.access_level }}
                     </p>
                     <!-- djlint:off -->
+                    {% if multiple_owners %}
                     <footer class="card-footer has-text-danger">
                         <!-- djlint:on -->
                         <form action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}" method="post" style="display: inline;">
@@ -139,6 +140,7 @@
                             </button>
                         </form>
                     </footer>
+                    {% endif %}
             </div>
         </div>
     {% endfor %}
