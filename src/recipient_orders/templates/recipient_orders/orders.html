@@ -15,7 +15,7 @@
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title">Modify Order</p>
-                <button class="delete" aria-label="close"></button>
+                <a class="tag is-delete" onclick="closeModifyModal()"></a>
             </header>
             <form method="post"
                   action="{% url 'modify_order' %}"
@@ -212,7 +212,7 @@
                                             <p class="title is-4">{{ order.donation.food_item }}</p>
                                         </div>
                                         <div class="media-right mt-2-mobile">
-                                            <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} reserved</span>
+                                            <span class="tag is-primary is-light is-medium mt-1">{{ order.order_quantity }} canceled</span>
                                         </div>
                                     </div>
                                     <div class="content">
