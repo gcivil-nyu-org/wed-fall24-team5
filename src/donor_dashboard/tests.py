@@ -728,7 +728,7 @@ class DonorDashboardStatsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(
-            response_data["labels"][0], self.order.order_created_at.strftime("%Y-%m-%d")
+            response_data["labels"][0], self.order.order_created_at.strftime("%b %d")
         )
         self.assertEqual(response_data["data"][0], 1)
 
@@ -755,7 +755,7 @@ class DonorDashboardStatsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(
-            response_data["labels"][0], self.donation.created_at.strftime("%Y-%m-%d")
+            response_data["labels"][0], self.donation.created_at.strftime("%b %d")
         )
         self.assertEqual(response_data["data"][0], 1)
 
