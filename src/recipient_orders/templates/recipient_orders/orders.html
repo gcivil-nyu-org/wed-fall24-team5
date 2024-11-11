@@ -15,7 +15,7 @@
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title">Modify Order</p>
-                <button class="delete" aria-label="close"></button>
+                <a class="tag is-delete" onclick="closeModifyModal()"></a>
             </header>
             <form method="post"
                   action="{% url 'modify_order' %}"

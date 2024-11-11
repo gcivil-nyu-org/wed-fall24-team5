@@ -1,11 +1,11 @@
 {% load static %}
 <link rel="stylesheet" href="{% static 'css/review_modal.css' %}">
 <div id="reviewModal" class="modal">
-    <div class="modal-background"></div>
+    <div class="modal-background" onclick="closeModal()"></div>
     <div class="modal-card">
         <header class="modal-card-head">
             <p class="modal-card-title">Review Your Order</p>
-            <button class="delete" aria-label="close"></button>
+            <a class="tag is-delete" onclick="closeModal()"></a>
         </header>
         <section class="modal-card-body">
             <form id="reviewForm" action="{% url 'submit_review' %}" method="post">
@@ -37,7 +37,7 @@
         </section>
         <footer class="modal-card-foot">
             <button class="button is-success" id="submitReview">Submit Review</button>
-            <button class="button" id="closeModal">Cancel</button>
+            <button type="button" class="button" onclick="closeModal()">Cancel</button>
         </footer>
     </div>
 </div>

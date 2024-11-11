@@ -18,12 +18,13 @@ Organizations Dashboard
     </div>
     <!-- Modal structure -->
     <div class="modal" id="org-modal">
-        <div class="modal-background" id="modal-background"></div>
+        <div class="modal-background" id="modal-background" onclick="closeModal()"></div>
         <!-- djlint:off -->
         <div class="modal-card" style="min-width: 80%;">
             <!-- djlint:on -->
             <header class="modal-card-head">
                 <p class="modal-card-title">Add a New Organization</p>
+                <a class="tag is-delete" id="close-modal" onclick="closeModal()"></a>
             </header>
             <form method="post">
                 {% csrf_token %}
@@ -62,7 +63,7 @@ Organizations Dashboard
                 </section>
                 <footer class="modal-card-foot">
                     <button type="submit" class="button is-link">Add</button>
-                    <button class="button" id="close-modal-footer">Cancel</button>
+                    <button type="button" class="button" id="close-modal-footer" onclick="closeModal()">Cancel</button>
                 </footer>
             </form>
         </div>
