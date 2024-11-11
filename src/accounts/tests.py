@@ -30,6 +30,13 @@ class CollectionPageTest(TestData):
         response = self.client.get(reverse("accounts:register"))
         self.assertEqual(response.status_code, 200)
 
+    def test_register_view_get_redirects_post_authenticated_user(self):
+        """Test that the register page redirects when authenticated users hits register page again."""
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("accounts:register"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/recipient_dashboard")
+
     def test_register_view_post_success(self):
         """Test successful registration view behavior."""
         response = self.client.post(
@@ -91,6 +98,13 @@ class CollectionPageTest(TestData):
         """Test that the login view returns a 200 OK status on GET request."""
         response = self.client.get(reverse("accounts:login"))
         self.assertEqual(response.status_code, 200)
+
+    def test_login_view_get_redirects_authenticated_user(self):
+        """Test that the login page redirects when authenticated users hits login page again."""
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("accounts:login"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/recipient_dashboard")
 
     def test_login_view_post_success(self):
         """Test login view with correct credentials."""
