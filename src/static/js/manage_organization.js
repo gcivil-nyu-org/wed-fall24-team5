@@ -1,3 +1,19 @@
+// Function to confirm deletion of an organization
+function confirmDelete() {
+    if (confirm("Are you sure you want to delete this organization?")) {
+        // If confirmed, submit the form
+        document.getElementById('delete-form').submit();
+    }
+}
+
+// Function to confirm deletion of a donation and submit the form
+function submitDeleteForm(donationId) {
+    if (confirm("Are you sure you want to delete this donation?")) {
+        // Find the form by ID and submit it
+        document.getElementById('delete-form-' + donationId).submit();
+    }
+}
+
 // Handle the dropdowns
 document.addEventListener('DOMContentLoaded', function () {
     // Get all dropdown buttons
