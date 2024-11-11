@@ -26,23 +26,29 @@ Manage Organization
             <strong>{{ organization.organization_name }}</strong>
         </h2>
         <div id="organization-id" hidden>{{ organization.organization_id }}</div>
-        {% if owner_access %}
-        <div class="buttons is-inline-block">
-            <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
-                class="button is-info">Messages</a>
-            <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
-                class="button is-info">Manage Organization</a>
-            <form id="delete-form" class="is-inline-block"
-                action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
-                {% csrf_token %}
-                <button type="button" class="button is-danger" onclick="confirmDelete()">Make Organization Inactive </button>
-            </form>
-        </div>
+        {% if status %}
+            {% if owner_access %}
+            <div class="buttons is-inline-block">
+                <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                    class="button is-info">Messages</a>
+                <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
+                    class="button is-info">Manage Organization</a>
+                <form id="delete-form" class="is-inline-block"
+                    action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
+                    {% csrf_token %}
+                    <button type="button" class="button is-danger" onclick="confirmDelete()">Make Organization Inactive </button>
+                </form>
+            </div>
+            {% else %}
+            <div class="buttons is-inline-block">
+                <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
+                    class="button is-info">Messages</a>
+            </div>
+            {% endif %}
         {% else %}
-        <div class="buttons is-inline-block">
-            <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
-                class="button is-info">Messages</a>
-        </div>
+            <div class="media-right">
+                <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+            </div>
         {% endif %}
     </div>
     <!-- Statistics -->
