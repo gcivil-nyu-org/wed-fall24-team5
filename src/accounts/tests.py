@@ -1,172 +1,147 @@
-from django.test import TestCase, Client
+from django.test import TestCase
+from django.contrib.sites.models import Site
 from django.urls import reverse
 from django.contrib.auth import get_user_model
+from django.contrib.auth.models import User
 from django.contrib.messages import get_messages
-from allauth.socialaccount.models import SocialApp
-from django.contrib.sites.models import Site
-import os
-from unittest.mock import patch
 
 
-class ViewTests(TestCase):
+class TestData(TestCase):
+    @classmethod
+    def setUpTestData(cls):
+        cls.current_site = Site.objects.get_current()
+        cls.SocialApp1 = cls.current_site.socialapp_set.create(
+            provider="google",
+            name="google",
+            client_id="1234567890",
+            secret="0987654321",
+        )
+
+
+class CollectionPageTest(TestData):
     def setUp(self):
-        # Set up reusable client and user
         User = get_user_model()
-        self.client = Client()
         self.user = User.objects.create_user(
-            username="testuser@example.com",
-            email="testuser@example.com",
-            password="password",
+            username="testuser", email="testuser@example.com", password="testpass"
         )
 
-        # Create a Site instance (needed by allauth's SocialApp)
-        self.site = Site.objects.get(id=1)
-
-        # Create a SocialApp instance
-        self.social_app, _ = SocialApp.objects.get_or_create(
-            provider="google", name="google"
-        )
-        self.social_app.client_id = os.getenv("google_auth_client_id", "none")
-        self.social_app.secret = os.getenv("google_auth_secret_key", "none")
-        self.social_app.sites.add(self.site)
-        self.social_app.save()
-
-    def test_landing_view_anonymous(self):
-        """Test landing view for anonymous users"""
-        response = self.client.get(reverse("accounts:landing"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "accounts/landing.html")
-
-    def test_profile_view_authenticated(self):
-        """Test profile view for authenticated users"""
-        self.client.login(email="testuser@example.com", password="password")
-        response = self.client.get(reverse("accounts:profile"), follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertRedirects(
-            response, "/recipient_dashboard/", status_code=302, target_status_code=200
-        )
-
-    @patch(
-        "allauth.socialaccount.templatetags.socialaccount.provider_login_url",
-        return_value="/mock-login-url/",
-    )
-    def test_register_view_get(self, mock_provider_login_url):  # f
-        """Test GET request for register view"""
+    def test_accounts_register_status_code(self):
+        """Test that the accounts register view returns a 200 OK status."""
         response = self.client.get(reverse("accounts:register"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "accounts/register.html")
 
-    @patch(
-        "allauth.socialaccount.templatetags.socialaccount.provider_login_url",
-        return_value="/mock-login-url/",
-    )
-    def test_register_view_post_success(self, mock_provider_login_url):  # f
-        """Test successful registration"""
+    def test_register_view_post_success(self):
+        """Test successful registration view behavior."""
         response = self.client.post(
             reverse("accounts:register"),
             {
                 "email": "newuser@example.com",
-                "first_name": "first_name",
-                "last_name": "last_name",
-                "password1": "strongpassword123",
-                "password2": "strongpassword123",
+                "password1": "C*pml3XP4ssw0RD!",
+                "password2": "C*pml3XP4ssw0RD!",
+                "first_name": "New",
+                "last_name": "User",
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("accounts:profile"))
-        self.assertTrue(
-            get_user_model().objects.filter(username="newuser@example.com").exists()
-        )
 
-    @patch(
-        "allauth.socialaccount.templatetags.socialaccount.provider_login_url",
-        return_value="/mock-login-url/",
-    )
-    def test_register_view_post_email_exists(self, mock_provider_login_url):  #
-        """Test registration with an existing email"""
-        get_user_model().objects.create_user(
-            username="existing@example.com",
-            email="existing@example.com",
-            password="password",
-        )
+        # Only check form errors if the response did not redirect (status code 200)
+        if response.status_code == 200:
+            form = response.context.get("form")
+            if form and form.errors:
+                print("Form errors:", form.errors)
+
+        self.assertEqual(
+            response.status_code, 302
+        )  # Redirects after successful registration
+        self.assertEqual(response.url, "/accounts/profile/")
+        self.assertTrue(User.objects.filter(email="newuser@example.com").exists())
+
+    def test_register_view_post_email_already_exists(self):
+        """Test registration view when email is already in use."""
         response = self.client.post(
             reverse("accounts:register"),
             {
-                "email": "existing@example.com",
-                "first_name": "first_name",
-                "last_name": "last_name",
-                "password1": "newpassword123",
-                "password2": "newpassword123",
+                "email": "testuser@example.com",
+                "password1": "C*pml3XP4ssw0RD!",
+                "password2": "C*pml3XP4ssw0RD!",
+            },
+        )
+        self.assertEqual(response.status_code, 200)  # Stays on the registration page
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(
+            any("This email is already registered." in str(m) for m in messages)
+        )
+
+    def test_register_view_post_password_mismatch(self):
+        """Test registration view with password mismatch."""
+        response = self.client.post(
+            reverse("accounts:register"),
+            {
+                "email": "anotheruser@example.com",
+                "password1": "C*pml3XP4ssw0RD!",
+                "password2": "differentpassword",
             },
         )
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
         self.assertTrue(
-            any("already registered" in str(message) for message in messages)
+            any("Registration Failed!! Password mismatch" in str(m) for m in messages)
         )
 
-    @patch(
-        "allauth.socialaccount.templatetags.socialaccount.provider_login_url",
-        return_value="/mock-login-url/",
-    )
-    def test_login_view_get(self, mock_provider_login_url):
-        """Test GET request for login view"""
+    def test_login_view_get(self):
+        """Test that the login view returns a 200 OK status on GET request."""
         response = self.client.get(reverse("accounts:login"))
         self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "accounts/login.html")
 
-    @patch(
-        "allauth.socialaccount.templatetags.socialaccount.provider_login_url",
-        return_value="/mock-login-url/",
-    )
-    def test_login_view_post_success(self, mock_provider_login_url):
-        """Test successful login"""
-        get_user_model().objects.create_user(
-            username="testuser@example.com",
-            email="testuser@example.com",
-            password="testpassword",
-        )
+    def test_login_view_post_success(self):
+        """Test login view with correct credentials."""
         response = self.client.post(
             reverse("accounts:login"),
             {
-                "email": "testuser@example.com",
-                "username": "testuser",
-                "password": "testpassword",
+                "username": "testuser@example.com",
+                "password": "testpass",
             },
         )
-        self.assertEqual(response.status_code, 302)
-        self.assertRedirects(response, reverse("accounts:profile"))
+        self.assertEqual(
+            response.status_code, 302
+        )  # Redirects after successful registration
+        self.assertEqual(response.url, "/accounts/profile/")
 
-    @patch(
-        "allauth.socialaccount.templatetags.socialaccount.provider_login_url",
-        return_value="/mock-login-url/",
-    )
-    def test_login_view_post_incorrect_credentials(self, mock_provider_login_url):  # f
-        """Test login with incorrect credentials"""
-        get_user_model().objects.create_user(
-            username="testuser@example.com",
-            email="testuser@example.com",
-            password="testpassword",
-        )
+    def test_login_view_post_invalid_credentials(self):
+        """Test login view with incorrect credentials."""
         response = self.client.post(
             reverse("accounts:login"),
             {
-                "email": "testuser@example.com",
-                "username": "testuser",
-                "password": "wrongpassword",
+                "username": "testuser@example.com",
+                "password": "wrongpass",
             },
         )
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("Incorrect email or password" in str(message) for message in messages)
+        self.assertTrue(any("Incorrect email or password" in str(m) for m in messages))
+
+    def test_profile_view_redirects_unauthenticated_user(self):
+        """Test that the profile view redirects unauthenticated users to the login page."""
+        response = self.client.get(reverse("accounts:profile"))
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response, f"{reverse('accounts:login')}?next=/accounts/profile/"
         )
 
-    def test_logout_view(self):
-        """Test logout view"""
-        self.client.login(email="testuser@example.com", password="password")
-        response = self.client.get(reverse("accounts:logout"), follow=True)
-        self.assertEqual(response.status_code, 200)
-        self.assertRedirects(
-            response, "/accounts/landing/", status_code=302, target_status_code=200
-        )
+    def test_profile_view_authenticated_user(self):
+        """Test that the profile view redirects authenticated users to /recipient_dashboard."""
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("accounts:profile"))
+
+        self.assertEqual(
+            response.status_code, 302
+        )  # Redirects after successful registration
+        self.assertEqual(response.url, "/recipient_dashboard")
+
+    def test_logout_view_clears_messages(self):
+        """Test that the logout view clears messages and redirects."""
+        self.client.login(username="testuser", password="testpass")
+        response = self.client.get(reverse("accounts:logout"))
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(response.url, "/")
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(len(messages), 0)

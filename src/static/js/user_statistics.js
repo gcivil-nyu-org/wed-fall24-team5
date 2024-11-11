@@ -32,13 +32,24 @@ function renderUserOrdersChart() {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'Date',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Order Count'
+                                text: 'Order Count',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
+                            },
+                            ticks: {
+                                precision: 0
                             }
                         }
                     }
@@ -77,13 +88,24 @@ function renderUserDonationsChart() {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'Date',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Donation Count'
+                                text: 'Donation Count',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
+                            },
+                            ticks: {
+                                precision: 0
                             }
                         }
                     }

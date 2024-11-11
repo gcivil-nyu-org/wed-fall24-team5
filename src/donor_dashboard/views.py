@@ -228,10 +228,18 @@ def organization_details(request, organization_id):
                     }
                 )
 
+            owner_count = organization_admins.filter(access_level="owner").count()
+            multiple_owners = owner_count > 1
+
             return render(
                 request,
                 "donor_dashboard/organization_details.html",
-                {"organization": organization, "form": form, "admins": admins},
+                {
+                    "organization": organization,
+                    "form": form,
+                    "admins": admins,
+                    "multiple_owners": multiple_owners,
+                },
             )
         else:
             messages.warning(request, "You Don't have permission to do this action")
@@ -308,7 +316,7 @@ def statistics_orders(request, organization_id):
         .annotate(order_count=Count("order_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
+    dates = [entry["date"].strftime("%b %d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
 
     return JsonResponse(
@@ -360,7 +368,7 @@ def statistics_donations(request, organization_id):
         .annotate(order_count=Count("donation_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in donations_data]
+    dates = [entry["date"].strftime("%b %d") for entry in donations_data]
     donations_counts = [entry["order_count"] for entry in donations_data]
 
     return JsonResponse(
@@ -622,6 +630,21 @@ def assign_organization_access_level(
         current_org_admin = OrganizationAdmin.objects.get(
             user=current_user, organization=organization
         )
+
+        # Check if current user is the only owner
+        owner_count = OrganizationAdmin.objects.filter(
+            organization=organization, access_level="owner"
+        ).count()
+
+        if current_org_admin.access_level == "owner":
+            if current_access_level == "owner" and owner_count == 1:
+                # Prevent downgrading the only owner
+                messages.warning(request, "You cannot remove the only owner.")
+                return redirect(
+                    "donor_dashboard:organization_details",
+                    organization_id=organization_id,
+                )
+
         if current_org_admin.access_level == "owner":
             if request.method == "POST":
                 admin_user = User.objects.get(email=admin_email)
