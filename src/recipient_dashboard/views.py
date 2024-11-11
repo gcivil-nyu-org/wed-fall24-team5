@@ -209,7 +209,7 @@ def statistics_user_orders(request):
         .annotate(order_count=Count("order_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
+    dates = [entry["date"].strftime("%b %d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
 
     return JsonResponse(
@@ -234,7 +234,7 @@ def statistics_user_donations(request):
         .annotate(donation_count=Count("donation_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in donations_data]
+    dates = [entry["date"].strftime("%b %d") for entry in donations_data]
     donations_counts = [entry["donation_count"] for entry in donations_data]
 
     return JsonResponse(

@@ -42,13 +42,24 @@ function renderOrdersChart() {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'Date',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Order Count'
+                                text: 'Order Count',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
+                            },
+                            ticks: {
+                                precision: 0
                             }
                         }
                     }
@@ -82,12 +93,15 @@ function renderOrderStatusChart() {
                     responsive: true,
                     plugins: {
                         legend: {
-                            position: 'top',
+                            position: 'bottom',
+                            labels: {
+                                boxWidth: 20
+                            }
                         },
                         tooltip: {
                             callbacks: {
                                 label: function (data) {
-                                    return `${data.label}: ${data.raw}`;
+                                    return `${data.label} Orders: ${data.raw}`;
                                 }
                             }
                         }
@@ -127,13 +141,24 @@ function renderDonationsChart() {
                         x: {
                             title: {
                                 display: true,
-                                text: 'Date'
+                                text: 'Date',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
                             }
                         },
                         y: {
                             title: {
                                 display: true,
-                                text: 'Donation Count'
+                                text: 'Donation Count',
+                                font: {
+                                    weight: 'bold',
+                                    size: 14
+                                },
+                            },
+                            ticks: {
+                                precision: 0
                             }
                         }
                     }
@@ -184,6 +209,9 @@ function renderRatingsChart() {
                     plugins: {
                         legend: {
                             position: 'bottom',
+                            labels: {
+                                boxWidth: 30
+                            }
                         },
                         tooltip: {
                             callbacks: {

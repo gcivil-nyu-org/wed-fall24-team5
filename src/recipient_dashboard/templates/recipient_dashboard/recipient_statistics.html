@@ -4,6 +4,7 @@ User Statistics
 {% endblock title %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/statistics.css' %}">
 <div class="container">
     <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
         <ul>
@@ -42,7 +43,11 @@ User Statistics
                 <div class="card pt-2 pb-2">
                     <div class="card-content">
                         <p class="heading">Average Rating Given</p>
+                        {% if rating is None %}
+                        <p class="title has-text-grey">No ratings</p>
+                        {% else %}
                         <p class="title">{{ rating }} / 5</p>
+                        {% endif %}
                     </div>
                 </div>
             </div>
@@ -58,6 +63,10 @@ User Statistics
                 <div class="card">
                     <header class="card-header">
                         <p class="card-header-title is-size-5">Total Orders</p>
+                        <button class="card-header-icon tooltip">
+                            <span class="icon ml-3"><i class="fa fa-info-circle"></i></span>
+                            <span class="tooltiptext">Total orders placed by you</span>
+                        </button>
                     </header>
                     <div class="card-content">
                         <canvas id="userOrdersChart"
@@ -70,6 +79,10 @@ User Statistics
                 <div class="card">
                     <header class="card-header">
                         <p class="card-header-title is-size-5">Total Donations</p>
+                        <button class="card-header-icon tooltip">
+                            <span class="icon ml-3"><i class="fa fa-info-circle"></i></span>
+                            <span class="tooltiptext">Total donations made by all of your organizations</span>
+                        </button>
                     </header>
                     <div class="card-content">
                         <canvas id="userDonationsChart"

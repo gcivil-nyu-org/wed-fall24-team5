@@ -1,6 +1,4 @@
-from django.urls import path
-from . import views
+from django.urls import path  # noqa
+from . import views  # noqa
 
-urlpatterns = [
-    path("test-database/", views.test_database_view, name="test_database"),
-]
+urlpatterns = []
