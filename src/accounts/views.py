@@ -46,7 +46,7 @@ def my_signal_receiver(sender, **kwargs):  # pylint: disable=unused-argument
 def register_view(request):
     if request.user.is_authenticated:
         return profile_view(request)
-    
+
     if request.method == "POST":
         form = MyUserCreationForm(request.POST)
         email = request.POST.get("email")
@@ -77,7 +77,7 @@ def register_view(request):
 def login_view(request):
     if request.user.is_authenticated:
         return profile_view(request)
-    
+
     if request.method == "POST":
         form = MyAuthenticationForm(request, data=request.POST)
         if form.is_valid():  # pylint: disable=no-else-return
