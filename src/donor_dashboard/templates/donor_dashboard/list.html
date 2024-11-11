@@ -145,59 +145,53 @@ Organizations Dashboard
             <div class="column is-full-mobile is-one-third-tablet is-one-third-desktop">
                 <div class="card mb-5 is-flex is-flex-direction-column">
                     <div class="card-content is-flex-grow-1">
-                        <div class="media is-flex is-justify-content-space-between">
-                            <div class="media-content">
-                                <p class="title is-4 is-clipped">{{ org.org_name }}</p>
+                        <div class="level">
+                            <div class="level-left"  style="max-width: 45%;">
+                                <div class="level-item" style="max-width: 100%;">
+                                    <p class="title is-5 is-clipped" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_name }}</p>
+                                </div>
                             </div>
-                            <div class="media-right">
-                                <span class="tag is-primary is-light is-medium mt-1">In Active</span>
-                            </div>
-                            <div class="media-right">
-                                <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                            <div class="level-right">
+                                <div class="level-item">
+                                    <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                                </div>
+                                <div class="level-item">
+                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                </div>
                             </div>
                         </div>
                         <div class="content">
+                            <p>
                             <div class="button is-link is-light has-text-centered"
                                 style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
                                 {{ org.org_address }}
                             </div>
-                            <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p>
-                            <p>{{ org.org_contact_number }}</p>
-                            <a href="{{ org.org_website }}" style="word-wrap: break-word;
-                                                                                      overflow-wrap: break-word">{{
-                                org.org_website }}</a>
-                            <!-- <div class="columns"> -->
-                            <!-- <div class="column is-full-mobile is-half-tablet"> -->
-                            <!-- djlint:off -->
-                            <!-- <div class="button is-link is-light has-text-centered" -->
-                            <!-- style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;"> -->
-                            <!-- djlint:on -->
-                            <!-- {{ org.org_address }} -->
-                            <!-- </div> -->
-                            <!-- </div> -->
-                            <!-- <div class="column is-full-mobile is-half-tablet has-text-centered"> -->
-                            <!-- djlint:off -->
-                            <!-- <p style="word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_email }}</p> -->
-                            <!-- <p>{{ org.org_contact_number }}</p> -->
-                            <!-- <a href="{{ org.org_website }}" -->
-                            <!-- style="word-wrap: break-word; -->
-                            <!-- overflow-wrap: break-word">{{ org.org_website }}</a> -->
-                            <!-- djlint:on -->
-                            <!-- </div> -->
+                            </p>
+                            <p class="icon-text mt-1 block" style="word-wrap: break-word; overflow-wrap: break-word;">
+                                <span class="icon"><i class="fa fa-envelope"></i></span>
+                                <span>{{ org.org_email }}</span>
+                            </p>
+                            <p class="icon-text block">
+                                <span class="icon"><i class="fa fa-phone"></i></span>
+                                <span>{{ org.org_contact_number }}</span>
+                            </p>
+                            <p class="icon-text block" style="word-wrap: break-word; overflow-wrap: break-word;">
+                                <span class="icon"><i class="fa fa-link"></i></span>
+                                <span><a href="{{ org.org_website }}">{{ org.org_website }}</a></span>
+                            </p>
                         </div>
                     </div>
+                    <footer class="card-footer mt-auto has-background-white-ter has-text-weight-semibold">
+                        <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}"
+                            class="card-footer-item">View Organization</a>
+                    </footer>
                 </div>
-                <footer class="card-footer mt-auto">
-                    <a href="{% url 'donor_dashboard:manage_organization' org.org_id %}" class="card-footer-item">View
-                        Organization</a>
-                </footer>
             </div>
+            {% endfor %}
+            {% else %}
+            <p class="box">No Inactive Organization!!</p>
+            {% endif %}
         </div>
-        {% endfor %}
-        {% else %}
-        <p class="box">No In Active Organizations!!</p>
-        {% endif %}
     </div>
-</div>
 </div>
 {% endblock content %}
