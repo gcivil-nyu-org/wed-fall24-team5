@@ -35,7 +35,7 @@ Manage Organization
             <form id="delete-form" class="is-inline-block"
                 action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
                 {% csrf_token %}
-                <button type="button" class="button is-danger" onclick="confirmDelete()">Make Organization Inactive</button>
+                <button type="button" class="button is-danger" onclick="confirmDelete()">Make Organization Inactive </button>
             </form>
         </div>
         {% else %}
