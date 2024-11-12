@@ -96,6 +96,53 @@ Organization Details
         </div>
     </div>
     <div class="columns is-multiline is-variable is-4">
+        <div class="column is-one-third is-full-mobile">
+            <div class="card mb-5 is-flex is-flex-direction-column">
+                <div class="card-content">
+                    <div class="level">
+                        <div class="level-left" style="max-width: 60%;">
+                            <div class="level-item" style="max-width: 100%;">
+                                <p class="title is-5 is-clipped"
+                                    style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                    {{ current_org_admin.user.first_name }} {{ current_org_admin.user.last_name }}</p>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <span class="tag is-primary is-medium mt-1">you</span>
+                            </div>
+                            <div class="level-item">
+                                <span class="tag is-primary is-medium mt-1">{{ current_org_admin.access_level }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    <p class="icon-text mt-1" style="word-wrap: break-word; overflow-wrap: break-word;">
+                        <span class="icon"><i class="fa fa-envelope"></i></span>
+                        <span><strong>Email:</strong> {{ current_org_admin.user.email }}</span>
+                    </p>
+                    <p class="icon-text mt-1" style="word-wrap: break-word; overflow-wrap: break-word;">
+                        <span class="icon"><i class="fa fa-calendar"></i></span>
+                        <span><strong>Joined On:</strong> {{ current_org_admin.created_at }}</span>
+                    </p>
+                </div>
+                <footer class="card-footer mt-auto has-background-white-ter has-text-weight-semibold">
+                        {% csrf_token %}
+                        {% if current_org_admin.access_level == "owner" and multiple_owners %}
+                            <button type="submit" class="card-footer-item has-text-primary js-modal-trigger" data-target="makeAdminModal">
+                            Make Admin
+                        {% else %}
+                            <button type="submit" class="card-footer-item has-text-grey-light" disabled>
+                                Only Owner
+                        {% endif %}
+                            </button>
+                    {% if multiple_owners %}
+                        <button class="card-footer-item has-text-danger js-modal-trigger" data-target="leaveOrgModal">
+                            Leave
+                        </button>
+                    {% endif %}
+                </footer>
+            </div>
+        </div>
         {% if admins %}
         {% for admin in admins %}
         <div class="column is-one-third is-full-mobile">
@@ -111,15 +158,17 @@ Organization Details
                         </div>
                         <div class="level-right">
                             <div class="level-item">
-                                <span class="tag is-primary is-light is-medium mt-1">{{ admin.access_level }}</span>
+                                <span class="tag {% if admin.access_level == 'owner' %}is-primary{% else %}is-info{% endif %} is-light is-medium mt-1">{{ admin.access_level }}</span>
                             </div>
                         </div>
                     </div>
-                    <p>
-                        <strong>Email:</strong> {{ admin.email }}
+                    <p class="icon-text mt-1" style="word-wrap: break-word; overflow-wrap: break-word;">
+                        <span class="icon"><i class="fa fa-envelope"></i></span>
+                        <span><strong>Email:</strong> {{ admin.email }}</span>
                     </p>
-                    <p>
-                        <strong>Role:</strong> {{ admin.access_level }}
+                    <p class="icon-text mt-1" style="word-wrap: break-word; overflow-wrap: break-word;">
+                        <span class="icon"><i class="fa fa-calendar"></i></span>
+                        <span><strong>Joined On:</strong> {{ admin.created_at }}</span>
                     </p>
                 </div>
                 <footer class="card-footer mt-auto has-background-white-ter has-text-weight-semibold">
@@ -127,15 +176,19 @@ Organization Details
                         action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}"
                         method="post" class="card-footer-item">
                         {% csrf_token %}
-                        <button type="submit" class="has-text-success">
-                            {% if admin.access_level == "owner" and multiple_owners %}
+                        {% if admin.access_level == "owner" and multiple_owners %}
+                            <button type="submit" class="has-text-primary">
                             Make Admin
-                            {% else %}
+                            {% elif admin.access_level == "admin" %}
+                            <button type="submit" class="has-text-primary">
                             Make Owner
+                            {% else %}
+                            <button type="submit" disabled>
+                            Only Owner
                             {% endif %}
-                        </button>
+                            </button>
                     </form>
-                    {% if multiple_owners %}
+                    {% if admin.access_level == "admin" %}
                     <form
                         action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}"
                         method="post" class="card-footer-item">
@@ -149,21 +202,19 @@ Organization Details
             </div>
         </div>
         {% endfor %}
-        {% else %}
-        <p class="box">No Admins in this Organization!!</p>
         {% endif %}
     </div>
-    <div id="addAdminModal" class="modal"">
-        <div class=" modal-background"></div>
-    <div class="modal-content" style="max-width: 430px;">
+<div id="addAdminModal" class="modal">
+    <div class="modal-background"></div>
+        <div class="modal-content has-text-centered" style="max-width: 430px;">
         <div class="box">
-            <p class="icon-text is-size-5">
-                <span class="icon has-text-warning">
+            <p class="icon-text is-size-3 py-3">
+                <span class="icon has-text-warning is-medium">
                     <i class="fa fa-exclamation-triangle"></i>
                 </span>
-                <span><strong>Unregistered User</strong></span>
             </p>
-            <p class="block is-size-6 mt-3">You are adding an unregistered user. Are you sure?</p>
+            <p class="title is-5">Unregistered User</p>
+            <p class="subtitle is-6 mt-1">You are adding an unregistered user. Are you sure?</p>
             <div class="field is-grouped is-grouped-centered">
                 <p class="control">
                     <button id="confirmButton" class="button is-primary" onclick="confirmAddUser()">Confirm</button>
@@ -176,20 +227,81 @@ Organization Details
     </div>
     <button class="modal-close is-large" aria-label="close"></button>
 </div>
+<div id="leaveOrgModal" class="modal">
+    <div class="modal-background"></div>
+        <div class="modal-content has-text-centered py-2" style="max-width: 430px;">
+        <div class="box">
+            <p class="icon-text is-size-3 py-3">
+                <span class="icon has-text-warning is-medium">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </span>
+            </p>
+            <p class="title is-5">Leave Organization</p>
+            <p class="subtitle is-6 mt-1">Are you sure you want to leave this organization?</p>
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <form
+                        action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id current_org_admin.user.email %}"
+                        method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="button is-danger">
+                            Leave
+                        </button>
+                    </form>
+                </p>
+                <p class="control">
+                    <button class="button close-modal">Cancel</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+<div id="makeAdminModal" class="modal">
+    <div class="modal-background"></div>
+        <div class="modal-content has-text-centered p-4" style="max-width: 430px;">
+        <div class="box">
+            <p class="icon-text is-size-3 py-3">
+                <span class="icon has-text-warning is-medium">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </span>
+            </p>
+            <p class="title is-5">Convert to Admin</p>
+            <p class="subtitle is-6 mt-2" style="line-height: 1.5;">Are you sure you want to become an admin?<br>
+                <span class="is-7 is-italic">You will lose management permissions to this organization.</span></p>
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <form
+                        action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id current_org_admin.user.email current_org_admin.access_level %}"
+                        method="post">
+                        {% csrf_token %}
+                        <button type="submit" class="button is-danger">
+                            Confirm
+                        </button>
+                    </form>
+                </p>
+                <p class="control">
+                    <button class="button close-modal">Cancel</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
 </div>
 {% if messages %}
 {% for message in messages %}
 {% if 'temp_password' in message.extra_tags %}
 <div class="modal" id="passwordModal">
     <div class="modal-background"></div>
-    <div class="modal-content">
+    <div class="modal-content has-text-centered" style="max-width: 430px;">
         <div class="box">
-            <p class="icon-text is-size-5">
-                <span class="icon has-text-success">
+            <p class="icon-text is-size-3 py-2">
+                <span class="icon has-text-success is-medium">
                     <i class="fa fa-check-circle"></i>
                 </span>
-                <span><strong>Admin Created</strong></span>
             </p>
+            <p class="subtitle"><strong>Admin Created</strong></p>
             <p class="block is-size-6 mt-3">{{ message }}</p>
             <div class="field is-centered">
                 <p class="control">
