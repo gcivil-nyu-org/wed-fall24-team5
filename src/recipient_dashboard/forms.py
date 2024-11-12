@@ -111,7 +111,7 @@ class SearchDonationForm(forms.Form):
     radius = forms.ChoiceField(
         required=False,
         label="Search Radius",
-        initial=1,  # Set default value
+        initial=0.5,  # Set default value
         choices=[
             ("0.5", "0.5 miles"),  # Change to strings for better form handling
             ("1", "1 mile"),
