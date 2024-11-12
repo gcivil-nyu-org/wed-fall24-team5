@@ -448,7 +448,7 @@ def add_donation(request):
         if form.is_valid():
             donation = form.save(commit=False)
             organization = Organization.objects.get(organization_id=organization_id)
-            donation.organization=organization
+            donation.organization = organization
             donation.save()
 
         else:

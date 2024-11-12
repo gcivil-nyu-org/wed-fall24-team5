@@ -2,6 +2,7 @@ from django import forms
 from database.models import Donation
 from django.utils import timezone
 
+
 class AddDonationForm(forms.ModelForm):
     food_item = forms.CharField(
         required=True,
@@ -60,7 +61,7 @@ class AddDonationForm(forms.ModelForm):
             "quantity",
             "pickup_by",
         ]
-    
+
     def clean(self):
         cleaned_data = super().clean()
         food_item = cleaned_data.get("food_item")
@@ -72,12 +73,14 @@ class AddDonationForm(forms.ModelForm):
 
         if quantity is None or quantity <= 0:
             raise forms.ValidationError("Quantity must be a positive integer.")
-        
+
         try:
             today = timezone.now().date()
             one_week_later = today + timezone.timedelta(weeks=1)
             if not (today <= pickup_by <= one_week_later):
-                raise forms.ValidationError("Pickup date must be between today and one week from today.")
+                raise forms.ValidationError(
+                    "Pickup date must be between today and one week from today."
+                )
         except ValueError:
             raise forms.ValidationError("Invalid date format. Please use YYYY-MM-DD.")
 
