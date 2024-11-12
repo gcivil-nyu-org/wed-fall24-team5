@@ -527,18 +527,18 @@ class SearchDonationFormTest(TestCase):
 
     def test_radius_field_default_value(self):
         form = SearchDonationForm()
-        self.assertEqual(form.fields["radius"].initial, 5)
+        self.assertEqual(form.fields["radius"].initial, 0.5)  # Changed from 5 to 0.5
 
     def test_radius_field_choices(self):
         form = SearchDonationForm()
         self.assertEqual(
             form.fields["radius"].choices,
             [
+                ("0.5", "0.5 miles"),
+                ("1", "1 mile"),
+                ("3", "3 miles"),
                 ("5", "5 miles"),
                 ("10", "10 miles"),
-                ("25", "25 miles"),
-                ("50", "50 miles"),
-                ("100", "100 miles"),
             ],
         )
 
