@@ -536,10 +536,9 @@ class SearchDonationFormTest(TestCase):
             [
                 ("0.5", "0.5 miles"),
                 ("1", "1 mile"),
-                ("2", "2 miles"),
                 ("3", "3 miles"),
-                ("4", "4 miles"),
                 ("5", "5 miles"),
+                ("10", "10 miles"),
             ],
         )
 
