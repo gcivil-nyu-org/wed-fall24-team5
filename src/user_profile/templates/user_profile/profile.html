@@ -40,7 +40,7 @@
                         <div class="field">
                             <label class="label">Phone Number</label>
                             <div class="control">
-                                <input class="input is-danger" type="text" placeholder="Phone Number" name="phone_number" value="{{ user_profile.phone_number }}">
+                                <input class="input is-danger" type="tel" pattern="[0-9]{10}" placeholder="Enter phone number in this format XXXXXXXXXX" name="phone_number" value="{{ user_profile.phone_number }}">
                             </div>
                         </div>
                     </div>
