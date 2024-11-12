@@ -1,7 +1,7 @@
 from django.contrib.auth.models import User
 from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-from database.models import Room, Organization, Message
+from database.models import Room, Organization, Message, OrganizationAdmin
 from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
@@ -84,6 +84,10 @@ def messaging_view(request):
 @login_required
 def get_messages(request, room_id):
     user_id = request.user.id
+
+    if not str(user_id) in room_id.split("_"):
+        return redirect("messaging:messaging")
+
     curr_user = User.objects.get(id=user_id)
     organizations = Organization.objects.all()
 
@@ -160,6 +164,17 @@ def start_conversation(request):
 @login_required
 def org_messaging_view(request, organization_id):
 
+    user_id = request.user.id
+    if (
+        len(
+            OrganizationAdmin.objects.filter(
+                organization_id=organization_id, user_id=user_id
+            )
+        )
+        == 0
+    ):
+        return redirect("donor_dashboard:org_list")
+
     rooms = get_rooms(organization_id)
     return render(
         request,
@@ -170,6 +185,17 @@ def org_messaging_view(request, organization_id):
 
 @login_required
 def org_get_messages(request, organization_id, room_id):
+
+    user_id = request.user.id
+    if (
+        len(
+            OrganizationAdmin.objects.filter(
+                organization_id=organization_id, user_id=user_id
+            )
+        )
+        == 0
+    ):
+        return redirect("donor_dashboard:org_list")
 
     curr_org = Organization.objects.get(organization_id=organization_id)
     rooms = get_rooms(organization_id)
