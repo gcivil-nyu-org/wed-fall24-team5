@@ -88,9 +88,7 @@ class MessagingViewTests(TestCase):
             reverse("messaging:get_messages", args=[self.room1.room_id])
         )
         self.assertEqual(response.status_code, 302)
-        self.assertRedirects(
-            response, "/messaging/"
-        )
+        self.assertRedirects(response, "/messaging/")
 
     def test_start_conversation_new(self):
         self.client.login(username="user1", password="password1")
