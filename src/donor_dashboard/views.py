@@ -10,7 +10,7 @@ from database.models import (
     UserReview,
 )
 from django.contrib import messages
-from donor_dashboard.forms import AddOrganizationForm
+from donor_dashboard.forms import AddOrganizationForm, AddDonationForm
 from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from django.http import HttpResponse, JsonResponse
@@ -164,6 +164,7 @@ def manage_organization(request, organization_id):
         )
         rating = reviews.aggregate(avg=Avg("rating"))["avg"]
         num_users = orders.values("user").distinct().count()
+        form = AddDonationForm()
         return render(
             request,
             "donor_dashboard/manage_organization.html",
@@ -176,6 +177,7 @@ def manage_organization(request, organization_id):
                 "reviews": reviews,
                 "rating": rating,
                 "num_users": num_users,
+                "form": form,
             },
         )
     except Exception:
@@ -439,31 +441,20 @@ def organization_statistics(request, organization_id):
 @login_required
 def add_donation(request):
     if request.method == "POST":
-        food_item = request.POST["food_item"]
-        quantity = request.POST.get("quantity")
-        pickup_by = request.POST.get("pickup_by")
         organization_id = request.POST.get("organization")
         organization_id = organization_id.strip()
+        form = AddDonationForm(request.POST)
 
-        # Validate Donation
-        errors = validate_donation(food_item, quantity, pickup_by, organization_id)
+        if form.is_valid():
+            donation = form.save(commit=False)
+            organization = Organization.objects.get(organization_id=organization_id)
+            donation.organization=organization
+            donation.save()
 
-        if errors:
-            for error in errors:
-                messages.warning(request, error)
-            return redirect(
-                "donor_dashboard:manage_organization", organization_id=organization_id
-            )
+        else:
+            messages.error(request, "Unable to add donation.")
 
-        # Create new donation if all validations pass
-        Donation.objects.create(
-            food_item=food_item,
-            quantity=int(quantity),
-            pickup_by=timezone.datetime.strptime(pickup_by, "%Y-%m-%d").date(),
-            organization_id=organization_id,
-        )
-
-        messages.success(request, f"Donation: {food_item} added successfully!")
+        messages.success(request, "Donation added successfully!")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
