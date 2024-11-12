@@ -226,14 +226,6 @@ Donation Dashboard
         } else {
             alert('Geolocation is not supported by your browser. Please enter an address manually.');
         }
-    }
-
-    // Auto-get location on page load if no address is entered
-    document.addEventListener('DOMContentLoaded', function () {
-        const addressInput = document.querySelector('input[name="address"]');
-        if (addressInput && !addressInput.value) {
-            getUserLocation();
-        }
-    });
+    };
 </script>
 {% endblock content %}
