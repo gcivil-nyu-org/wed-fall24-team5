@@ -44,7 +44,6 @@ def get_messages_from_room_id(room_id):
                 "time": message.created_at,
             }
         )
-    print(messages)
     return messages
 
 
