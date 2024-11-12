@@ -1,8 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const modal = document.getElementById('reviewModal');
     const reviewButtons = document.querySelectorAll('.review-btn');
-    const closeModalBtn = modal.querySelector('.delete');
-    const cancelBtn = document.getElementById('closeModal');
     const submitBtn = document.getElementById('submitReview');
     const orderIdInput = document.getElementById('orderId');
     const ratingInput = document.getElementById('ratingInput');
@@ -30,12 +28,6 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
             commentInput.value = ''; // Clear the comment field if no comment exists
         }
-    }
-
-    function closeModal() {
-        resetStars();
-        commentInput.value = '';
-        modal.classList.remove('is-active');
     }
 
     // Reset stars to default (empty stars)
@@ -89,11 +81,13 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    closeModalBtn.addEventListener('click', closeModal);
-    cancelBtn.addEventListener('click', closeModal);
-
     // Submit review
     submitBtn.addEventListener('click', () => {
         document.getElementById('reviewForm').submit();
     });
 });
+
+function closeModal() {
+    const modal = document.getElementById('reviewModal');
+    modal.classList.remove('is-active');
+}

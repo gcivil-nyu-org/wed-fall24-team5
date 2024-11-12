@@ -10,9 +10,11 @@ from database.models import (
     UserReview,
 )
 from django.contrib import messages
-from donor_dashboard.forms import AddOrganizationForm
+from donor_dashboard.forms import AddOrganizationForm, AddDonationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Avg, Count, F, Value
 from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
@@ -20,6 +22,7 @@ from .helpers import validate_donation
 import csv
 from itertools import chain
 from operator import attrgetter
+import json
 
 
 @login_required
@@ -164,6 +167,7 @@ def manage_organization(request, organization_id):
         )
         rating = reviews.aggregate(avg=Avg("rating"))["avg"]
         num_users = orders.values("user").distinct().count()
+        form = AddDonationForm()
         return render(
             request,
             "donor_dashboard/manage_organization.html",
@@ -176,6 +180,7 @@ def manage_organization(request, organization_id):
                 "reviews": reviews,
                 "rating": rating,
                 "num_users": num_users,
+                "form": form,
             },
         )
     except Exception:
@@ -218,20 +223,31 @@ def organization_details(request, organization_id):
             )
             admins = []
             for organization_admin in organization_admins:
+                org_user = organization_admin.user
+                if org_user.first_name and org_user.last_name:
+                    name = org_user.first_name + " " + org_user.last_name
+                else:
+                    name = org_user.email.split("@")[0]
                 admins.append(
                     {
-                        "name": organization_admin.user.first_name
-                        + " "
-                        + organization_admin.user.last_name,
+                        "name": name,
                         "email": organization_admin.user.email,
                         "access_level": organization_admin.access_level,
                     }
                 )
 
+            owner_count = organization_admins.filter(access_level="owner").count()
+            multiple_owners = owner_count > 1
+
             return render(
                 request,
                 "donor_dashboard/organization_details.html",
-                {"organization": organization, "form": form, "admins": admins},
+                {
+                    "organization": organization,
+                    "form": form,
+                    "admins": admins,
+                    "multiple_owners": multiple_owners,
+                },
             )
         else:
             messages.warning(request, "You Don't have permission to do this action")
@@ -308,7 +324,7 @@ def statistics_orders(request, organization_id):
         .annotate(order_count=Count("order_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
+    dates = [entry["date"].strftime("%b %d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
 
     return JsonResponse(
@@ -360,7 +376,7 @@ def statistics_donations(request, organization_id):
         .annotate(order_count=Count("donation_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in donations_data]
+    dates = [entry["date"].strftime("%b %d") for entry in donations_data]
     donations_counts = [entry["order_count"] for entry in donations_data]
 
     return JsonResponse(
@@ -431,31 +447,21 @@ def organization_statistics(request, organization_id):
 @login_required
 def add_donation(request):
     if request.method == "POST":
-        food_item = request.POST["food_item"]
-        quantity = request.POST.get("quantity")
-        pickup_by = request.POST.get("pickup_by")
         organization_id = request.POST.get("organization")
         organization_id = organization_id.strip()
+        form = AddDonationForm(request.POST)
 
-        # Validate Donation
-        errors = validate_donation(food_item, quantity, pickup_by, organization_id)
+        if form.is_valid():
+            donation = form.save(commit=False)
+            food_item = form.cleaned_data["food_item"]
+            organization = Organization.objects.get(organization_id=organization_id)
+            donation.organization = organization
+            donation.save()
+            messages.success(request, f"Donation: {food_item} added successfully!")
 
-        if errors:
-            for error in errors:
-                messages.warning(request, error)
-            return redirect(
-                "donor_dashboard:manage_organization", organization_id=organization_id
-            )
+        else:
+            messages.error(request, "Unable to add donation.")
 
-        # Create new donation if all validations pass
-        Donation.objects.create(
-            food_item=food_item,
-            quantity=int(quantity),
-            pickup_by=timezone.datetime.strptime(pickup_by, "%Y-%m-%d").date(),
-            organization_id=organization_id,
-        )
-
-        messages.success(request, f"Donation: {food_item} added successfully!")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
@@ -579,7 +585,14 @@ def add_org_admin(request):
         )
         if current_org_admin.access_level == "owner":
             if request.method == "POST":
-                new_admin_user = User.objects.get(email=new_admin_email)
+                new_admin_user, created = User.objects.get_or_create(
+                    email=new_admin_email
+                )
+                if created:
+                    new_admin_user.username = new_admin_email  # Set username as email
+                    default_password = get_random_string(8)
+                    new_admin_user.password = make_password(default_password)
+                    new_admin_user.save()  # Save the user object
                 if (
                     len(
                         OrganizationAdmin.objects.filter(
@@ -587,14 +600,22 @@ def add_org_admin(request):
                         )
                     )
                     == 0
+                    or created
                 ):
-
                     OrganizationAdmin.objects.create(
                         user=new_admin_user,
                         organization=organization,
                         access_level="admin",
                     )
-                    messages.success(request, "Admin successfully added.")
+                    if created:
+                        messages.add_message(
+                            request,
+                            messages.INFO,
+                            f"Admin successfully created with default password: {default_password}",
+                            extra_tags="temp_password",
+                        )
+                    else:
+                        messages.success(request, "Admin successfully added.")
                 else:
                     messages.success(request, "Admin already associated")
             return redirect(
@@ -613,6 +634,15 @@ def add_org_admin(request):
 
 
 @login_required
+def check_user(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        email = data.get("email")
+        exists = User.objects.filter(email=email).exists()
+        return JsonResponse({"exists": exists})
+
+
+@login_required
 def assign_organization_access_level(
     request, organization_id, admin_email, current_access_level
 ):
@@ -622,6 +652,21 @@ def assign_organization_access_level(
         current_org_admin = OrganizationAdmin.objects.get(
             user=current_user, organization=organization
         )
+
+        # Check if current user is the only owner
+        owner_count = OrganizationAdmin.objects.filter(
+            organization=organization, access_level="owner"
+        ).count()
+
+        if current_org_admin.access_level == "owner":
+            if current_access_level == "owner" and owner_count == 1:
+                # Prevent downgrading the only owner
+                messages.warning(request, "You cannot remove the only owner.")
+                return redirect(
+                    "donor_dashboard:organization_details",
+                    organization_id=organization_id,
+                )
+
         if current_org_admin.access_level == "owner":
             if request.method == "POST":
                 admin_user = User.objects.get(email=admin_email)

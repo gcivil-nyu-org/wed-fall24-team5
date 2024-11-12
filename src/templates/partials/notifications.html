@@ -7,6 +7,7 @@
                     right: 5px;
                     z-index: 1000">
                 {% for message in messages %}
+                {% if 'temp_password' not in message.extra_tags %}
                 <div class="notification is-{{ message.tags }}"
                      style="width: auto;
                             padding-right: 2.5rem">
@@ -14,6 +15,7 @@
 <!-- djlint:on -->
 {{ message }}
 </div>
+{% endif %}
 {% endfor %}
 </div>
 {% endif %}

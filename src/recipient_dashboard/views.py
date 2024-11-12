@@ -148,13 +148,51 @@ def reserve_donation(request, donation_id):
             messages.warning(request, "This donation is no longer available.")
             return redirect("recipient_dashboard")
 
+        # Check if user has 3 or more pending orders for this specific item
+        existing_item_count = (
+            Order.objects.filter(
+                donation=donation,
+                user=request.user,
+                active=True,
+                order_status="pending",
+            ).aggregate(total_quantity=Count("order_quantity"))["total_quantity"]
+            or 0
+        )
+
+        if existing_item_count >= 3:
+            messages.warning(
+                request,
+                "You cannot reserve more than 3 of the same item that are pending pickup.",
+            )
+            return redirect("recipient_dashboard")
+
+        # Check if user has 5 or more different pending items
+        different_pending_items = (
+            Order.objects.filter(user=request.user, active=True, order_status="pending")
+            .values("donation")
+            .distinct()
+            .count()
+        )
+
+        if different_pending_items >= 5:
+            messages.warning(
+                request, "You cannot have more than 5 different items pending pickup."
+            )
+            return redirect("recipient_dashboard")
+
         # Check if the user has already reserved this donation
         existing_order = Order.objects.filter(
             donation=donation, user=request.user, active=True, order_status="pending"
         ).first()
 
         if existing_order:
-            # Increment order quantity if an order exists
+            # Only increment if they haven't reached the limit of 3
+            if existing_order.order_quantity >= 3:
+                messages.warning(
+                    request, "You cannot reserve more than 3 of the same item."
+                )
+                return redirect("recipient_dashboard")
+
             existing_order.order_quantity += 1
             existing_order.save()
             messages.success(request, "Donation reserved successfully.")
@@ -163,7 +201,7 @@ def reserve_donation(request, donation_id):
             Order.objects.create(
                 donation=donation,
                 user=request.user,
-                order_quantity=1,  # In the future: allow user to select quantity
+                order_quantity=1,
                 order_status="pending",
             )
             messages.success(request, "Donation reserved successfully.")
@@ -173,7 +211,7 @@ def reserve_donation(request, donation_id):
         donation.save()
 
         return redirect("recipient_dashboard")
-    except Exception:
+    except Exception as e:  # noqa
         messages.warning(request, "Unable to reserve donation. Try again later.")
         return redirect("recipient_dashboard")
 
@@ -209,7 +247,7 @@ def statistics_user_orders(request):
         .annotate(order_count=Count("order_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in orders_data]
+    dates = [entry["date"].strftime("%b %d") for entry in orders_data]
     orders_counts = [entry["order_count"] for entry in orders_data]
 
     return JsonResponse(
@@ -234,7 +272,7 @@ def statistics_user_donations(request):
         .annotate(donation_count=Count("donation_id"))
         .order_by("date")
     )
-    dates = [entry["date"].strftime("%Y-%m-%d") for entry in donations_data]
+    dates = [entry["date"].strftime("%b %d") for entry in donations_data]
     donations_counts = [entry["donation_count"] for entry in donations_data]
 
     return JsonResponse(

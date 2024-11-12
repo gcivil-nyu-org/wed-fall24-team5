@@ -12,6 +12,7 @@ from database.models import (
     DietaryRestriction,
 )
 from donor_dashboard.forms import AddOrganizationForm
+import json
 
 
 class DonorDashboardViewsTests(TestCase):
@@ -659,6 +660,28 @@ class OrganizationAdminViewsTestCase(TestCase):
             "Succesfully remove this org access to email: admin@example.com",
         )
 
+    def test_check_user(self):
+        data = json.dumps({"email": self.new_admin.email})
+        response = self.client.post(
+            reverse("donor_dashboard:check_user"), data, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # Check that admin email exists in user
+        response_data = response.json()
+        self.assertEqual(response_data["exists"], True)
+
+    def test_check_user_does_not_exist(self):
+        data = json.dumps({"email": "noadmin@example.com"})
+        response = self.client.post(
+            reverse("donor_dashboard:check_user"), data, content_type="application/json"
+        )
+        self.assertEqual(response.status_code, 200)
+
+        # Check that admin email exists in user
+        response_data = response.json()
+        self.assertEqual(response_data["exists"], False)
+
 
 class DonorDashboardStatsTests(TestCase):
     def setUp(self):
@@ -728,7 +751,7 @@ class DonorDashboardStatsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(
-            response_data["labels"][0], self.order.order_created_at.strftime("%Y-%m-%d")
+            response_data["labels"][0], self.order.order_created_at.strftime("%b %d")
         )
         self.assertEqual(response_data["data"][0], 1)
 
@@ -755,7 +778,7 @@ class DonorDashboardStatsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(
-            response_data["labels"][0], self.donation.created_at.strftime("%Y-%m-%d")
+            response_data["labels"][0], self.donation.created_at.strftime("%b %d")
         )
         self.assertEqual(response_data["data"][0], 1)
 

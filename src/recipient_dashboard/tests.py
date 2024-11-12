@@ -527,18 +527,18 @@ class SearchDonationFormTest(TestCase):
 
     def test_radius_field_default_value(self):
         form = SearchDonationForm()
-        self.assertEqual(form.fields["radius"].initial, 5)
+        self.assertEqual(form.fields["radius"].initial, 0.5)  # Changed from 5 to 0.5
 
     def test_radius_field_choices(self):
         form = SearchDonationForm()
         self.assertEqual(
             form.fields["radius"].choices,
             [
+                ("0.5", "0.5 miles"),
+                ("1", "1 mile"),
+                ("3", "3 miles"),
                 ("5", "5 miles"),
                 ("10", "10 miles"),
-                ("25", "25 miles"),
-                ("50", "50 miles"),
-                ("100", "100 miles"),
             ],
         )
 
@@ -767,7 +767,7 @@ class RecipientDashboardStatsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(
-            response_data["labels"][0], self.order.order_created_at.strftime("%Y-%m-%d")
+            response_data["labels"][0], self.order.order_created_at.strftime("%b %d")
         )
         self.assertEqual(response_data["data"][0], 1)
 
@@ -776,6 +776,121 @@ class RecipientDashboardStatsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         response_data = response.json()
         self.assertEqual(
-            response_data["labels"][0], self.donation.created_at.strftime("%Y-%m-%d")
+            response_data["labels"][0], self.donation.created_at.strftime("%b %d")
         )
         self.assertEqual(response_data["data"][0], 1)
+
+
+class ReservationLimitTests(TestCase):
+    def setUp(self):
+        # Create test user
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.login(username="testuser", password="testpass")
+
+        # Create test organization
+        self.organization = Organization.objects.create(
+            organization_name="Test Organization",
+            type="restaurant",
+            address="123 Test St",
+            zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
+        )
+
+        # Create test donations
+        self.donation1 = Donation.objects.create(
+            organization=self.organization,
+            food_item="Test Food 1",
+            quantity=10,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        self.donation2 = Donation.objects.create(
+            organization=self.organization,
+            food_item="Test Food 2",
+            quantity=10,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+    def test_same_item_limit(self):
+        """Test that a user cannot reserve more than 3 of the same item."""
+        # Make 3 successful reservations
+        for _ in range(3):
+            response = self.client.get(
+                reverse("reserve_donation", args=[self.donation1.donation_id])
+            )
+            self.assertEqual(response.status_code, 302)
+
+        # Try to make a fourth reservation
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation1.donation_id])
+        )
+        messages = list(response.wsgi_request._messages)
+        self.assertTrue(
+            any(
+                "cannot reserve more than 3 of the same item" in str(m)
+                for m in messages
+            )
+        )
+
+    def test_different_items_limit(self):
+        """Test that a user cannot have more than 5 different pending items."""
+        # Create 5 different donations and reserve them
+        donations = []
+        for i in range(5):
+            donation = Donation.objects.create(
+                organization=self.organization,
+                food_item=f"Test Food {i+3}",  # Starting at 3 since we already have 1 and 2
+                quantity=10,
+                pickup_by=timezone.now() + timedelta(days=1),
+                active=True,
+            )
+            donations.append(donation)
+            response = self.client.get(
+                reverse("reserve_donation", args=[donation.donation_id])
+            )
+            self.assertEqual(response.status_code, 302)
+
+        # Try to reserve a sixth different item
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation2.donation_id])
+        )
+        messages = list(response.wsgi_request._messages)
+        self.assertTrue(
+            any("cannot have more than 5 different items" in str(m) for m in messages)
+        )
+
+    def test_increment_existing_order_limit(self):
+        """Test that incrementing an existing order respects the 3-item limit."""
+        # Create an order with quantity 2
+        Order.objects.create(
+            donation=self.donation1,
+            user=self.user,
+            order_quantity=2,
+            order_status="pending",
+            active=True,
+        )
+
+        # Try to reserve one more (should succeed)
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation1.donation_id])
+        )
+        self.assertEqual(response.status_code, 302)
+        messages = list(response.wsgi_request._messages)
+        self.assertTrue(any("reserved successfully" in str(m) for m in messages))
+
+        # Try to reserve another (should fail)
+        response = self.client.get(
+            reverse("reserve_donation", args=[self.donation1.donation_id])
+        )
+        messages = list(response.wsgi_request._messages)
+        self.assertTrue(
+            any(
+                "cannot reserve more than 3 of the same item" in str(m)
+                for m in messages
+            )
+        )

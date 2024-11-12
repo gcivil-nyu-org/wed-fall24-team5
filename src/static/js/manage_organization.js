@@ -1,6 +1,6 @@
 // Function to confirm deletion of an organization
 function confirmDelete() {
-    if (confirm("Are you sure you want to delete this organization?")) {
+    if (confirm("Are you sure you want to make this organization inactive? All the donations and orders under this organization will also be inactive!!")) {
         // If confirmed, submit the form
         document.getElementById('delete-form').submit();
     }
@@ -127,6 +127,42 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
     // Existing code for modals, delete confirmation, etc.
+    const quantityInput = document.getElementById("id_quantity");
+    const quantityWarning = document.getElementById("quantity-warning");
+    quantityInput.addEventListener("input", function () {
+        const quantityValue = quantityInput.value;
+        if (quantityValue <= 0) {
+            quantityWarning.style.display = "block";
+        } else {
+            quantityWarning.style.display = "none";
+        }
+    });
+
+    const dateInput = document.getElementById("id_pickup_by");
+    const dateWarning = document.getElementById("date-warning");
+    dateInput.addEventListener("input", function () {
+        const dateValue = dateInput.value;
+        if (!isValidDate(dateValue)) {
+            dateWarning.style.display = "block";
+        } else {
+            dateWarning.style.display = "none";
+        }
+    });
+
+    function isValidDate(dateString) {
+        const inputDate = new Date(dateString);
+        if (isNaN(inputDate)) {
+            return false;
+        }
+
+        const currentDate = new Date();
+        const range = new Date();
+        range.setDate(currentDate.getDate() + 7);
+
+        // Check if the date is within one week in the future
+        return inputDate > currentDate && inputDate <= range;
+    }
+
     var addDonationButton = document.getElementById("add-donation-button");
     if (addDonationButton) {
         addDonationButton.onclick = function () {
@@ -140,7 +176,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
             const modalForm = document.querySelector('#addDonationModal form');
             modalForm.action = `/donor_dashboard/add_donation/`;
-            document.getElementById("addDonationModal").style.display = "block";
+            // document.getElementById("addDonationModal").style.display = "block";
+            document.getElementById("addDonationModal").classList.add("is-active");
         };
     }
 
@@ -163,22 +200,21 @@ document.addEventListener("DOMContentLoaded", function () {
             const modalForm = document.querySelector('#addDonationModal form');
             modalForm.action = `/donor_dashboard/modify_donation/${donationId}/`;
 
-            const modal = document.getElementById('addDonationModal');
-            modal.style.display = 'block';
+            document.getElementById("addDonationModal").classList.add("is-active");
         };
     });
 
     var closeButton = document.getElementById("closeModal");
     if (closeButton) {
         closeButton.onclick = function () {
-            document.getElementById("addDonationModal").style.display = "none";
+            document.getElementById("addDonationModal").classList.remove("is-active");
         };
     }
 
     window.onclick = function (event) {
         var modal = document.getElementById("addDonationModal");
         if (event.target == modal) {
-            modal.style.display = "none";
+            modal.classList.remove("is-active");
         }
     };
 });
