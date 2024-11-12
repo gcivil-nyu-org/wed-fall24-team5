@@ -1,7 +1,7 @@
 from django.test import TestCase, Client
 from django.urls import reverse
 from django.contrib.auth.models import User
-from database.models import Room, Organization, Message
+from database.models import Room, Organization, Message, OrganizationAdmin
 from django.contrib.contenttypes.models import ContentType
 
 
@@ -32,6 +32,10 @@ class MessagingViewTests(TestCase):
             type="self",
             address="123 Test St",
             zipcode=12345,
+        )
+
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user1, organization=self.org1, access_level="owner"
         )
 
         # Create room
