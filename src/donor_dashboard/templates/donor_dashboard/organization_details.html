@@ -130,11 +130,12 @@ Organization Details
                         {% if current_org_admin.access_level == "owner" and multiple_owners %}
                             <button type="submit" class="card-footer-item has-text-primary js-modal-trigger" data-target="makeAdminModal">
                             Make Admin
+                            </button>
                         {% else %}
                             <button type="submit" class="card-footer-item has-text-grey-light" disabled>
                                 Only Owner
-                        {% endif %}
                             </button>
+                        {% endif %}
                     {% if multiple_owners %}
                         <button class="card-footer-item has-text-danger js-modal-trigger" data-target="leaveOrgModal">
                             Leave
@@ -179,14 +180,16 @@ Organization Details
                         {% if admin.access_level == "owner" and multiple_owners %}
                             <button type="submit" class="has-text-primary">
                             Make Admin
+                            </button>
                             {% elif admin.access_level == "admin" %}
                             <button type="submit" class="has-text-primary">
                             Make Owner
+                            </button>
                             {% else %}
                             <button type="submit" disabled>
                             Only Owner
-                            {% endif %}
                             </button>
+                            {% endif %}
                     </form>
                     {% if admin.access_level == "admin" %}
                     <form
