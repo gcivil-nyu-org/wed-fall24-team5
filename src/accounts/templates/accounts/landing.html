@@ -2,6 +2,14 @@
 {% block title %}
     Welcome
 {% endblock title %}
+{% block extra_head %}
+<style>
+    .hero.is-halfheight .hero-body, .hero.is-fullheight .hero-body, .hero.is-fullheight-with-navbar .hero-body {
+        align-items: center !important;
+        display: flex;
+      }
+</style>
+{% endblock extra_head %}
 {% block content %}
     <div class="container has-text-centered">
         <h1 class="title is-2 is-spaced">Food Donation App</h1>
