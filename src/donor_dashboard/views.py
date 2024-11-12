@@ -12,7 +12,9 @@ from database.models import (
 from django.contrib import messages
 from donor_dashboard.forms import AddOrganizationForm
 from django.contrib.auth.decorators import login_required
+from django.contrib.auth.hashers import make_password
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.http import HttpResponse, JsonResponse
 from django.db.models import Avg, Count, F, Value
 from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
@@ -20,6 +22,7 @@ from .helpers import validate_donation
 import csv
 from itertools import chain
 from operator import attrgetter
+import json
 
 
 @login_required
@@ -218,11 +221,14 @@ def organization_details(request, organization_id):
             )
             admins = []
             for organization_admin in organization_admins:
+                org_user = organization_admin.user
+                if org_user.first_name and org_user.last_name:
+                    name = org_user.first_name + " " + org_user.last_name
+                else:
+                    name = org_user.email.split("@")[0]
                 admins.append(
                     {
-                        "name": organization_admin.user.first_name
-                        + " "
-                        + organization_admin.user.last_name,
+                        "name": name,
                         "email": organization_admin.user.email,
                         "access_level": organization_admin.access_level,
                     }
@@ -587,7 +593,14 @@ def add_org_admin(request):
         )
         if current_org_admin.access_level == "owner":
             if request.method == "POST":
-                new_admin_user = User.objects.get(email=new_admin_email)
+                new_admin_user, created = User.objects.get_or_create(
+                    email=new_admin_email
+                )
+                if created:
+                    new_admin_user.username = new_admin_email  # Set username as email
+                    default_password = get_random_string(8)
+                    new_admin_user.password = make_password(default_password)
+                    new_admin_user.save()  # Save the user object
                 if (
                     len(
                         OrganizationAdmin.objects.filter(
@@ -595,14 +608,22 @@ def add_org_admin(request):
                         )
                     )
                     == 0
+                    or created
                 ):
-
                     OrganizationAdmin.objects.create(
                         user=new_admin_user,
                         organization=organization,
                         access_level="admin",
                     )
-                    messages.success(request, "Admin successfully added.")
+                    if created:
+                        messages.add_message(
+                            request,
+                            messages.INFO,
+                            f"Admin successfully created with default password: {default_password}",
+                            extra_tags="temp_password",
+                        )
+                    else:
+                        messages.success(request, "Admin successfully added.")
                 else:
                     messages.success(request, "Admin already associated")
             return redirect(
@@ -618,6 +639,15 @@ def add_org_admin(request):
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
+
+
+@login_required
+def check_user(request):
+    if request.method == "POST":
+        data = json.loads(request.body)
+        email = data.get("email")
+        exists = User.objects.filter(email=email).exists()
+        return JsonResponse({"exists": exists})
 
 
 @login_required

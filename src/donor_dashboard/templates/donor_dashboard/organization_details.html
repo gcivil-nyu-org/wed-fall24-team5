@@ -1,126 +1,118 @@
 {% extends "_base.html" %}
 {% block title %}
-    Organization Details
+Organization Details
 {% endblock title %}
+{% load static %}
 {% block content %}
-    <div class="container">
-        {% include "partials/notifications.html" %}
-        <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
-            <ul>
-                <li><a href="{% url 'donor_dashboard:org_list' %}">
-                        <span class="icon is-small"><i class="fa fa-angle-double-left" aria-hidden="true"></i></span>
-                        <span>Organizations</span>
-                    </a></li>
-                    <li><a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}">
-                        <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
-                        <span>{{ organization.organization_name }}</span>
-                    </a></li>
-                <li class="is-active">
-                    <a href="#" aria-current="page">Edit Details</a>
-                </li>
-            </ul>
-        </nav>
-        <h1 class="title mt-3">
-            <strong>{{ organization.organization_name }}</strong>
-        </h1>
-        <h2 class="subtitle mt-3">
-            Edit Organization Details
-        </h2>
-        <form method="post">
-            {% csrf_token %}
-            <div class="card">
-                <div class="card-content">
-                    <div class="columns is-multiline">
-                        <div class="column is-full-mobile is-two-thirds-tablet">
-                            <div class="field">{{ form.organization_name }}</div>
-                        </div>
-                        <div class="column is-full-mobile is-one-third-tablet">
-                            <div class="field">
-                                <div class="control">
-                                    <div class="tag is-medium is-light is-fullwidth">{{ form.type }}</div>
-                                </div>
+<script src="{% static 'js/organization_details.js' %}"></script>
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <nav class="breadcrumb mt-5" aria-label="breadcrumbs">
+        <ul>
+            <li><a href="{% url 'donor_dashboard:org_list' %}">
+                    <span class="icon is-small"><i class="fa fa-angle-double-left" aria-hidden="true"></i></span>
+                    <span>Organizations</span>
+                </a></li>
+            <li><a href="{% url 'donor_dashboard:manage_organization' organization.organization_id %}">
+                    <span class="icon is-small"><i class="fa fa-angle-left" aria-hidden="true"></i></span>
+                    <span>{{ organization.organization_name }}</span>
+                </a></li>
+            <li class="is-active">
+                <a href="#" aria-current="page">Edit Details</a>
+            </li>
+        </ul>
+    </nav>
+    <h1 class="title mt-3">
+        <strong>{{ organization.organization_name }}</strong>
+    </h1>
+    <h2 class="subtitle mt-3">
+        Edit Organization Details
+    </h2>
+    <form method="post">
+        {% csrf_token %}
+        <div class="card">
+            <div class="card-content">
+                <div class="columns is-multiline">
+                    <div class="column is-full-mobile is-two-thirds-tablet">
+                        <div class="field">{{ form.organization_name }}</div>
+                    </div>
+                    <div class="column is-full-mobile is-one-third-tablet">
+                        <div class="field">
+                            <div class="control">
+                                <div class="tag is-medium is-light is-fullwidth">{{ form.type }}</div>
                             </div>
                         </div>
                     </div>
-                    <div class="columns is-multiline">
-                        <div class="column is-two-thirds-tablet is-full-mobile">
-                            <div class="field">
-                                <div class="control">
-                                    <div class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">{{ form.address }}</div>
-                                </div>
+                </div>
+                <div class="columns is-multiline">
+                    <div class="column is-two-thirds-tablet is-full-mobile">
+                        <div class="field">
+                            <div class="control">
+                                <div class="button is-link is-light is-fullwidth has-text-left is-flex-wrap-wrap">
+                                    {{ form.address }}</div>
                             </div>
-                            <div class="field">{{ form.zipcode }}</div>
                         </div>
-                        <div class="column is-one-third-tablet is-full-mobile">
-                            <div class="field">{{ form.email }}</div>
-                            <div class="field">{{ form.contact_number }}</div>
-                            <div class="field">{{ form.website }}</div>
-                        </div>
+                        <div class="field">{{ form.zipcode }}</div>
+                    </div>
+                    <div class="column is-one-third-tablet is-full-mobile">
+                        <div class="field">{{ form.email }}</div>
+                        <div class="field">{{ form.contact_number }}</div>
+                        <div class="field">{{ form.website }}</div>
                     </div>
                 </div>
-                <footer class="card-footer has-background-white-ter">
-                    <button id="submit-btn" type="submit" class="card-footer-item">
-                        <strong>Update</strong>
-                    </button>
-                </footer>
             </div>
-        </form>
-        <h2 class="subtitle mt-4">
-            <strong>Add Admins:</strong>
-        </h2>
-        <form method="post" action="{% url 'donor_dashboard:add_org_admin' %}">
-            {% csrf_token %}
-            <div class="card">
-                <input type="hidden"
-                       name="organization_id"
-                       value="{{ organization.organization_id }}">
+            <footer class="card-footer has-background-white-ter">
+                <button id="submit-btn" type="submit" class="card-footer-item">
+                    <strong>Update</strong>
+                </button>
+            </footer>
+        </div>
+    </form>
+    <h1 class="subtitle mt-5">
+        <strong>Admin List</strong>
+    </h1>
+    <div class="level">
+        <div class="level-left">
+            <div class="level-item">
+                <p class="subtitle is-6"><strong>Add Admin</strong></p>
+            </div>
+            <div class="level-item">
+                <form id="addAdminForm" method="post" action="{% url 'donor_dashboard:add_org_admin' %}"
+                    data-check-url="{% url 'donor_dashboard:check_user' %}">
+                    {% csrf_token %}
+                    <input type="hidden" name="organization_id" value="{{ organization.organization_id }}">
+                    <div class="field is-grouped">
+                        <p class="control is-expanded">
+                            <input class="input" type="email" id="email" name="email" placeholder="Enter new admin email" required />
+                        </p>
+                        <p class="control">
+                            <button id="submit-btn" type="submit" class="button is-info" data-target="addAdminModal">
+                                <strong>Add</strong>
+                            </button>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="columns is-multiline is-variable is-4">
+        {% if admins %}
+        {% for admin in admins %}
+        <div class="column is-one-third is-full-mobile">
+            <div class="card mb-5 is-flex is-flex-direction-column">
                 <div class="card-content">
-                    <h2>
-                        Email:
-                        <input type="email"
-                               id="email"
-                               name="email"
-                               placeholder="Enter new admin email"
-                               required>
-                    </h2>
-                </div>
-                <footer class="card-footer has-background-white-ter">
-                    <button id="submit-btn" type="submit" class="card-footer-item">
-                        <strong>Add</strong>
-                    </button>
-                </footer>
-            </div>
-        </form>
-        <h2 class="subtitle mt-4">
-            <strong>All Admins list</strong>
-        </h2>
-        <div class="columns is-multiline is-variable is-4">
-            {% if admins %}
-                {% for admin in admins %}
-                    <div class="column is-one-third">
-                        <div class="box">
-                            <div class="columns is-multiline">
-                                <div class="column is-full-mobile is-two-thirds-tablet">
-                                    <h3 class="title is-4">{{ admin.name }}</h3>
-                                </div>
-                                <div class="column is-full-mobile is-one-third-tablet">
-                                    {% if admin.access_level == "owner" and multiple_owners %}
-                                        <!-- djlint:off -->
-                                        <form action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" method="post" style="display: inline;">
-                                            {% csrf_token %}
-                                            <button type="submit" style="color: green; background: none; border: none; cursor: pointer;">
-                                                Make as admin
-                                            </button>
-                                        </form>
-                                    {% elif admin.access_level == "admin" %}
-                                        <form action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}" method="post" style="display: inline;">
-                                                {% csrf_token %}
-                                            <button type="submit" style="color: green; background: none; border: none; cursor: pointer;">
-                                                Make as owner
-                                            </button>
-                                        </form>                                     
-                                <!-- djlint:on -->
-                            {% endif %}
+                    <div class="level">
+                        <div class="level-left" style="max-width: 60%;">
+                            <div class="level-item" style="max-width: 100%;">
+                                <p class="title is-5 is-clipped"
+                                    style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
+                                    {{ admin.name }}</p>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <span class="tag is-primary is-light is-medium mt-1">{{ admin.access_level }}</span>
+                            </div>
                         </div>
                     </div>
                     <p>
@@ -129,24 +121,93 @@
                     <p>
                         <strong>Role:</strong> {{ admin.access_level }}
                     </p>
-                    <!-- djlint:off -->
+                </div>
+                <footer class="card-footer mt-auto has-background-white-ter has-text-weight-semibold">
+                    <form
+                        action="{% url 'donor_dashboard:assign_organization_access_level' organization.organization_id admin.email admin.access_level %}"
+                        method="post" class="card-footer-item">
+                        {% csrf_token %}
+                        <button type="submit" class="has-text-success">
+                            {% if admin.access_level == "owner" and multiple_owners %}
+                            Make Admin
+                            {% else %}
+                            Make Owner
+                            {% endif %}
+                        </button>
+                    </form>
                     {% if multiple_owners %}
-                    <footer class="card-footer has-text-danger">
-                        <!-- djlint:on -->
-                        <form action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}" method="post" style="display: inline;">
-                            {% csrf_token %}
-                            <button type="submit" class="card-footer-item" style="background: none; border: none; color: inherit; cursor: pointer;">
-                                Remove
-                            </button>
-                        </form>
-                    </footer>
+                    <form
+                        action="{% url 'donor_dashboard:remove_admin_owner' organization.organization_id admin.email %}"
+                        method="post" class="card-footer-item">
+                        {% csrf_token %}
+                        <button type="submit" class="has-text-danger">
+                            Remove
+                        </button>
+                    </form>
                     {% endif %}
+                </footer>
             </div>
         </div>
-    {% endfor %}
-{% else %}
-    <p class="box">No Admins in this Organizations!!</p>
+        {% endfor %}
+        {% else %}
+        <p class="box">No Admins in this Organization!!</p>
+        {% endif %}
+    </div>
+    <div id="addAdminModal" class="modal"">
+        <div class=" modal-background"></div>
+    <div class="modal-content" style="max-width: 430px;">
+        <div class="box">
+            <p class="icon-text is-size-5">
+                <span class="icon has-text-warning">
+                    <i class="fa fa-exclamation-triangle"></i>
+                </span>
+                <span><strong>Unregistered User</strong></span>
+            </p>
+            <p class="block is-size-6 mt-3">You are adding an unregistered user. Are you sure?</p>
+            <div class="field is-grouped is-grouped-centered">
+                <p class="control">
+                    <button id="confirmButton" class="button is-primary" onclick="confirmAddUser()">Confirm</button>
+                </p>
+                <p class="control">
+                    <button class="button">Cancel</button>
+                </p>
+            </div>
+        </div>
+    </div>
+    <button class="modal-close is-large" aria-label="close"></button>
+</div>
+</div>
+{% if messages %}
+{% for message in messages %}
+{% if 'temp_password' in message.extra_tags %}
+<div class="modal" id="passwordModal">
+    <div class="modal-background"></div>
+    <div class="modal-content">
+        <div class="box">
+            <p class="icon-text is-size-5">
+                <span class="icon has-text-success">
+                    <i class="fa fa-check-circle"></i>
+                </span>
+                <span><strong>Admin Created</strong></span>
+            </p>
+            <p class="block is-size-6 mt-3">{{ message }}</p>
+            <div class="field is-centered">
+                <p class="control">
+                    <button class="button close-btn" onclick="closeModal()">Close</button>
+                </p>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        document.getElementById('passwordModal').classList.add('is-active');
+        document.querySelector('.close-btn').addEventListener('click', () => {
+            document.getElementById('passwordModal').classList.remove('is-active');
+        });
+    });
+</script>
 {% endif %}
-</div>
-</div>
+{% endfor %}
+{% endif %}
 {% endblock content %}

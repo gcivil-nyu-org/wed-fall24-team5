@@ -83,4 +83,5 @@ urlpatterns = [
         views.statistics_ratings,
         name="statistics_ratings",
     ),
+    path("check_user/", views.check_user, name="check_user"),
 ]
