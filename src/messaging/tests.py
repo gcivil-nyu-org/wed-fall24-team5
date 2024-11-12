@@ -78,6 +78,16 @@ class MessagingViewTests(TestCase):
         self.assertEqual(len(response.context["messages"]), 1)
         self.assertEqual(response.context["messages"][0]["message_body"], "Hello!")
 
+    def test_get_messages_invalid_user_view(self):
+        self.client.login(username="user2", password="password2")
+        response = self.client.get(
+            reverse("messaging:get_messages", args=[self.room1.room_id])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(
+            response, "/messaging/"
+        )
+
     def test_start_conversation_new(self):
         self.client.login(username="user1", password="password1")
         data = {
@@ -118,3 +128,11 @@ class MessagingViewTests(TestCase):
         self.assertTemplateUsed(response, "messaging_dashboard.html")
         self.assertIn("rooms", response.context)
         self.assertEqual(len(response.context["rooms"]), 1)
+
+    def test_org_messaging_invalid_user_view(self):
+        self.client.login(username="user2", password="password2")
+        response = self.client.get(
+            reverse("messaging:org_messaging_view", args=[self.org1.organization_id])
+        )
+        self.assertEqual(response.status_code, 302)
+        self.assertRedirects(response, "/donor_dashboard/")
