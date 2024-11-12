@@ -39,6 +39,10 @@ jobs:
           on:
             repo: gcivil-nyu-org/wed-fall24-team5
             branch: test
+      # Re-run migrate after deploy to support Google Auth
+      after_deploy:
+        - python src/manage.py makemigrations
+        - python src/manage.py migrate
     # Main deployment via cron
     - stage: merge-develop-into-main
       if: type = cron
@@ -75,6 +79,10 @@ jobs:
           on:
             repo: gcivil-nyu-org/wed-fall24-team5
             branch: main
+      # Re-run migrate after deploy to support Google Auth
+      after_deploy:
+        - python src/manage.py makemigrations
+        - python src/manage.py migrate
     # Develop deployment
     - stage: test-and-send-to-dev
       branches:
@@ -103,3 +111,7 @@ jobs:
           on:
             repo: gcivil-nyu-org/wed-fall24-team5
             branch: develop
+      # Re-run migrate after deploy to support Google Auth
+      after_deploy:
+        - python src/manage.py makemigrations
+        - python src/manage.py migrate
