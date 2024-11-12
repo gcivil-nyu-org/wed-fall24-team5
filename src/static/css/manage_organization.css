@@ -26,7 +26,6 @@
 }
 
 .modal {
-    display: none;
     position: fixed;
     z-index: 1000;
     left: 0;
@@ -72,6 +71,7 @@
 .cell-content {
     max-height: 350px;
     overflow-y: scroll;
+}
 
 /***** Orders dropdown styles *****/
 .orders-dropdown {

@@ -109,7 +109,7 @@ Manage Organization
         </div>
     </nav>
     <!-- Tab navigation -->
-    <div class="tabs is-centered is-toggle is-fullwidth mt-3">
+    <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold mt-3">
         <ul>
             <li id="donations-tab">
                 <a>Donations</a>
@@ -124,6 +124,8 @@ Manage Organization
     </div>
     <!-- Content for List of Donations tab -->
     <div id="donations-content" class="manage-tab">
+        <div class="flex-container is-justify-content-space-between is-align-items-center mb-3">
+            <h2 class="subtitle mt-3"><strong>All Donations</strong></h2>
         {% if status %}
         <div class="buttons">
             <button id="add-donation-button" class="button is-dark">Add Donation</button>
@@ -133,6 +135,7 @@ Manage Organization
             <span class="tag is-primary is-light is-medium mt-1">In Active</span>
         </div>
         {% endif %}
+        </div>
         {% if donations %}
         <div class="columns is-multiline is-variable is-4">
             {% for donation in donations %}
@@ -315,29 +318,25 @@ Manage Organization
     </div>
     <div id="addDonationModal" class="modal">
         <div class="modal-content">
-            <span class="close" name="modal-close" id="closeModal">X</span>
-            <h2 id="modal-header">Add a Donation</h2>
+            <span class="icon is-small close" name="modal-close" id="closeModal"><i class="fa fa-close"></i></span>
+            <h2 class="subtitle has-text-weight-bold" id="modal-header">Add a Donation</h2>
             <hr>
             <form method="post" action="{% url 'donor_dashboard:add_donation' %}">
                 {% csrf_token %}
                 <!-- Donation Form Fields -->
                 <div class="field">
-                    <label class="label">Food Item</label>
-                    <div class="control">
-                        <input class="input" type="text" name="food_item" placeholder="Food item">
-                    </div>
+                    <label class="label">{{ form.food_item.label_tag }}</label>
+                    <div class="control">{{ form.food_item }}</div>
                 </div>
                 <div class="field">
-                    <label class="label">Quantity</label>
-                    <div class="control">
-                        <input class="input" type="number" name="quantity" placeholder="Quantity">
-                    </div>
+                    <label class="label">{{ form.quantity.label_tag }}</label>
+                    <div class="control">{{ form.quantity }}</div>
+                    <p id="quantity-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a positive integer.</p>
                 </div>
                 <div class="field">
-                    <label class="label">Pickup By</label>
-                    <div class="control">
-                        <input class="input" type="date" name="pickup_by">
-                    </div>
+                    <label class="label" for="pickup_by">{{ form.pickup_by.label_tag }}</label>
+                    <div class="control">{{ form.pickup_by }}</div>
+                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date within 1 week from today.</p>
                 </div>
                 <div class="field" hidden>
                     <label class="label">Organization</label>
