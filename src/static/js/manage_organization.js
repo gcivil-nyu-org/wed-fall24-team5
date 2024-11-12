@@ -129,7 +129,7 @@ document.addEventListener("DOMContentLoaded", function () {
     // Existing code for modals, delete confirmation, etc.
     const quantityInput = document.getElementById("id_quantity");
     const quantityWarning = document.getElementById("quantity-warning");
-    quantityInput.addEventListener("input", function() {
+    quantityInput.addEventListener("input", function () {
         const quantityValue = quantityInput.value;
         if (quantityValue <= 0) {
             quantityWarning.style.display = "block";
@@ -140,7 +140,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const dateInput = document.getElementById("id_pickup_by");
     const dateWarning = document.getElementById("date-warning");
-    dateInput.addEventListener("input", function() {
+    dateInput.addEventListener("input", function () {
         const dateValue = dateInput.value;
         if (!isValidDate(dateValue)) {
             dateWarning.style.display = "block";
@@ -154,11 +154,11 @@ document.addEventListener("DOMContentLoaded", function () {
         if (isNaN(inputDate)) {
             return false;
         }
-        
+
         const currentDate = new Date();
         const range = new Date();
         range.setDate(currentDate.getDate() + 7);
-        
+
         // Check if the date is within one week in the future
         return inputDate > currentDate && inputDate <= range;
     }
