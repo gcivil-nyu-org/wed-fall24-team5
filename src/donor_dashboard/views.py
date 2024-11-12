@@ -447,14 +447,15 @@ def add_donation(request):
 
         if form.is_valid():
             donation = form.save(commit=False)
+            food_item = form.cleaned_data["food_item"]
             organization = Organization.objects.get(organization_id=organization_id)
             donation.organization = organization
             donation.save()
+            messages.success(request, f"Donation: {food_item} added successfully!")
 
         else:
             messages.error(request, "Unable to add donation.")
 
-        messages.success(request, "Donation added successfully!")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
