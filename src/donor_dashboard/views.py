@@ -202,7 +202,7 @@ def organization_details(request, organization_id):
         if current_org_admin.access_level == "owner":
             organization_admins = OrganizationAdmin.objects.filter(
                 organization_id=organization_id
-            )
+            ).order_by("-access_level")
 
             if request.method == "POST":
                 form = AddOrganizationForm(request.POST, instance=organization)
@@ -224,17 +224,19 @@ def organization_details(request, organization_id):
             admins = []
             for organization_admin in organization_admins:
                 org_user = organization_admin.user
-                if org_user.first_name and org_user.last_name:
-                    name = org_user.first_name + " " + org_user.last_name
-                else:
-                    name = org_user.email.split("@")[0]
-                admins.append(
-                    {
-                        "name": name,
-                        "email": organization_admin.user.email,
-                        "access_level": organization_admin.access_level,
-                    }
-                )
+                if org_user != current_user:
+                    if org_user.first_name and org_user.last_name:
+                        name = org_user.first_name + " " + org_user.last_name
+                    else:
+                        name = org_user.email.split("@")[0]
+                    admins.append(
+                        {
+                            "name": name,
+                            "email": organization_admin.user.email,
+                            "access_level": organization_admin.access_level,
+                            "created_at": organization_admin.created_at,
+                        }
+                    )
 
             owner_count = organization_admins.filter(access_level="owner").count()
             multiple_owners = owner_count > 1
@@ -245,17 +247,18 @@ def organization_details(request, organization_id):
                 {
                     "organization": organization,
                     "form": form,
+                    "current_org_admin": current_org_admin,
                     "admins": admins,
                     "multiple_owners": multiple_owners,
                 },
             )
         else:
-            messages.warning(request, "You Don't have permission to do this action")
+            messages.warning(request, "You don't have permission to do this action")
             return redirect(
                 "donor_dashboard:manage_organization", organization_id=organization_id
             )
     except Exception:
-        messages.warning(request, "You Don't have permission to do this action")
+        messages.warning(request, "You don't have permission to do this action")
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )

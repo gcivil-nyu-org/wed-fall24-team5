@@ -29,43 +29,51 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function confirmAddUser() {
-        closeModal();
+        document.getElementById("addAdminModal").classList.remove("is-active");
         document.getElementById("addAdminForm").submit(); // Submit the form after confirmation
     }
 
     // Functions to open and close a modal
     function openModal($el) {
-        $el.classList.add('is-active');
+        $el.classList.add("is-active");
     }
 
-    function closeModal() {
-        document.getElementById('addAdminModal').classList.remove('is-active');
+    function closeModal($el) {
+        $el.classList.remove("is-active");
+    }
+
+    function closeAllModals() {
+        (document.querySelectorAll(".modal") || []).forEach(($modal) => {
+            closeModal($modal);
+        });
     }
 
     // Add a click event on buttons to open a specific modal
-    (document.querySelectorAll('.js-modal-trigger') || []).forEach(($trigger) => {
+    (document.querySelectorAll(".js-modal-trigger") || []).forEach(($trigger) => {
         const modal = $trigger.dataset.target;
         const $target = document.getElementById(modal);
 
-        $trigger.addEventListener('click', () => {
+        $trigger.addEventListener("click", () => {
             openModal($target);
         });
     });
 
     // Add a click event on various child elements to close the parent modal
-    (document.querySelectorAll('.modal-background, .modal-close, .delete, .button') || []).forEach(($close) => {
-        $close.addEventListener('click', () => {
-            closeModal();
+    (document.querySelectorAll(".modal-background, .modal-close, .delete, .button") || []).forEach(($close) => {
+        const $target = $close.closest(".modal");
+
+        $close.addEventListener("click", () => {
+            closeModal($target);
         });
     });
 
     // Add a keyboard event to close all modals
-    document.addEventListener('keydown', (event) => {
+    document.addEventListener("keydown", (event) => {
         if (event.key === "Escape") {
-            closeModal();
+            closeAllModals();
         }
     });
 
     document.getElementById("addAdminForm").addEventListener("submit", handleFormSubmit);
-    document.querySelector('.button.is-primary').addEventListener('click', confirmAddUser);
+    document.querySelector(".button.is-primary").addEventListener("click", confirmAddUser);
 });
