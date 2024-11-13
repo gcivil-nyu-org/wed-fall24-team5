@@ -399,3 +399,152 @@ class SubmitReviewTest(TestCase):
         self.assertEqual(review.rating, 5)
         self.assertEqual(review.comment, "Excellent food!")
         self.assertRedirects(response, reverse("recipient_orders"))
+
+
+# new modify order tests
+
+
+class ModifyOrderTests(TestCase):
+    def setUp(self):
+        # Create test user
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+        self.client.login(username="testuser", password="testpass")
+
+        # Create test organization
+        self.organization = Organization.objects.create(
+            organization_name="Test Organization",
+            type="restaurant",
+            address="123 Test St",
+            zipcode=12345,
+            contact_number="1234567890",
+            email="test@example.com",
+            active=True,
+        )
+
+        # Create test donation
+        self.donation = Donation.objects.create(
+            organization=self.organization,
+            food_item="Test Food",
+            quantity=5,
+            pickup_by=timezone.now() + timedelta(days=1),
+            active=True,
+        )
+
+        # Create test order
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=2,
+            order_status="pending",
+            active=True,
+        )
+
+    def test_modify_order_get_request(self):
+        """Test that GET requests are rejected"""
+        response = self.client.get(reverse("modify_order"))
+        messages = list(get_messages(response.wsgi_request))
+
+        self.assertRedirects(response, reverse("recipient_orders"))
+        self.assertEqual(str(messages[0]), "Invalid request method")
+
+    def test_modify_order_valid_quantity(self):
+        """Test successful order modification with valid quantity"""
+        data = {
+            "order_id": str(self.order.order_id),
+            "new_quantity": "3",
+            "current_quantity": "2",
+        }
+        response = self.client.post(reverse("modify_order"), data)
+
+        # Refresh order from database
+        self.order.refresh_from_db()
+        self.donation.refresh_from_db()
+
+        self.assertEqual(self.order.order_quantity, 3)
+        self.assertEqual(
+            self.donation.quantity, 4
+        )  # Original 5 + 2 (current) - 3 (new)
+        self.assertRedirects(response, reverse("recipient_orders"))
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Order quantity updated successfully")
+
+    def test_modify_order_quantity_too_low(self):
+        """Test modification with quantity less than 1"""
+        data = {
+            "order_id": str(self.order.order_id),
+            "new_quantity": "0",
+            "current_quantity": "2",
+        }
+        response = self.client.post(reverse("modify_order"), data)
+
+        # Check that order wasn't modified
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.order_quantity, 2)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Quantity must be at least 1")
+
+    def test_modify_order_quantity_too_high(self):
+        """Test modification with quantity above maximum allowed"""
+        data = {
+            "order_id": str(self.order.order_id),
+            "new_quantity": "4",
+            "current_quantity": "2",
+        }
+        response = self.client.post(reverse("modify_order"), data)
+
+        # Check that order wasn't modified
+        self.order.refresh_from_db()
+        self.assertEqual(self.order.order_quantity, 2)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue("Maximum allowed quantity is" in str(messages[0]))
+
+    def test_modify_nonexistent_order(self):
+        """Test modification of non-existent order"""
+        data = {
+            "order_id": "12345678-1234-5678-1234-567812345678",
+            "new_quantity": "2",
+            "current_quantity": "1",
+        }
+        response = self.client.post(reverse("modify_order"), data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Order not found")
+
+    def test_modify_completed_order(self):
+        """Test modification of non-pending order"""
+        # Change order status to picked up
+        self.order.order_status = "picked_up"
+        self.order.save()
+
+        data = {
+            "order_id": str(self.order.order_id),
+            "new_quantity": "3",
+            "current_quantity": "2",
+        }
+        response = self.client.post(reverse("modify_order"), data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Order not found")
+
+    def test_modify_other_user_order(self):
+        """Test modification of another user's order"""
+        # Create another user and try to modify first user's order
+        User = get_user_model()
+        other_user = User.objects.create_user(  # noqa
+            username="otheruser", password="testpass"
+        )  # noqa
+        self.client.login(username="otheruser", password="testpass")
+
+        data = {
+            "order_id": str(self.order.order_id),
+            "new_quantity": "3",
+            "current_quantity": "2",
+        }
+        response = self.client.post(reverse("modify_order"), data)
+
+        messages = list(get_messages(response.wsgi_request))
+        self.assertEqual(str(messages[0]), "Order not found")
