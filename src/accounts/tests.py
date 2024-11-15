@@ -91,7 +91,10 @@ class CollectionPageTest(TestData):
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
         self.assertTrue(
-            any("Email is not valid. Please try again with a valid email." in str(m) for m in messages)
+            any(
+                "Email is not valid. Please try again with a valid email." in str(m)
+                for m in messages
+            )
         )
 
     def test_register_view_post_password_mismatch(self):
@@ -106,9 +109,7 @@ class CollectionPageTest(TestData):
         )
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("Password mismatch." in str(m) for m in messages)
-        )
+        self.assertTrue(any("Password mismatch." in str(m) for m in messages))
 
     def test_login_view_get(self):
         """Test that the login view returns a 200 OK status on GET request."""
