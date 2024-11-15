@@ -63,9 +63,18 @@ def register_view(request):
             login(request, user, backend="django.contrib.auth.backends.ModelBackend")
             return redirect("accounts:profile")
         else:
-            messages.warning(
-                request, "Registration Failed!! Password mismatch or too generic"
-            )  # noqa
+            if form.errors.get("password2"):
+                messages.warning(request, "Password mismatch.")
+            elif form.errors.get("password1"):
+                messages.warning(request, "Password is too generic.")
+            elif form.errors.get("email"):
+                messages.warning(
+                    request, "Email is not valid. Please try again with a valid email."
+                )
+            else:
+                messages.warning(
+                    request, "Registration failed. Please check the form for errors."
+                )
             form = MyUserCreationForm()
             return render(request, "accounts/register.html", {"form": form})
     else:
