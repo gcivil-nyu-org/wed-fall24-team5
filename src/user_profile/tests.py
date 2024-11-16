@@ -26,7 +26,14 @@ class ProfileViewTests(TestCase):
         response = self.client.get(reverse("user_profile:profile"))
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "user_profile/profile.html")
-        self.assertContains(response, self.user_profile.phone_number)
+        self.assertContains(response, self.user_profile.user.first_name)
+        self.assertContains(response, self.user_profile.user.last_name)
+        phone_number = (
+            self.user_profile.phone_number
+            if self.user_profile.phone_number is not None
+            else ""
+        )
+        self.assertContains(response, phone_number)
 
     def test_profile_view_post_request_successful_update_with_restrictions(self):
         """Test successful profile update with dietary restrictions via POST request."""
