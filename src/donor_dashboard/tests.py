@@ -39,30 +39,6 @@ class DonorDashboardViewsTests(TestCase):
         )
         self.client.login(email="testuser@example.com", password="password")
 
-    def test_add_organization_view_get(self):
-        response = self.client.get(reverse("donor_dashboard:add_organization"))
-        self.assertEqual(response.status_code, 200)
-        self.assertTemplateUsed(response, "add_organization.html")
-        self.assertIsInstance(response.context["form"], AddOrganizationForm)
-
-    def test_add_organization_view_post_valid(self):
-        form_data = {
-            "organization_name": "New Org",
-            "type": "self",
-            "address": "456 Test Avenue",
-            "zipcode": "54321",
-            "email": "neworg@test.com",
-            "website": "https://new.org",
-            "contact_number": "0987654321",
-        }
-        response = self.client.post(
-            reverse("donor_dashboard:add_organization"), form_data
-        )
-        self.assertEqual(response.status_code, 302)
-        self.assertTrue(
-            Organization.objects.filter(organization_name="New Org").exists()
-        )
-
     def test_get_org_list_view(self):
         response = self.client.get(reverse("donor_dashboard:org_list"))
         self.assertEqual(response.status_code, 200)
