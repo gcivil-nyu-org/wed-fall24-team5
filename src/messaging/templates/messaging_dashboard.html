@@ -3,6 +3,7 @@
 {% block title %}
     Messaging Dashboard
 {% endblock title %}
+{% load static %}
 {% block content %}
     <!-- Bootstrap CSS -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -51,9 +52,16 @@
                     {% endif %}
                     <ul class="list-group" id="room-list">
                         {% for room in rooms %}
-                            <li class="list-group-item" data-room-id="{{ room.id }}">
+                            {% if not is_org %}
+                            <li class="list-group-item" data-room-id="{{ room.id }}" org-id="{{ organization_id }}" is-org="{{ is_org }}" url="{% url 'messaging:get_messages' 'ROOM_ID' %}">
                                 {{ room.name }}
                             </li>
+                            {% else %}
+                            <li class="list-group-item" data-room-id="{{ room.id }}" org-id="{{ organization_id }}" is-org="{{ is_org }}" url="{% url 'messaging:org_get_messages' room_id='ROOM_ID' organization_id='ORG_ID' %}">
+                                {{ room.name }}
+                            </li>
+                            {% endif %}
+
                         {% endfor %}
                     </ul>                    
                 </div>
@@ -116,141 +124,21 @@
                 </div>
             </div>
         </div>
-
-        <script>
-            const chatContainer = document.getElementById('chatContainer');
-            function scrollToBottom() {
-                var chatContainer = document.getElementById("chatContainer");
-                chatContainer.scrollTop = chatContainer.scrollHeight;
-            }
-
-            function sendMessage() {
-                const messageBody = messageInput.value;
-                if (messageBody.trim() === '') return;  // Don't send empty messages
-                document.getElementById("sendMsgButton").textContent = "Sending...";
-                document.getElementById("sendMsgButton").disabled = true;
-                messageInput.value = '';
-                // Send message data to the server
-                fetch('send_message/', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRFToken': '{{ csrf_token }}'  // Django CSRF token for security
-                    },
-                    body: JSON.stringify({
-                        message_body: messageBody
-                    })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.success) {
-                        messageInput.value = '';  // Clear the input field
-                        fetchData();
-                        document.getElementById("sendMsgButton").disabled = false;
-                        document.getElementById("sendMsgButton").textContent = "Send";
-                    } else {
-                        console.error('Message failed to send');
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-            const options = {
-                year: "numeric",
-                month: "short",
-                day: "2-digit",
-                hour: "2-digit",
-                minute: "numeric",
-                timeZone: "UTC",
-                hour12: true
-                };
-
-            function fetchData() {
-                fetch('get_new_messages/')
-                    .then(response => response.json())
-                    .then(messages => {
-                        chatContainer.innerHTML = '';  // Clear the chat container before adding new messages
-
-                        // Loop through each message and add it to the chat container
-                        messages.forEach(message => {
-                            const sender = message.sender_id;
-                            const date = new Date(message.time);
-                            const formattedDate = new Intl.DateTimeFormat("en-US", options).format(date);
-                            const messageItem = document.createElement('div');
-                            console.log("sender "+sender)
-                            console.log(sender == "{{ user.id }}")
-                            console.log(sender == "{{ organization_id }}")
-                            if (sender == "{{ user.id }}" || sender == "{{ organization_id }}"){
-                                messageItem.className = 'message-item has-text-right';
-                            }else{
-                                messageItem.className = 'message-item has-text-left';
-                            }
-                            
-                            // Create the inner HTML structure
-                            messageItem.innerHTML = `
-                                <p><strong>${message.sender_name}:</strong> ${message.message_body}</p>
-                                <p class="is-size-7 has-text-grey">${formattedDate}</p>
-                            `;
-
-                            chatContainer.appendChild(messageItem);
-                            chatContainer.appendChild(document.createElement('hr'));
-                        });
-
-                        // Optionally, scroll to the latest message
-                        chatContainer.scrollTop = chatContainer.scrollHeight;
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-            if("{{curr_room}}"){
-                setInterval(fetchData, 1000);  // Call fetchData every second
-            }
-        </script>
-
-        <script>
-            document.addEventListener("DOMContentLoaded", function() {
-                // Get all list items
-
-                const roomItems = document.querySelectorAll("#room-list .list-group-item");
-        
-                roomItems.forEach(item => {
-                    item.addEventListener("click", function() {
-                        // Get room ID from data attribute
-                        const roomId = item.getAttribute("data-room-id");
-                        if ("{{ is_org }}"){
-                            window.location.href = `{% url 'messaging:org_get_messages' room_id='ROOM_ID' organization_id='ORG_ID' %}`
-                                                        .replace("ROOM_ID", roomId)
-                                                        .replace("ORG_ID", "{{organization_id}}");
-                        }else{
-                            window.location.href = `{% url 'messaging:get_messages' room_id='ROOM_ID' %}`.replace("ROOM_ID", roomId);
-                        }
-                        // Redirect to a view with room ID as a parameter
-                        
-                    });
-                });
-            });
-        </script>
-
-        <!-- Bootstrap JS -->
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-        <!-- jQuery -->
-        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-
-        <!-- Select2 JS -->
-        <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
-
-        <script>
-            $(document).ready(function() {
-                $('#organization').select2({
-                    placeholder: 'Search and select an organization',
-                    allowClear: true,
-                    width: '100%',
-                    dropdownParent: $('#newConversationModal')  // Attach dropdown to modal
-                });
-
-                $('#newConversationModal').on('shown.bs.modal', function () {
-                    $('#organization').select2('focus');  // Focus Select2 input manually
-                });
-            });
-        </script>
     </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- jQuery -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <!-- Select2 JS -->
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+    <script>
+        window.djangoVars = {
+            currRoom: "{{ curr_room }}",
+            userId: "{{ user.id }}",
+            organizationId: "{{ organization_id }}",
+            csrfToken: "{{ csrf_token }}"
+        };
+    </script>
+    <script src="{% static 'js/messaging.js' %}"></script>
 {% endblock content %}
