@@ -78,6 +78,25 @@ class CollectionPageTest(TestData):
             any("This email is already registered." in str(m) for m in messages)
         )
 
+    def test_register_view_invalid_email(self):
+        """Test registration view with invalid email."""
+        response = self.client.post(
+            reverse("accounts:register"),
+            {
+                "email": "invalidemail@email",
+                "password1": "C*pml3XP4ssw0RD!",
+                "password2": "C*pml3XP4ssw0RD!",
+            },
+        )
+        self.assertEqual(response.status_code, 200)
+        messages = list(get_messages(response.wsgi_request))
+        self.assertTrue(
+            any(
+                "Email is not valid. Please try again with a valid email." in str(m)
+                for m in messages
+            )
+        )
+
     def test_register_view_post_password_mismatch(self):
         """Test registration view with password mismatch."""
         response = self.client.post(
@@ -90,9 +109,7 @@ class CollectionPageTest(TestData):
         )
         self.assertEqual(response.status_code, 200)
         messages = list(get_messages(response.wsgi_request))
-        self.assertTrue(
-            any("Registration Failed!! Password mismatch" in str(m) for m in messages)
-        )
+        self.assertTrue(any("Password mismatch." in str(m) for m in messages))
 
     def test_login_view_get(self):
         """Test that the login view returns a 200 OK status on GET request."""

@@ -5,6 +5,20 @@ from django.contrib import messages
 from django.db import transaction
 
 
+def nameCheck(first_name):
+    if len(first_name) < 1:
+        return False
+    return True
+
+
+def phoneNumberCheck(phone_number):
+    if phone_number is None or len(phone_number) == 0:
+        return True
+    if len(phone_number) < 10 or not phone_number.isdigit():
+        return False
+    return True
+
+
 @login_required
 def profile_view(request):
     user_profile = get_object_or_404(UserProfile, user=request.user)
@@ -39,6 +53,16 @@ def profile_view(request):
             first_name = request.POST.get("first_name")
             last_name = request.POST.get("last_name")
             phone_number = request.POST.get("phone_number")
+
+            if not nameCheck(first_name):
+                messages.warning(request, "First Name is not valid")
+                return redirect("user_profile:profile")
+            if not nameCheck(last_name):
+                messages.warning(request, "Last Name is not valid")
+                return redirect("user_profile:profile")
+            if not phoneNumberCheck(phone_number):
+                messages.warning(request, "Phone Number is not valid")
+                return redirect("user_profile:profile")
 
             custom_restriction = request.POST.get("custom_restriction")
 
