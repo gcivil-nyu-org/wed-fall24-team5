@@ -6,6 +6,9 @@ from django.contrib import messages
 from django.contrib.contenttypes.models import ContentType
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Q
+from django.http import JsonResponse
+import json
+from datetime import timezone
 
 
 def get_rooms(id):
@@ -41,7 +44,9 @@ def get_messages_from_room_id(room_id):
                 "sender_id": sender_id,
                 "message_body": message.message_body,
                 "sender_name": sender_name,
-                "time": message.created_at,
+                "time": message.created_at.astimezone(timezone.utc).strftime(
+                    "%b %d, %Y, %I:%M %p"
+                ),
             }
         )
     return messages
@@ -106,6 +111,18 @@ def get_messages(request, room_id):
             "messages": messages,
         },
     )
+
+
+@login_required
+def get_new_messages(request, room_id):
+    messages = get_messages_from_room_id(room_id)
+    return JsonResponse(list(messages), safe=False)
+
+
+@login_required
+def org_get_new_messages(request, organization_id, room_id):
+    messages = get_messages_from_room_id(room_id)
+    return JsonResponse(list(messages), safe=False)
 
 
 @login_required
@@ -214,3 +231,53 @@ def org_get_messages(request, organization_id, room_id):
             "messages": messages,
         },
     )
+
+
+@login_required
+def send_message(request, room_id):
+    if request.method == "POST":
+        user_id = request.user.id
+
+        data = json.loads(request.body)
+        message_body = data.get("message_body")
+
+        if str(user_id) == room_id.split("_")[0]:
+            organization_id = room_id.split("_")[1]
+        elif str(user_id) == room_id.split("_")[1]:
+            organization_id = room_id.split("_")[0]
+        else:
+            return JsonResponse(
+                {"success": False, "error": "Invalid Organization"}, status=400
+            )
+
+        current_user = User.objects.get(email=request.user.email)
+        organization = Organization.objects.get(organization_id=organization_id)
+
+        Message.objects.create(
+            room_id=room_id,
+            sender_user=current_user,
+            receiver_organization=organization,
+            message_body=message_body,
+        )
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=405)
+
+
+@login_required
+def org_send_message(request, organization_id, room_id):
+    if request.method == "POST":
+
+        data = json.loads(request.body)
+        message_body = data.get("message_body")
+
+        current_user = User.objects.get(email=request.user.email)
+        organization = Organization.objects.get(organization_id=organization_id)
+
+        Message.objects.create(
+            room_id=room_id,
+            receiver_user=current_user,
+            sender_organization=organization,
+            message_body=message_body,
+        )
+        return JsonResponse({"success": True})
+    return JsonResponse({"success": False, "error": "Invalid request"}, status=405)

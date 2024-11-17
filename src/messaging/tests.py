@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.contrib.auth.models import User
 from database.models import Room, Organization, Message, OrganizationAdmin
 from django.contrib.contenttypes.models import ContentType
+import json
 
 
 class MessagingViewTests(TestCase):
@@ -163,3 +164,76 @@ class MessagingViewTests(TestCase):
         )
         self.assertEqual(response.status_code, 302)
         self.assertRedirects(response, "/donor_dashboard/")
+
+    def test_get_new_messages(self):
+        self.client.login(username="user1", password="password1")
+        response = self.client.get(
+            reverse("messaging:get_new_messages", args=[self.room_id_1])
+        )
+        self.assertEqual(response.status_code, 200)
+        messages = json.loads(response.content)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0]["message_body"], "Hello!")
+
+    def test_org_get_new_messages(self):
+        self.client.login(username="user1", password="password1")
+        response = self.client.get(
+            reverse(
+                "messaging:org_get_new_messages",
+                args=[self.org1.organization_id, self.room_id_1],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        messages = json.loads(response.content)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(messages[0]["message_body"], "Hello!")
+
+    def test_send_message(self):
+        self.client.login(username="user1", password="password1")
+        data = {"message_body": "New Message from User"}
+        response = self.client.post(
+            reverse("messaging:send_message", args=[self.room_id_1]),
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertTrue(response_data["success"])
+        self.assertEqual(Message.objects.filter(room_id=self.room_id_1).count(), 2)
+
+    def test_send_message_invalid_request(self):
+        self.client.login(username="user1", password="password1")
+        response = self.client.get(
+            reverse("messaging:send_message", args=[self.room_id_1])
+        )
+        self.assertEqual(response.status_code, 405)
+        response_data = json.loads(response.content)
+        self.assertFalse(response_data["success"])
+
+    def test_org_send_message(self):
+        self.client.login(username="user1", password="password1")
+        data = {"message_body": "New Message from Organization"}
+        response = self.client.post(
+            reverse(
+                "messaging:org_send_message",
+                args=[self.org1.organization_id, self.room_id_1],
+            ),
+            data=json.dumps(data),
+            content_type="application/json",
+        )
+        self.assertEqual(response.status_code, 200)
+        response_data = json.loads(response.content)
+        self.assertTrue(response_data["success"])
+        self.assertEqual(Message.objects.filter(room_id=self.room_id_1).count(), 2)
+
+    def test_org_send_message_invalid_request(self):
+        self.client.login(username="user1", password="password1")
+        response = self.client.get(
+            reverse(
+                "messaging:org_send_message",
+                args=[self.org1.organization_id, self.room_id_1],
+            )
+        )
+        self.assertEqual(response.status_code, 405)
+        response_data = json.loads(response.content)
+        self.assertFalse(response_data["success"])
