@@ -26,23 +26,6 @@ import json
 
 
 @login_required
-def add_organization(request):
-    if request.method == "POST":
-        form = AddOrganizationForm(request.POST)
-        if form.is_valid():
-            organization = form.save()
-            org_user = User.objects.get(email=request.user.email)
-            OrganizationAdmin.objects.create(
-                user=org_user, organization=organization, access_level="owner"
-            )
-            messages.success(request, "Organization successfully added.")
-            return redirect("/")
-    else:
-        form = AddOrganizationForm()
-    return render(request, "add_organization.html", {"form": form})
-
-
-@login_required
 def get_org_info(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
     donations = Donation.objects.filter(
@@ -73,6 +56,33 @@ def get_org_list(request):
                 user=org_user, organization=organization, access_level="owner"
             )
             messages.success(request, "Organization successfully added.")
+            return redirect("/donor_dashboard")
+        else:
+            # Handle errors using Django messages
+            if form.errors.get("organization_name"):
+                messages.warning(
+                    request, "Organization Name is invalid. Please try again."
+                )
+            if form.errors.get("address"):
+                messages.warning(request, "Address is not valid. Please try again.")
+            if form.errors.get("zipcode"):
+                messages.warning(request, "Zipcode is not valid. Please try again.")
+            if form.errors.get("contact_number"):
+                messages.warning(
+                    request, "Contact Number is not valid. Please try again."
+                )
+            if form.errors.get("email"):
+                messages.warning(request, "Email is not valid. Please try again.")
+            if form.errors.get("website"):
+                messages.warning(request, "Website is not valid. Please try again.")
+
+            # Fallback error message
+            if not any(form.errors):
+                messages.warning(
+                    request, "Registration failed. Please check the form for errors."
+                )
+
+            # Pass the form with errors back to the template
             return redirect("/donor_dashboard")
     else:
         form = AddOrganizationForm()
