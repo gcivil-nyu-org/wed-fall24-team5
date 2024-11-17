@@ -836,3 +836,72 @@ class DietaryRestrictionTests(TestCase):
         ]
         self.assertIn("Gluten Free", formatted_restrictions)
         self.assertIn("Nut Free", formatted_restrictions)
+
+
+class AddOrganizationFormErrorsTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="password",
+        )
+        self.client.login(email="testuser@example.com", password="password")
+
+    def test_add_organization_view_post_valid(self):
+        form_data = {
+            "organization_name": "New Org",
+            "type": "self",
+            "address": "456 Test Avenue",
+            "zipcode": "54321",
+            "email": "neworg@test.com",
+            "website": "https://new.org",
+            "contact_number": "1234567890",
+        }
+        response = self.client.post(reverse("donor_dashboard:org_list"), form_data)
+        self.assertEqual(response.status_code, 302)
+        self.assertTrue(
+            Organization.objects.filter(organization_name="New Org").exists()
+        )
+
+    def test_add_organization_missing_required_field(self):
+        """Test missing required field generates the correct error message."""
+        form_data = {
+            "organization_name": "",
+            "type": "self",
+            "address": "123 Test Street",
+            "zipcode": "12345",
+            "contact_number": "1234567890",
+            "email": "org@test.com",
+            "website": "https://test.org",
+        }
+        response = self.client.post(reverse("donor_dashboard:org_list"), form_data)
+        self.assertEqual(response.status_code, 302)
+
+        # Check error message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(
+            "Organization Name is invalid. Please try again.",
+            [msg.message for msg in messages_list],
+        )
+
+    def test_add_organization_invalid_zipcode(self):
+        """Test invalid zipcode generates the correct error message."""
+        form_data = {
+            "organization_name": "Test Org",
+            "type": "self",
+            "address": "123 Test Street",
+            "zipcode": "1234",  # Invalid: Less than 5 digits
+            "contact_number": "1234567890",
+            "email": "org@test.com",
+            "website": "https://test.org",
+        }
+        response = self.client.post(reverse("donor_dashboard:org_list"), form_data)
+        self.assertEqual(response.status_code, 302)
+
+        # Check error message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(
+            "Zipcode is not valid. Please try again.",
+            [msg.message for msg in messages_list],
+        )

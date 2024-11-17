@@ -21,9 +21,7 @@ class AddOrganizationForm(forms.ModelForm):
 
     def clean_organization_name(self):
         organization_name = self.cleaned_data.get("organization_name")
-        print(f"Validating organization_name: {organization_name}")
         if len(organization_name) < 3:
-            print("error")
             raise forms.ValidationError(
                 "Organization name should be at least 3 characters."
             )
