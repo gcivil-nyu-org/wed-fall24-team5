@@ -559,31 +559,74 @@ def manage_order(request, order_id):
 
 
 @login_required
+def sanitize_csv_field(value):
+    """
+    Escape potential CSV injection by adding a single quote
+    to values starting with special characters. Convert non-string values to strings.
+    """
+    if not isinstance(value, str):
+        value = str(value)
+
+    # List of potentially dangerous prefixes
+    dangerous_prefixes = ("=", "+", "-", "@", "\t", "\n")
+
+    # If value starts with any dangerous prefix, prepend a single quote
+    if value.startswith(dangerous_prefixes):
+        return f"'{value}"
+    return value
+
+
+@login_required
+def sanitize_order(order, organization):
+    """
+    Sanitizes all the fields of an order object and returns a list of sanitized fields.
+    """
+    return [
+        sanitize_csv_field(order.order_id),
+        sanitize_csv_field(order.donation.food_item),
+        sanitize_csv_field(order.user.email),
+        sanitize_csv_field(f"{order.user.first_name} {order.user.last_name}"),
+        sanitize_csv_field(order.order_quantity),
+        sanitize_csv_field(
+            order.donation.pickup_by.strftime("%Y-%m-%d")
+            if order.donation.pickup_by
+            else ""
+        ),
+        sanitize_csv_field(organization.address),
+        sanitize_csv_field(order.order_status),
+    ]
+
+
+@login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
+    # Fetch and sort orders by the pickup date in descending order
+    orders = (
+        Order.objects.filter(donation__organization=organization)
+        .prefetch_related("donation")
+        .order_by("-donation__pickup_by")  # Sorting by most recent pickup date
     )
+
     response = HttpResponse(content_type="text/csv")
     response["Content-Disposition"] = "attachment; filename=orders.csv"
 
     writer = csv.writer(response)
     writer.writerow(
-        ["ID", "Donation", "User", "Quantity", "Pickup Date", "Address", "Status"]
+        [
+            "Order ID",
+            "Item",
+            "Reserved By (Email)",
+            "Reserved By (Name)",
+            "Quantity",
+            "Pickup Date",
+            "Address",
+            "Order Status",
+        ]
     )
 
     for order in orders:
-        writer.writerow(
-            [
-                order.order_id,
-                order.donation.food_item,
-                order.user,
-                order.order_quantity,
-                order.donation.pickup_by,
-                organization.address,
-                order.order_status,
-            ]
-        )
+        sanitized_order = sanitize_order(order, organization)
+        writer.writerow(sanitized_order)
 
     return response
 
