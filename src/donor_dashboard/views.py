@@ -158,7 +158,9 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
-            .order_by("donation__donation_id")
+            .order_by(
+                "-donation__pickup_by", "donation__donation_id"
+            )  # Sort by pickup date descending, then by donation ID
         )
 
         # Process dietary restrictions to replace underscores and apply title case
