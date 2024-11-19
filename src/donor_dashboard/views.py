@@ -559,9 +559,11 @@ def manage_order(request, order_id):
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
-    ).order_by("order_created_at")
+    orders = (
+        Order.objects.filter(donation__organization=organization)
+        .prefetch_related("donation")
+        .order_by("order_created_at")
+    )
     current_date = timezone.datetime.now().strftime("%Y%m%d")
 
     response = HttpResponse(content_type="text/csv")
@@ -570,7 +572,15 @@ def download_orders(request, organization_id):
 
     writer = csv.writer(response)
     writer.writerow(
-        ["Donation", "User", "Quantity", "Pickup Date", "Status", "Created On", "Modified On"]
+        [
+            "Donation",
+            "User",
+            "Quantity",
+            "Pickup Date",
+            "Status",
+            "Created On",
+            "Modified On",
+        ]
     )
 
     for order in orders:
@@ -582,7 +592,7 @@ def download_orders(request, organization_id):
                 order.donation.pickup_by,
                 order.order_status,
                 order.order_created_at,
-                order.order_modified_at
+                order.order_modified_at,
             ]
         )
 
