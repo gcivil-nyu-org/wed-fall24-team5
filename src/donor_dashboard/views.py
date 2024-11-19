@@ -28,9 +28,7 @@ import json
 @login_required
 def get_org_info(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(
-        organization_id=organization.organization_id, active=True
-    )
+    donations = Donation.objects.filter(organization_id=organization.organization_id)
     orders = Order.objects.filter(donation__organization=organization).prefetch_related(
         "donation"
     )
@@ -138,17 +136,17 @@ def manage_organization(request, organization_id):
 
         # Fetch donations with related reviews
         donations = Donation.objects.filter(
-            organization_id=organization.organization_id, active=True
+            organization_id=organization.organization_id
         ).prefetch_related(
             Prefetch(
                 "userreview_set",
-                queryset=UserReview.objects.filter(active=True).order_by("modified_at"),
+                queryset=UserReview.objects.order_by("modified_at"),
             )
         )
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization, active=True)
+            Order.objects.filter(donation__organization=organization)
             .prefetch_related(
                 "donation",
                 "user",
@@ -308,9 +306,7 @@ def delete_organization(request, organization_id):
 @login_required
 def filter_statistics(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(
-        organization_id=organization.organization_id, active=True
-    )
+    donations = Donation.objects.filter(organization_id=organization.organization_id)
     grouped_donations = (
         donations.annotate(month=ExtractMonth("created_at"))
         .values("month")
@@ -380,9 +376,7 @@ def statistics_orders_status(request, organization_id):
 @login_required
 def statistics_donations(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(
-        organization_id=organization.organization_id, active=True
-    )
+    donations = Donation.objects.filter(organization_id=organization.organization_id)
     donations_data = (
         donations.annotate(date=TruncDate("created_at"))
         .values("date")
@@ -522,7 +516,7 @@ def modify_donation(request, donation_id):
 
 @login_required
 def delete_donation(request, donation_id):
-    donation = get_object_or_404(Donation, donation_id=donation_id, active=True)
+    donation = get_object_or_404(Donation, donation_id=donation_id)
     if request.method == "POST":
         donation.active = False  # Set the active field to False for soft delete
         donation.quantity = 0
@@ -544,7 +538,7 @@ def delete_donation(request, donation_id):
 
 @login_required
 def manage_order(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, active=True)
+    order = get_object_or_404(Order, order_id=order_id)
     donation = Donation.objects.get(donation_id=order.donation_id)
 
     order.order_status = "picked_up" if order.order_status == "pending" else "pending"

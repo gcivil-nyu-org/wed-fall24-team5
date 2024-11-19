@@ -160,6 +160,7 @@ Manage Organization
                             </div>
                         </div>
                     </div>
+                    {% if donation.donation_status == "active" %}
                     <footer class="card-footer">
                         <a href="#" class="card-footer-item edit-link" data-id="{{ donation.donation_id }}"
                             data-food-item="{{ donation.food_item }}" data-quantity="{{ donation.quantity }}"
@@ -173,6 +174,7 @@ Manage Organization
                                 onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
                         </form>
                     </footer>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
@@ -232,6 +234,7 @@ Manage Organization
                                     {% endif %}
                                 </div>
                                 <br>
+                                {% if order.order_status == "pending" %}
                                 <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
                                     class="button is-small is-rounded is-info is-light is-outlined">
                                     {% if order.order_status == "pending" %}
@@ -240,6 +243,7 @@ Manage Organization
                                     Mark as pending
                                     {% endif %}
                                 </a>
+                                {% endif %}
                             </div>
                         </div>
                         {% endfor %}
