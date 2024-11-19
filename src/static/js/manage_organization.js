@@ -126,15 +126,36 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
+    const submitButton = document.querySelector('button[type="submit"]');
+
     // Existing code for modals, delete confirmation, etc.
     const quantityInput = document.getElementById("id_quantity");
     const quantityWarning = document.getElementById("quantity-warning");
     quantityInput.addEventListener("input", function () {
         const quantityValue = quantityInput.value;
-        if (quantityValue <= 0) {
+        if (quantityValue <= 0 || quantityValue > 200) {
             quantityWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
         } else {
             quantityWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
+        }
+    });
+
+    const foodItemInput = document.getElementById("id_food_item");
+    const foodItemWarning = document.getElementById("donation-name-warning");
+    foodItemInput.addEventListener("input", function () {
+        const foodItemValue = foodItemInput.value;
+        if (foodItemValue.length > 250 || foodItemValue.length === 0) {
+            foodItemWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            foodItemWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
         }
     });
 
@@ -144,22 +165,28 @@ document.addEventListener("DOMContentLoaded", function () {
         const dateValue = dateInput.value;
         if (!isValidDate(dateValue)) {
             dateWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
         } else {
             dateWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
         }
     });
 
     function isValidDate(dateString) {
-        const inputDate = new Date(dateString);
-        if (isNaN(inputDate)) {
-            return false;
-        }
+        if (!dateString) return false;
+
+        const inputDate = new Date(`${dateString}T00:00:00`);
+        if (isNaN(inputDate)) return false;
 
         const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Normalize to start of the day
+
         const range = new Date();
         range.setDate(currentDate.getDate() + 7);
+        range.setHours(23, 59, 59, 999); // End of the range day
 
-        // Check if the date is within one week in the future
         return inputDate > currentDate && inputDate <= range;
     }
 

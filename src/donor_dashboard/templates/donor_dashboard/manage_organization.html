@@ -327,16 +327,17 @@ Manage Organization
                 <div class="field">
                     <label class="label">{{ form.food_item.label_tag }}</label>
                     <div class="control">{{ form.food_item }}</div>
+                    <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">Food item name must be at least 1 character and less than 250 characters.</p>
                 </div>
                 <div class="field">
                     <label class="label">{{ form.quantity.label_tag }}</label>
                     <div class="control">{{ form.quantity }}</div>
-                    <p id="quantity-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a positive integer.</p>
+                    <p id="quantity-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a positive integer less than 200.</p>
                 </div>
                 <div class="field">
                     <label class="label" for="pickup_by">{{ form.pickup_by.label_tag }}</label>
                     <div class="control">{{ form.pickup_by }}</div>
-                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date within 1 week from today.</p>
+                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date between tomorrow and 1 week from today.</p>
                 </div>
                 <div class="field" hidden>
                     <label class="label">Organization</label>
