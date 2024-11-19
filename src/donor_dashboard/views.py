@@ -76,7 +76,10 @@ def get_org_list(request):
             if form.errors.get("website"):
                 messages.warning(request, "Website is not valid. Please try again.")
             if form.errors.get("__all__"):
-                messages.warning(request, "An organization with the same details already exists. Please modify at least one field and try again.")
+                messages.warning(
+                    request,
+                    "An organization with the same details already exists. Please modify at least one field and try again.",
+                )
 
             # Fallback error message
             if not any(form.errors):

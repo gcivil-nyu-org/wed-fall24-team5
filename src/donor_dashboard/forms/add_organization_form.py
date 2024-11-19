@@ -180,10 +180,14 @@ class AddOrganizationForm(forms.ModelForm):
             contact_number=contact_number,
             email=email,
             website=website,
-            active=True
+            active=True,
         ).exists():
             raise forms.ValidationError(
-                {"__all__": ["An organization with the same details already exists. Please modify at least one field."]}
+                {
+                    "__all__": [
+                        "An organization with the same details already exists. Please modify at least one field."
+                    ]
+                }
             )
-        
+
         return all_data
