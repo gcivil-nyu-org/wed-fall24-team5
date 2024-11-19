@@ -133,7 +133,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const quantityWarning = document.getElementById("quantity-warning");
     quantityInput.addEventListener("input", function () {
         const quantityValue = quantityInput.value;
-        if (quantityValue <= 0) {
+        if (quantityValue <= 0 || quantityValue > 200) {
             quantityWarning.style.display = "block";
             submitButton.setAttribute("disabled", "true");
             submitButton.classList.add("is-disabled");
