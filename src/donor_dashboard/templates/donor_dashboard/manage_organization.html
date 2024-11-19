@@ -326,7 +326,8 @@ Manage Organization
                 <!-- Donation Form Fields -->
                 <div class="field">
                     <label class="label">{{ form.food_item.label_tag }}</label>
-                    <div class="control">{{ form.food_item }}</div>
+                    <div class="control" id = "id_pickup_by">{{ form.food_item }}</div>
+                    <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">Food item name must be at least 1 character and less than 300 characters.</p>
                 </div>
                 <div class="field">
                     <label class="label">{{ form.quantity.label_tag }}</label>

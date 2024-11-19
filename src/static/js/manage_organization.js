@@ -126,6 +126,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
+    const submitButton = document.querySelector('button[type="submit"]');
+
     // Existing code for modals, delete confirmation, etc.
     const quantityInput = document.getElementById("id_quantity");
     const quantityWarning = document.getElementById("quantity-warning");
@@ -135,6 +137,21 @@ document.addEventListener("DOMContentLoaded", function () {
             quantityWarning.style.display = "block";
         } else {
             quantityWarning.style.display = "none";
+        }
+    });
+
+    const foodItemInput = document.getElementById("id_food_item");
+    const foodItemWarning = document.getElementById("donation-name-warning");
+    foodItemInput.addEventListener("input", function () {
+        const foodItemValue = foodItemInput.value;
+        if (foodItemValue.length > 300 || foodItemValue.length === 0) {
+            foodItemWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            foodItemWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
         }
     });
 
