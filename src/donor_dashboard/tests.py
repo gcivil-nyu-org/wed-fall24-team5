@@ -905,3 +905,34 @@ class AddOrganizationFormErrorsTests(TestCase):
             "Zipcode is not valid. Please try again.",
             [msg.message for msg in messages_list],
         )
+
+    def test_add_organization_duplicate(self):
+        """Test duplicate organization generates the correct error message."""
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        form_data = {
+            "organization_name": "Test Org",
+            "type": "self",
+            "address": "123 Test Street",
+            "zipcode": "12345",
+            "contact_number": "1234567890",
+            "email": "org@test.com",
+            "website": "https://test.org",
+        }
+        response = self.client.post(reverse("donor_dashboard:org_list"), form_data)
+        self.assertEqual(response.status_code, 302)
+
+        # Check error message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(
+            "An organization with the same details already exists. Please modify at least one field and try again.",
+            [msg.message for msg in messages_list],
+        )
