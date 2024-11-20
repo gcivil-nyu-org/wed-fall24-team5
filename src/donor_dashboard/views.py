@@ -306,7 +306,9 @@ def delete_organization(request, organization_id):
 @login_required
 def filter_statistics(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(organization_id=organization.organization_id)
+    donations = Donation.objects.filter(
+        organization_id=organization.organization_id, active=True
+    )
     grouped_donations = (
         donations.annotate(month=ExtractMonth("created_at"))
         .values("month")
