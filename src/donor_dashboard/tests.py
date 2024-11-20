@@ -147,7 +147,7 @@ class DonorDashboardViewsTests(TestCase):
         self.assertEqual(response["Content-Type"], "text/csv")
         current_date = timezone.datetime.now().strftime("%Y%m%d")
         expected_filename = (
-            f"{self.organization.organization_name}_orders_{current_date}.csv"
+            f"{self.organization.organization_id}_orders_{current_date}.csv"
         )
 
         # Check that the filename is correct
