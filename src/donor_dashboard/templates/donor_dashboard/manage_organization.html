@@ -47,7 +47,7 @@ Manage Organization
             {% endif %}
         {% else %}
             <div class="media-right">
-                <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                <span class="tag is-primary is-medium mt-1">In Active</span>
             </div>
         {% endif %}
     </div>
@@ -132,7 +132,7 @@ Manage Organization
         </div>
         {% else %}
         <div class="media-right">
-            <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+            <span class="tag is-primary is-medium mt-1">In Active</span>
         </div>
         {% endif %}
         </div>
@@ -187,6 +187,20 @@ Manage Organization
     
     <!-- Content for Orders Received tab -->
     <div id="orders-content" class="is-hidden manage-tab">
+        <div class="flex-container is-justify-content-space-between is-align-items-center mb-3">
+            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+        {% if status %}
+        <div class="buttons">
+            <a class="button is-dark" href="{% url 'donor_dashboard:download_orders' organization.organization_id %}">
+                Download Orders
+            </a>
+        </div>
+        {% else %}
+        <div class="media-right">
+            <span class="tag is-primary is-medium mt-1">In Active</span>
+        </div>
+        {% endif %}
+        </div>
         {% if orders %}
         {% regroup orders by donation.donation_id as food_item_orders %}
         {% for group in food_item_orders %}
@@ -341,7 +355,7 @@ Manage Organization
                 <div class="field">
                     <label class="label" for="pickup_by">{{ form.pickup_by.label_tag }}</label>
                     <div class="control">{{ form.pickup_by }}</div>
-                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date between tomorrow and 1 week from today.</p>
+                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date between today and 1 week from today.</p>
                 </div>
                 <div class="field" hidden>
                     <label class="label">Organization</label>
