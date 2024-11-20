@@ -143,17 +143,18 @@ def manage_organization(request, organization_id):
 
         # Fetch donations with related reviews
         donations = Donation.objects.filter(
-            organization_id=organization.organization_id, active=True
+            organization_id=organization.organization_id,
+            active=True,
         ).prefetch_related(
             Prefetch(
                 "userreview_set",
-                queryset=UserReview.objects.filter(active=True).order_by("modified_at"),
+                queryset=UserReview.objects.order_by("modified_at"),
             )
         )
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization, active=True)
+            Order.objects.filter(donation__organization=organization)
             .prefetch_related(
                 "donation",
                 "user",
@@ -529,7 +530,7 @@ def modify_donation(request, donation_id):
 
 @login_required
 def delete_donation(request, donation_id):
-    donation = get_object_or_404(Donation, donation_id=donation_id, active=True)
+    donation = get_object_or_404(Donation, donation_id=donation_id)
     if request.method == "POST":
         donation.active = False  # Set the active field to False for soft delete
         donation.quantity = 0
@@ -551,7 +552,7 @@ def delete_donation(request, donation_id):
 
 @login_required
 def manage_order(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, active=True)
+    order = get_object_or_404(Order, order_id=order_id)
     donation = Donation.objects.get(donation_id=order.donation_id)
 
     order.order_status = "picked_up" if order.order_status == "pending" else "pending"
@@ -566,27 +567,40 @@ def manage_order(request, order_id):
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
+    orders = (
+        Order.objects.filter(donation__organization=organization)
+        .prefetch_related("donation")
+        .order_by("order_created_at")
     )
+    current_date = timezone.datetime.now().strftime("%Y%m%d")
+
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename=orders.csv"
+    filename = f"{organization.organization_name}_orders_{current_date}.csv"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     writer = csv.writer(response)
     writer.writerow(
-        ["ID", "Donation", "User", "Quantity", "Pickup Date", "Address", "Status"]
+        [
+            "Donation",
+            "User",
+            "Quantity",
+            "Pickup Date",
+            "Status",
+            "Created On",
+            "Modified On",
+        ]
     )
 
     for order in orders:
         writer.writerow(
             [
-                order.order_id,
                 order.donation.food_item,
                 order.user,
                 order.order_quantity,
                 order.donation.pickup_by,
-                organization.address,
                 order.order_status,
+                order.order_created_at,
+                order.order_modified_at,
             ]
         )
 
