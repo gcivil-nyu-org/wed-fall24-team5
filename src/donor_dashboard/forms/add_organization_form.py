@@ -161,3 +161,33 @@ class AddOrganizationForm(forms.ModelForm):
             "email",
             "website",
         ]
+
+    def clean(self):
+        all_data = self.cleaned_data
+        name = all_data.get("organization_name")
+        type = all_data.get("type")
+        address = all_data.get("address")
+        zipcode = all_data.get("zipcode")
+        contact_number = all_data.get("contact_number")
+        email = all_data.get("email")
+        website = all_data.get("website")
+
+        if Organization.objects.filter(
+            organization_name=name,
+            type=type,
+            address=address,
+            zipcode=zipcode,
+            contact_number=contact_number,
+            email=email,
+            website=website,
+            active=True,
+        ).exists():
+            raise forms.ValidationError(
+                {
+                    "__all__": [
+                        "An organization with the same details already exists. Please modify at least one field."
+                    ]
+                }
+            )
+
+        return all_data
