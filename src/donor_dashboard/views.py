@@ -558,7 +558,6 @@ def manage_order(request, order_id):
     )
 
 
-@login_required
 def sanitize_csv_field(value):
     """
     Escape potential CSV injection by adding a single quote
@@ -576,40 +575,50 @@ def sanitize_csv_field(value):
     return value
 
 
-@login_required
 def sanitize_order(order, organization):
     """
     Sanitizes all the fields of an order object and returns a list of sanitized fields.
     """
     return [
-        sanitize_csv_field(order.donation.food_item),
-        sanitize_csv_field(order.user.email),
-        sanitize_csv_field(f"{order.user.first_name} {order.user.last_name}"),
+        sanitize_csv_field(order.donation.food_item if order.donation else ""),
+        sanitize_csv_field(order.user.email if order.user else ""),
+        sanitize_csv_field(
+            f"{order.user.first_name} {order.user.last_name}" if order.user else ""
+        ),
         sanitize_csv_field(order.order_quantity),
         sanitize_csv_field(
             order.donation.pickup_by.strftime("%Y-%m-%d")
-            if order.donation.pickup_by
+            if order.donation and order.donation.pickup_by
             else ""
         ),
         sanitize_csv_field(organization.address),
         sanitize_csv_field(order.order_status),
-        sanitize_csv_field(order.order_created_at),
-        sanitize_csv_field(order.order_modified_at),
+        sanitize_csv_field(
+            order.order_created_at.strftime("%Y-%m-%d %H:%M:%S")
+            if order.order_created_at
+            else ""
+        ),
+        sanitize_csv_field(
+            order.order_modified_at.strftime("%Y-%m-%d %H:%M:%S")
+            if order.order_modified_at
+            else ""
+        ),
     ]
 
 
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
+    # Order by creation date (most recent first)
     orders = (
         Order.objects.filter(donation__organization=organization)
-        .prefetch_related("donation")
-        .order_by("order_created_at")
+        .prefetch_related("donation", "user")
+        .order_by("-donation__pickup_by")
     )
-    current_date = timezone.datetime.now().strftime("%Y%m%d")
+    current_date = timezone.now().strftime("%Y%m%d")
 
     response = HttpResponse(content_type="text/csv")
-    filename = f"{organization.organization_name}_orders_{current_date}.csv"
+    filename = f"{organization.organization_id}_orders_{current_date}.csv"
     response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     writer = csv.writer(response)
@@ -622,8 +631,8 @@ def download_orders(request, organization_id):
             "Pickup Date",
             "Address",
             "Order Status",
-            "Created On",
-            "Modified On",
+            "Order Created On",
+            "Order Modified On",
         ]
     )
 
