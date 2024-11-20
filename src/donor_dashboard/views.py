@@ -281,7 +281,7 @@ def delete_organization(request, organization_id):
         organization = Organization.objects.get(organization_id=organization_id)
 
         # Set the active field in Donations to False for soft delete
-        donations = Donation.objects.filter(organization=organization, active=True)
+        donations = Donation.objects.filter(organization=organization)
         for donation in donations:
 
             # Set the active field in Orders to False for soft delete
