@@ -28,7 +28,9 @@ import json
 @login_required
 def get_org_info(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(organization_id=organization.organization_id, active=True)
+    donations = Donation.objects.filter(
+        organization_id=organization.organization_id, active=True
+    )
     orders = Order.objects.filter(donation__organization=organization).prefetch_related(
         "donation"
     )
@@ -378,7 +380,9 @@ def statistics_orders_status(request, organization_id):
 @login_required
 def statistics_donations(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    donations = Donation.objects.filter(organization_id=organization.organization_id, active=True)
+    donations = Donation.objects.filter(
+        organization_id=organization.organization_id, active=True
+    )
     donations_data = (
         donations.annotate(date=TruncDate("created_at"))
         .values("date")
