@@ -123,6 +123,47 @@ class DonorDashboardViewsTests(TestCase):
         self.assertEqual(len(response.context["orders"]), 1)
         self.assertIn(self.order, response.context["orders"])
 
+    def test_download_orders(self):
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:download_orders",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        current_date = timezone.datetime.now().strftime("%Y%m%d")
+        expected_filename = (
+            f"{self.organization.organization_name}_orders_{current_date}.csv"
+        )
+
+        # Check that the filename is correct
+        self.assertIn(
+            f'filename="{expected_filename}"', response["Content-Disposition"]
+        )
+
+        # Check file contents
+        csv_content = response.content.decode("utf-8")
+        self.assertIn(
+            "Donation,User,Quantity,Pickup Date,Status,Created On,Modified On",
+            csv_content,
+        )
+        self.assertIn(self.donation.food_item, csv_content)
+        self.assertIn(self.order.user.username, csv_content)
+
     def test_view_organization_no_orders(self):
         self.organization1 = Organization.objects.create(
             organization_name="Test Org1",

@@ -561,27 +561,40 @@ def manage_order(request, order_id):
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
+    orders = (
+        Order.objects.filter(donation__organization=organization)
+        .prefetch_related("donation")
+        .order_by("order_created_at")
     )
+    current_date = timezone.datetime.now().strftime("%Y%m%d")
+
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename=orders.csv"
+    filename = f"{organization.organization_name}_orders_{current_date}.csv"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     writer = csv.writer(response)
     writer.writerow(
-        ["ID", "Donation", "User", "Quantity", "Pickup Date", "Address", "Status"]
+        [
+            "Donation",
+            "User",
+            "Quantity",
+            "Pickup Date",
+            "Status",
+            "Created On",
+            "Modified On",
+        ]
     )
 
     for order in orders:
         writer.writerow(
             [
-                order.order_id,
                 order.donation.food_item,
                 order.user,
                 order.order_quantity,
                 order.donation.pickup_by,
-                organization.address,
                 order.order_status,
+                order.order_created_at,
+                order.order_modified_at,
             ]
         )
 
