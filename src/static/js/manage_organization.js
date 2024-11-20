@@ -187,7 +187,7 @@ document.addEventListener("DOMContentLoaded", function () {
         range.setDate(currentDate.getDate() + 7);
         range.setHours(23, 59, 59, 999); // End of the range day
 
-        return inputDate > currentDate && inputDate <= range;
+        return inputDate >= currentDate && inputDate <= range;
     }
 
     var addDonationButton = document.getElementById("add-donation-button");
