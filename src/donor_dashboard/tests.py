@@ -158,7 +158,7 @@ class DonorDashboardViewsTests(TestCase):
         # Check file contents
         csv_content = response.content.decode("utf-8")
         self.assertIn(
-            "Donation,User,Quantity,Pickup Date,Status,Created On,Modified On",
+            "Item,Reserved By (Email),Reserved By (Name),Quantity,Pickup Date,Address,Order Status,Order Created On,Order Modified On",
             csv_content,
         )
         self.assertIn(self.donation.food_item, csv_content)
