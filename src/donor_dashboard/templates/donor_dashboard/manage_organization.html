@@ -160,7 +160,7 @@ Manage Organization
                             </div>
                         </div>
                     </div>
-                    {% if donation.donation_status == "active" %}
+                    {% if donation.active %}
                     <footer class="card-footer">
                         <a href="#" class="card-footer-item edit-link" data-id="{{ donation.donation_id }}"
                             data-food-item="{{ donation.food_item }}" data-quantity="{{ donation.quantity }}"
@@ -234,7 +234,7 @@ Manage Organization
                                     {% endif %}
                                 </div>
                                 <br>
-                                {% if order.order_status == "pending" %}
+                                {% if order.active %}
                                 <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
                                     class="button is-small is-rounded is-info is-light is-outlined">
                                     {% if order.order_status == "pending" %}
