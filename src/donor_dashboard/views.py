@@ -138,7 +138,8 @@ def manage_organization(request, organization_id):
 
         # Fetch donations with related reviews
         donations = Donation.objects.filter(
-            organization_id=organization.organization_id
+            organization_id=organization.organization_id,
+            active=True,
         ).prefetch_related(
             Prefetch(
                 "userreview_set",
@@ -280,7 +281,7 @@ def delete_organization(request, organization_id):
         organization = Organization.objects.get(organization_id=organization_id)
 
         # Set the active field in Donations to False for soft delete
-        donations = Donation.objects.filter(organization=organization)
+        donations = Donation.objects.filter(organization=organization, active=True)
         for donation in donations:
 
             # Set the active field in Orders to False for soft delete
