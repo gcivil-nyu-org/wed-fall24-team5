@@ -582,7 +582,6 @@ def sanitize_order(order, organization):
     Sanitizes all the fields of an order object and returns a list of sanitized fields.
     """
     return [
-        sanitize_csv_field(order.order_id),
         sanitize_csv_field(order.donation.food_item),
         sanitize_csv_field(order.user.email),
         sanitize_csv_field(f"{order.user.first_name} {order.user.last_name}"),
@@ -594,6 +593,8 @@ def sanitize_order(order, organization):
         ),
         sanitize_csv_field(organization.address),
         sanitize_csv_field(order.order_status),
+        sanitize_csv_field(order.order_created_at),
+        sanitize_csv_field(order.order_modified_at),
     ]
 
 
@@ -614,7 +615,6 @@ def download_orders(request, organization_id):
     writer = csv.writer(response)
     writer.writerow(
         [
-            "Order ID",
             "Item",
             "Reserved By (Email)",
             "Reserved By (Name)",
@@ -622,6 +622,8 @@ def download_orders(request, organization_id):
             "Pickup Date",
             "Address",
             "Order Status",
+            "Created On",
+            "Modified On",
         ]
     )
 
