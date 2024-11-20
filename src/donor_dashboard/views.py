@@ -600,15 +600,16 @@ def sanitize_order(order, organization):
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    # Fetch and sort orders by the pickup date in descending order
     orders = (
         Order.objects.filter(donation__organization=organization)
         .prefetch_related("donation")
-        .order_by("-donation__pickup_by")  # Sorting by most recent pickup date
+        .order_by("order_created_at")
     )
+    current_date = timezone.datetime.now().strftime("%Y%m%d")
 
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename=orders.csv"
+    filename = f"{organization.organization_name}_orders_{current_date}.csv"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     writer = csv.writer(response)
     writer.writerow(
