@@ -22,7 +22,7 @@ Manage Organization
         </ul>
     </nav>
     <div class="flex-container is-justify-content-space-between is-align-items-center">
-        <h2 class="title mt-5">
+        <h2 class="title mt-5" style="max-width: 70%;">
             <strong>{{ organization.organization_name }}</strong>
         </h2>
         <div id="organization-id" hidden>{{ organization.organization_id }}</div>
@@ -32,11 +32,11 @@ Manage Organization
                 <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
                     class="button is-info">Messages</a>
                 <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
-                    class="button is-info">Manage Organization</a>
+                    class="button is-info">Manage</a>
                 <form id="delete-form" class="is-inline-block"
                     action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
                     {% csrf_token %}
-                    <button type="button" class="button is-danger" onclick="confirmDelete()">Make Organization Inactive </button>
+                    <button type="button" class="button is-danger" onclick="confirmDelete()">Deactivate </button>
                 </form>
             </div>
             {% else %}
