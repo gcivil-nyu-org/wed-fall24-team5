@@ -10,12 +10,18 @@ Organizations Dashboard
 <script src="{% static 'js/add_org.js' %}"></script>
 <div class="container">
     {% include "partials/notifications.html" %}
-    <div class="flex-container">
-        <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <!-- Button to open the modal -->
-        <div class="buttons">
-            <button class="button  is-dark" id="open-modal">Add Organization</button>
+    <div class="level mt-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+            </div>
         </div>
+        <!-- Button to open the modal -->
+         <div class="level-right">
+            <div class="level-item">
+                <button class="button is-dark" id="open-modal">Add Organization</button>
+            </div>
+         </div>
     </div>
     <!-- Modal structure -->
     <div class="modal" id="org-modal">
@@ -166,7 +172,7 @@ Organizations Dashboard
         <div class="columns is-multiline is-variable is-4">
             {% if inactive_org_list %}
             {% for org in inactive_org_list %}
-            <div class="column is-full-mobile is-one-third-tablet is-one-third-desktop">
+            <div class="column is-full-mobile is-one-half-tablet is-one-third-desktop">
                 <div class="card mb-5 is-flex is-flex-direction-column">
                     <div class="card-content is-flex-grow-1">
                         <div class="level">
