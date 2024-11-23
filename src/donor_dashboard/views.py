@@ -16,7 +16,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.http import HttpResponse, JsonResponse
-from django.db.models import Avg, Count, F, Value
+from django.db.models import Avg, Count, F, Value, Case, When, IntegerField
 from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
 from .helpers import validate_donation
 import csv
@@ -164,9 +164,20 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
+            .annotate(
+                status_order=Case(
+                    When(order_status="pending", then=Value(0)),
+                    When(order_status="picked_up", then=Value(1)),
+                    When(order_status="canceled", then=Value(2)),
+                    default=Value(99),
+                    output_field=IntegerField(),
+                )
+            )
             .order_by(
-                "-donation__pickup_by", "donation__donation_id"
-            )  # Sort by pickup date descending, then by donation ID
+                "donation__pickup_by",
+                "donation__donation_id",
+                "status_order",
+            )
         )
 
         # Process dietary restrictions to replace underscores and apply title case
