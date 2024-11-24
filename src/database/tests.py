@@ -170,9 +170,9 @@ class ModelsTestCase(TestCase):
             meal_target=1000,
             volunteer_target=50,
             start_date=date.today(),
-            end_date=date.today() + timedelta(days=30)
+            end_date=date.today() + timedelta(days=30),
         )
-        
+
         # Test all fields
         self.assertIsInstance(drive.drive_id, uuid.UUID)
         self.assertEqual(drive.name, "Holiday Food Drive")
@@ -195,15 +195,15 @@ class ModelsTestCase(TestCase):
             meal_target=1000,
             volunteer_target=50,
             start_date=date.today(),
-            end_date=date.today() + timedelta(days=30)
+            end_date=date.today() + timedelta(days=30),
         )
-        
+
         drive_org = DriveOrganization.objects.create(
             drive=drive,
             organization=self.organization2,  # Using second test organization
-            meal_pledge=100
+            meal_pledge=100,
         )
-        
+
         # Test all fields
         self.assertIsInstance(drive_org.participation_id, uuid.UUID)
         self.assertEqual(drive_org.drive, drive)
@@ -211,7 +211,7 @@ class ModelsTestCase(TestCase):
         self.assertEqual(drive_org.meal_pledge, 100)
         self.assertIsNotNone(drive_org.created_at)
         self.assertIsNotNone(drive_org.modified_at)
-        
+
         # Test string representation
         expected_str = f"{self.organization2.organization_name} - {drive.name}"
         self.assertEqual(str(drive_org), expected_str)
@@ -225,16 +225,13 @@ class ModelsTestCase(TestCase):
             meal_target=1000,
             volunteer_target=50,
             start_date=date.today(),
-            end_date=date.today() + timedelta(days=30)
+            end_date=date.today() + timedelta(days=30),
         )
-        
+
         volunteer = DriveVolunteer.objects.create(
-            drive=drive,
-            name="John Doe",
-            email="john@example.com",
-            phone="555-0123"
+            drive=drive, name="John Doe", email="john@example.com", phone="555-0123"
         )
-        
+
         # Test initial creation
         self.assertIsInstance(volunteer.participation_id, uuid.UUID)
         self.assertEqual(volunteer.drive, drive)
@@ -244,19 +241,18 @@ class ModelsTestCase(TestCase):
         self.assertTrue(volunteer.active)
         self.assertIsNotNone(volunteer.created_at)
         self.assertIsNotNone(volunteer.modified_at)
-        
+
         # Test updates
         volunteer.phone = "555-9999"
         volunteer.active = False
         volunteer.save()
-        
+
         refreshed_volunteer = DriveVolunteer.objects.get(
             participation_id=volunteer.participation_id
         )
         self.assertEqual(refreshed_volunteer.phone, "555-9999")
         self.assertFalse(refreshed_volunteer.active)
-        
+
         # Test string representation
         expected_str = f"John Doe - {drive}"
         self.assertEqual(str(volunteer), expected_str)
-        

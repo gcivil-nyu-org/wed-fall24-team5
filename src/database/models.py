@@ -213,6 +213,7 @@ class DietaryRestriction(models.Model):
     def __str__(self):
         return f"{self.user.username}: {self.restriction}"
 
+
 class CommunityDrive(models.Model):
     drive_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     name = models.CharField(max_length=255)
@@ -228,9 +229,12 @@ class CommunityDrive(models.Model):
 
     def __str__(self):
         return f"{self.name} - {self.lead_organization.organization_name}"
-    
+
+
 class DriveOrganization(models.Model):
-    participation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    participation_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     drive = models.ForeignKey(CommunityDrive, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     meal_pledge = models.IntegerField()
@@ -239,9 +243,12 @@ class DriveOrganization(models.Model):
 
     def __str__(self):
         return f"{self.organization.organization_name} - {self.drive.name}"
-    
+
+
 class DriveVolunteer(models.Model):
-    participation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    participation_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
     drive = models.ForeignKey(CommunityDrive, on_delete=models.CASCADE)
     name = models.CharField(max_length=255)
     email = models.EmailField()
