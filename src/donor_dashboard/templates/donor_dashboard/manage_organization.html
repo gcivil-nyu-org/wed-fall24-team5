@@ -190,7 +190,7 @@ Manage Organization
     <!-- Content for Orders Received tab -->
     <div id="orders-content" class="is-hidden manage-tab">
         <div class="flex-container is-justify-content-space-between is-align-items-center mb-3">
-            <h2 class="subtitle mt-3"><strong>All Orders</strong></h2>
+            <h2 class="subtitle mt-3"><strong>Pending Orders</strong></h2>
         {% if status %}
         <div class="buttons">
             <a class="button is-dark" href="{% url 'donor_dashboard:download_orders' organization.organization_id %}">
@@ -244,26 +244,13 @@ Manage Organization
                                 <!-- Status and button at the bottom -->
                                 <div>
                                     <div class="tag is-info my-2 is-size-6 is-primary is-light">
-                                        Current Status:
-                                        {% if order.order_status == "pending" %}
-                                            Pending
-                                        {% elif order.order_status == "picked_up" %}
-                                            Complete
-                                        {% else %}
-                                            Cancelled
-                                        {% endif %}
+                                        Current Status: Pending
                                     </div>
                                     <br>
-                                    {% if order.active and order.order_status != "canceled" %}
                                     <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
                                         class="button is-small is-rounded is-info is-light is-outlined">
-                                        {% if order.order_status == "pending" %}
                                         Mark as complete
-                                        {% else %}
-                                        Mark as pending
-                                        {% endif %}
                                     </a>
-                                    {% endif %}
                                 </div>
                             </div>
                         {% endfor %}

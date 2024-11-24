@@ -154,7 +154,9 @@ def manage_organization(request, organization_id):
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization)
+            Order.objects.filter(
+                donation__organization=organization, order_status="pending"
+            )
             .prefetch_related(
                 "donation",
                 "user",
