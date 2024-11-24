@@ -4,7 +4,7 @@
 {% block title %}
 Donation Dashboard
 {% endblock title %}
-
+{% load static %}
 {% block content %}
 <div class="container">
     {% include "partials/notifications.html" %}
@@ -186,6 +186,15 @@ Donation Dashboard
                                 <p>{{ donation.pickup_by }}</p>
                             </div>
                         </div>
+                        <div class="image-container has-text-centered mt-4">
+                            <!-- djlint:off -->
+                            <img src="data:image/jpeg;base64,{{ donation.image_data }}" 
+                                alt="Default Image" 
+                                onerror="this.src='{% static 'default.png' %}';"
+                                class="image is-square"
+                                style="width: 600px; height: 300px; object-fit: cover; border-radius: 4px;">
+                            <!-- djlint:on -->
+                        </div>  
                     </div>
                 </div>
                 <footer class="card-footer has-text-weight-semibold has-background-white-ter">

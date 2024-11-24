@@ -160,6 +160,19 @@ Manage Organization
                                     <strong>Pickup by:</strong>
                                     <p>{{ donation.pickup_by }}</p>
                                 </div>
+                                <div class="image-container has-text-centered mt-4">
+                                    <!-- djlint:off -->
+                                    <img src="data:image/jpeg;base64,{{ donation.image_data }}" 
+                                            alt="Donation Image" 
+                                            onerror="this.src='{% static 'default.png' %}';"
+                                            class="image is-square is-clickable" 
+                                            data-donation-id="{{ donation.donation_id }}">
+                                    <!-- djlint:on -->
+                                    <input type="file" id="file-upload-{{ donation.donation_id }}" 
+                                           class="is-hidden file-upload" 
+                                           data-id="{{ donation.donation_id }}" 
+                                           onchange="uploadDonationImage(this)">
+                                </div>                                
                             </div>
                         </div>
                     </div>
