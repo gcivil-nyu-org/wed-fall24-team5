@@ -1,12 +1,22 @@
-{% extends "_base.html" %}
-{% load dashboard_filters %}
+{% extends "_base.html" %} 
+{% load static %} 
+{% load dashboard_filters %} 
 
-{% block title %}
-Donation Dashboard
-{% endblock title %}
+{% block title %} 
+    Donation Dashboard 
+{% endblock title %} 
+
+{% block extra_head %}
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script> 
+{% endblock extra_head %} 
 
 {% block content %}
 <div class="container">
+    <div id="page-loader"></div>
+    
+    <!-- Rest of your content -->
     {% include "partials/notifications.html" %}
     <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
     <form method="get">
@@ -198,34 +208,93 @@ Donation Dashboard
     {% else %}
     <p class="box">No donations available at the moment.</p>
     {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+          // Show loader when navigation starts
+          document.addEventListener('readystatechange', function() {
+            const loader = document.getElementById('page-loader');
+            if (document.readyState === 'loading') {
+              loader.style.display = 'block';
+            } else {
+              loader.style.display = 'none';
+            }
+          });
+      
+          // Show loader when clicking links/submitting forms
+          document.addEventListener('click', function(e) {
+            if (e.target.tagName === 'A' || e.target.closest('a') || e.target.closest('form')) {
+              const loader = document.getElementById('page-loader');
+              loader.style.display = 'block';
+            }
+          });
+      
+          // Show loader when submitting forms
+          document.addEventListener('submit', function() {
+            const loader = document.getElementById('page-loader');
+            loader.style.display = 'block';
+          });
+        });
+      </script>
 </div>
 
 <script>
-    function getUserLocation() {
-        if ("geolocation" in navigator) {
-            navigator.geolocation.getCurrentPosition(function (position) {
-                // Use reverse geocoding to get address from coordinates
-                fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`)
-                    .then(response => response.json())
-                    .then(data => {
-                        const addressInput = document.querySelector('input[name="address"]');
-                        if (addressInput) {
-                            addressInput.value = data.display_name;
-                            // Submit the form to update results
-                            addressInput.form.submit();
-                        }
-                    })
-                    .catch(error => {
-                        console.error('Error:', error);
-                        alert('Unable to get your location. Please enter an address manually.');
-                    });
-            }, function (error) {
-                console.error('Error:', error);
-                alert('Unable to get your location. Please enter an address manually.');
-            });
-        } else {
-            alert('Geolocation is not supported by your browser. Please enter an address manually.');
+    document.addEventListener('DOMContentLoaded', function() {
+        // Create a basic loader element since React setup isn't working
+        const loader = document.getElementById('page-loader');
+        loader.innerHTML = `
+            <div class="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center" style="display: none;">
+                <div class="flex flex-col items-center gap-4">
+                    <div class="h-12 w-12 animate-spin text-primary">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21 12a9 9 0 1 1-6.219-8.56"/>
+                        </svg>
+                    </div>
+                    <p class="text-lg font-medium text-gray-600">Loading...</p>
+                </div>
+            </div>
+        `;
+    
+        // Function to show loader
+        function showLoader() {
+            const loaderEl = loader.querySelector('div');
+            if (loaderEl) loaderEl.style.display = 'flex';
         }
-    };
-</script>
-{% endblock content %}
+    
+        // Function to hide loader
+        function hideLoader() {
+            const loaderEl = loader.querySelector('div');
+            if (loaderEl) loaderEl.style.display = 'none';
+        }
+    
+        // Show loader when page is loading
+        if (document.readyState === 'loading') {
+            showLoader();
+        }
+    
+        // Hide loader when page is loaded
+        window.addEventListener('load', hideLoader);
+    
+        // Show loader when clicking links or submitting forms
+        document.addEventListener('click', function(e) {
+            const clickedElement = e.target;
+            if (
+                clickedElement.tagName === 'A' || 
+                clickedElement.closest('a') || 
+                clickedElement.closest('form button[type="submit"]')
+            ) {
+                showLoader();
+            }
+        });
+    
+        // Show loader when submitting forms
+        document.addEventListener('submit', function() {
+            showLoader();
+        });
+    
+        // Hide loader if page has finished loading
+        if (document.readyState === 'complete') {
+            hideLoader();
+        }
+    });
+    </script>
+    {% endblock content %}
