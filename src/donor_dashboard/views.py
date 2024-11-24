@@ -75,6 +75,11 @@ def get_org_list(request):
                 messages.warning(request, "Email is not valid. Please try again.")
             if form.errors.get("website"):
                 messages.warning(request, "Website is not valid. Please try again.")
+            if form.errors.get("__all__"):
+                messages.warning(
+                    request,
+                    "An organization with the same details already exists. Please modify at least one field and try again.",
+                )
 
             # Fallback error message
             if not any(form.errors):
@@ -138,17 +143,18 @@ def manage_organization(request, organization_id):
 
         # Fetch donations with related reviews
         donations = Donation.objects.filter(
-            organization_id=organization.organization_id, active=True
+            organization_id=organization.organization_id,
+            active=True,
         ).prefetch_related(
             Prefetch(
                 "userreview_set",
-                queryset=UserReview.objects.filter(active=True).order_by("modified_at"),
+                queryset=UserReview.objects.order_by("modified_at"),
             )
         )
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization, active=True)
+            Order.objects.filter(donation__organization=organization)
             .prefetch_related(
                 "donation",
                 "user",
@@ -158,7 +164,9 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
-            .order_by("donation__donation_id")
+            .order_by(
+                "-donation__pickup_by", "donation__donation_id"
+            )  # Sort by pickup date descending, then by donation ID
         )
 
         # Process dietary restrictions to replace underscores and apply title case
@@ -522,7 +530,7 @@ def modify_donation(request, donation_id):
 
 @login_required
 def delete_donation(request, donation_id):
-    donation = get_object_or_404(Donation, donation_id=donation_id, active=True)
+    donation = get_object_or_404(Donation, donation_id=donation_id)
     if request.method == "POST":
         donation.active = False  # Set the active field to False for soft delete
         donation.quantity = 0
@@ -544,7 +552,7 @@ def delete_donation(request, donation_id):
 
 @login_required
 def manage_order(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, active=True)
+    order = get_object_or_404(Order, order_id=order_id)
     donation = Donation.objects.get(donation_id=order.donation_id)
 
     order.order_status = "picked_up" if order.order_status == "pending" else "pending"
@@ -556,32 +564,87 @@ def manage_order(request, order_id):
     )
 
 
+def sanitize_csv_field(value):
+    """
+    Escape potential CSV injection by adding a single quote
+    to values starting with special characters. Convert non-string values to strings.
+    """
+    if not isinstance(value, str):
+        value = str(value)
+
+    # List of potentially dangerous prefixes
+    dangerous_prefixes = ("=", "+", "-", "@", "\t", "\n")
+
+    # If value starts with any dangerous prefix, prepend a single quote
+    if value.startswith(dangerous_prefixes):
+        return f"'{value}"
+    return value
+
+
+def sanitize_order(order, organization):
+    """
+    Sanitizes all the fields of an order object and returns a list of sanitized fields.
+    """
+    return [
+        sanitize_csv_field(order.donation.food_item if order.donation else ""),
+        sanitize_csv_field(order.user.email if order.user else ""),
+        sanitize_csv_field(
+            f"{order.user.first_name} {order.user.last_name}" if order.user else ""
+        ),
+        sanitize_csv_field(order.order_quantity),
+        sanitize_csv_field(
+            order.donation.pickup_by.strftime("%Y-%m-%d")
+            if order.donation and order.donation.pickup_by
+            else ""
+        ),
+        sanitize_csv_field(organization.address),
+        sanitize_csv_field(order.order_status),
+        sanitize_csv_field(
+            order.order_created_at.strftime("%Y-%m-%d %H:%M:%S")
+            if order.order_created_at
+            else ""
+        ),
+        sanitize_csv_field(
+            order.order_modified_at.strftime("%Y-%m-%d %H:%M:%S")
+            if order.order_modified_at
+            else ""
+        ),
+    ]
+
+
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
+    # Order by creation date (most recent first)
+    orders = (
+        Order.objects.filter(donation__organization=organization)
+        .prefetch_related("donation", "user")
+        .order_by("-donation__pickup_by")
     )
+    current_date = timezone.now().strftime("%Y%m%d")
+
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename=orders.csv"
+    filename = f"{organization.organization_id}_orders_{current_date}.csv"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     writer = csv.writer(response)
     writer.writerow(
-        ["ID", "Donation", "User", "Quantity", "Pickup Date", "Address", "Status"]
+        [
+            "Item",
+            "Reserved By (Email)",
+            "Reserved By (Name)",
+            "Quantity",
+            "Pickup Date",
+            "Address",
+            "Order Status",
+            "Order Created On",
+            "Order Modified On",
+        ]
     )
 
     for order in orders:
-        writer.writerow(
-            [
-                order.order_id,
-                order.donation.food_item,
-                order.user,
-                order.order_quantity,
-                order.donation.pickup_by,
-                organization.address,
-                order.order_status,
-            ]
-        )
+        sanitized_order = sanitize_order(order, organization)
+        writer.writerow(sanitized_order)
 
     return response
 

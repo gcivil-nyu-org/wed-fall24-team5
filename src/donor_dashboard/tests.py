@@ -123,6 +123,47 @@ class DonorDashboardViewsTests(TestCase):
         self.assertEqual(len(response.context["orders"]), 1)
         self.assertIn(self.order, response.context["orders"])
 
+    def test_download_orders(self):
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+        self.order = Order.objects.create(
+            donation=self.donation,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        response = self.client.get(
+            reverse(
+                "donor_dashboard:download_orders",
+                args=[self.organization.organization_id],
+            )
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response["Content-Type"], "text/csv")
+        current_date = timezone.datetime.now().strftime("%Y%m%d")
+        expected_filename = (
+            f"{self.organization.organization_id}_orders_{current_date}.csv"
+        )
+
+        # Check that the filename is correct
+        self.assertIn(
+            f'filename="{expected_filename}"', response["Content-Disposition"]
+        )
+
+        # Check file contents
+        csv_content = response.content.decode("utf-8")
+        self.assertIn(
+            "Item,Reserved By (Email),Reserved By (Name),Quantity,Pickup Date,Address,Order Status,Order Created On,Order Modified On",
+            csv_content,
+        )
+        self.assertIn(self.donation.food_item, csv_content)
+        self.assertIn(self.order.user.username, csv_content)
+
     def test_view_organization_no_orders(self):
         self.organization1 = Organization.objects.create(
             organization_name="Test Org1",
@@ -903,5 +944,36 @@ class AddOrganizationFormErrorsTests(TestCase):
         messages_list = list(messages.get_messages(response.wsgi_request))
         self.assertIn(
             "Zipcode is not valid. Please try again.",
+            [msg.message for msg in messages_list],
+        )
+
+    def test_add_organization_duplicate(self):
+        """Test duplicate organization generates the correct error message."""
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        form_data = {
+            "organization_name": "Test Org",
+            "type": "self",
+            "address": "123 Test Street",
+            "zipcode": "12345",
+            "contact_number": "1234567890",
+            "email": "org@test.com",
+            "website": "https://test.org",
+        }
+        response = self.client.post(reverse("donor_dashboard:org_list"), form_data)
+        self.assertEqual(response.status_code, 302)
+
+        # Check error message
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertIn(
+            "An organization with the same details already exists. Please modify at least one field and try again.",
             [msg.message for msg in messages_list],
         )
