@@ -227,7 +227,7 @@ class CommunityDrive(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.drive_name} - {self.organization.organization_name}"
+        return f"{self.name} - {self.lead_organization.organization_name}"
     
 class DriveOrganization(models.Model):
     participation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
@@ -238,7 +238,7 @@ class DriveOrganization(models.Model):
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.organization.organization_name} - {self.drive.drive_name}"
+        return f"{self.organization.organization_name} - {self.drive.name}"
     
 class DriveVolunteer(models.Model):
     participation_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
