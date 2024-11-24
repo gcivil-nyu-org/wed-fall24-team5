@@ -16,7 +16,7 @@ from django.contrib.auth.hashers import make_password
 from django.utils import timezone
 from django.utils.crypto import get_random_string
 from django.http import HttpResponse, JsonResponse
-from django.db.models import Avg, Count, F, Value, Case, When, IntegerField
+from django.db.models import Avg, Count, F, Value
 from django.db.models.functions import ExtractMonth, TruncDate, Coalesce
 from .helpers import validate_donation
 import csv
