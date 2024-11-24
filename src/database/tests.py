@@ -1,14 +1,17 @@
 from django.test import TestCase
 from django.contrib.auth.models import User
 from .models import (
+    CommunityDrive,
     DietaryRestriction,
+    DriveOrganization,
+    DriveVolunteer,
     Organization,
     UserProfile,
     OrganizationAdmin,
     Donation,
     Order,
 )
-from datetime import date
+from datetime import date, timedelta
 import uuid
 
 
@@ -157,3 +160,103 @@ class ModelsTestCase(TestCase):
             str(restriction), f"{self.user.username}: {restriction.restriction}"
         )
         self.assertTrue(isinstance(restriction.restriction_id, uuid.UUID))
+
+    def test_community_drive_creation(self):
+        """Test CommunityDrive creation and all its fields"""
+        drive = CommunityDrive.objects.create(
+            name="Holiday Food Drive",
+            description="Annual holiday food drive",
+            lead_organization=self.organization,
+            meal_target=1000,
+            volunteer_target=50,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30)
+        )
+        
+        # Test all fields
+        self.assertIsInstance(drive.drive_id, uuid.UUID)
+        self.assertEqual(drive.name, "Holiday Food Drive")
+        self.assertEqual(drive.description, "Annual holiday food drive")
+        self.assertEqual(drive.lead_organization, self.organization)
+        self.assertEqual(drive.meal_target, 1000)
+        self.assertEqual(drive.volunteer_target, 50)
+        self.assertEqual(drive.start_date, date.today())
+        self.assertEqual(drive.end_date, date.today() + timedelta(days=30))
+        self.assertTrue(drive.active)
+        self.assertIsNotNone(drive.created_at)
+        self.assertIsNotNone(drive.modified_at)
+
+    def test_drive_organization_creation(self):
+        """Test DriveOrganization creation and relationships"""
+        drive = CommunityDrive.objects.create(
+            name="Holiday Food Drive",
+            description="Annual holiday food drive",
+            lead_organization=self.organization,
+            meal_target=1000,
+            volunteer_target=50,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30)
+        )
+        
+        drive_org = DriveOrganization.objects.create(
+            drive=drive,
+            organization=self.organization2,  # Using second test organization
+            meal_pledge=100
+        )
+        
+        # Test all fields
+        self.assertIsInstance(drive_org.participation_id, uuid.UUID)
+        self.assertEqual(drive_org.drive, drive)
+        self.assertEqual(drive_org.organization, self.organization2)
+        self.assertEqual(drive_org.meal_pledge, 100)
+        self.assertIsNotNone(drive_org.created_at)
+        self.assertIsNotNone(drive_org.modified_at)
+        
+        # Test string representation
+        expected_str = f"{self.organization2.organization_name} - {drive.name}"
+        self.assertEqual(str(drive_org), expected_str)
+
+    def test_drive_volunteer_creation(self):
+        """Test DriveVolunteer creation and updates"""
+        drive = CommunityDrive.objects.create(
+            name="Holiday Food Drive",
+            description="Annual holiday food drive",
+            lead_organization=self.organization,
+            meal_target=1000,
+            volunteer_target=50,
+            start_date=date.today(),
+            end_date=date.today() + timedelta(days=30)
+        )
+        
+        volunteer = DriveVolunteer.objects.create(
+            drive=drive,
+            name="John Doe",
+            email="john@example.com",
+            phone="555-0123"
+        )
+        
+        # Test initial creation
+        self.assertIsInstance(volunteer.participation_id, uuid.UUID)
+        self.assertEqual(volunteer.drive, drive)
+        self.assertEqual(volunteer.name, "John Doe")
+        self.assertEqual(volunteer.email, "john@example.com")
+        self.assertEqual(volunteer.phone, "555-0123")
+        self.assertTrue(volunteer.active)
+        self.assertIsNotNone(volunteer.created_at)
+        self.assertIsNotNone(volunteer.modified_at)
+        
+        # Test updates
+        volunteer.phone = "555-9999"
+        volunteer.active = False
+        volunteer.save()
+        
+        refreshed_volunteer = DriveVolunteer.objects.get(
+            participation_id=volunteer.participation_id
+        )
+        self.assertEqual(refreshed_volunteer.phone, "555-9999")
+        self.assertFalse(refreshed_volunteer.active)
+        
+        # Test string representation
+        expected_str = f"John Doe - {drive}"
+        self.assertEqual(str(volunteer), expected_str)
+        
