@@ -297,4 +297,32 @@
         }
     });
     </script>
+    <script>
+        function getUserLocation() {
+            if ("geolocation" in navigator) {
+                navigator.geolocation.getCurrentPosition(function (position) {
+                    // Use reverse geocoding to get address from coordinates
+                    fetch(`https://nominatim.openstreetmap.org/reverse?lat=${position.coords.latitude}&lon=${position.coords.longitude}&format=json`)
+                        .then(response => response.json())
+                        .then(data => {
+                            const addressInput = document.querySelector('input[name="address"]');
+                            if (addressInput) {
+                                addressInput.value = data.display_name;
+                                // Submit the form to update results
+                                addressInput.form.submit();
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            alert('Unable to get your location. Please enter an address manually.');
+                        });
+                }, function (error) {
+                    console.error('Error:', error);
+                    alert('Unable to get your location. Please enter an address manually.');
+                });
+            } else {
+                alert('Geolocation is not supported by your browser. Please enter an address manually.');
+            }
+        };
+    </script>
     {% endblock content %}
