@@ -17,6 +17,7 @@ import base64
 from io import BytesIO
 from uuid import uuid4
 
+
 class DonorDashboardViewsTests(TestCase):
     def setUp(self):
         # Set up test data
@@ -980,6 +981,7 @@ class AddOrganizationFormErrorsTests(TestCase):
             [msg.message for msg in messages_list],
         )
 
+
 class UploadDonationImageTests(TestCase):
     def setUp(self):
         User = get_user_model()
@@ -1015,7 +1017,7 @@ class UploadDonationImageTests(TestCase):
         image_file = BytesIO(content)
         image_file.name = name
         return image_file
-    
+
     def test_successful_image_upload(self):
         image_file = self.create_image_file()
         response = self.client.post(
@@ -1036,7 +1038,7 @@ class UploadDonationImageTests(TestCase):
         self.assertEqual(
             base64.b64decode(self.donation.image_data).decode("utf-8"), "image content"
         )
-    
+
     def test_missing_donation_id(self):
         image_file = self.create_image_file()
         response = self.client.post(self.url, {"image": image_file})
@@ -1046,16 +1048,18 @@ class UploadDonationImageTests(TestCase):
             response.content,
             {"success": False, "error": "Invalid data."},
         )
-    
+
     def test_missing_image(self):
-        response = self.client.post(self.url, {"donation_id": self.donation.donation_id})
+        response = self.client.post(
+            self.url, {"donation_id": self.donation.donation_id}
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertJSONEqual(
             response.content,
             {"success": False, "error": "Invalid data."},
         )
-    
+
     def test_invalid_donation_id(self):
         image_file = self.create_image_file()
         invalid_donation_id = uuid4()
@@ -1081,7 +1085,7 @@ class UploadDonationImageTests(TestCase):
             response.content,
             {"success": False, "error": "Invalid request method."},
         )
-    
+
     def test_unauthenticated_user(self):
         self.client.logout()
         response = self.client.post(self.url)

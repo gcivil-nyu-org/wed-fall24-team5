@@ -810,6 +810,7 @@ def remove_admin_owner(request, organization_id, admin_email):
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
 
+
 @login_required
 def upload_donation_image(request):
     if request.method == "POST":
