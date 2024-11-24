@@ -166,20 +166,7 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
-            .annotate(
-                status_order=Case(
-                    When(order_status="pending", then=Value(0)),
-                    When(order_status="picked_up", then=Value(1)),
-                    When(order_status="canceled", then=Value(2)),
-                    default=Value(99),
-                    output_field=IntegerField(),
-                )
-            )
-            .order_by(
-                "donation__pickup_by",
-                "donation__donation_id",
-                "status_order",
-            )
+            .order_by("-donation__pickup_by", "donation__donation_id")
         )
 
         # Process dietary restrictions to replace underscores and apply title case
