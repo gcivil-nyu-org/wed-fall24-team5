@@ -154,7 +154,9 @@ def manage_organization(request, organization_id):
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization)
+            Order.objects.filter(
+                donation__organization=organization, order_status="pending"
+            )
             .prefetch_related(
                 "donation",
                 "user",
@@ -164,9 +166,7 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
-            .order_by(
-                "-donation__pickup_by", "donation__donation_id"
-            )  # Sort by pickup date descending, then by donation ID
+            .order_by("-donation__pickup_by", "donation__donation_id")
         )
 
         # Process dietary restrictions to replace underscores and apply title case
