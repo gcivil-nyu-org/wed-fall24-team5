@@ -139,3 +139,10 @@
     border-bottom-left-radius: 0;
     border-bottom-right-radius: 0;
 }
+
+.image.is-square {
+    width: 400px;
+    height: 200px;
+    object-fit: cover; /* Ensures the image fills the square without distortion */
+    border-radius: 4px; /* Optional: Rounded corners */
+}
