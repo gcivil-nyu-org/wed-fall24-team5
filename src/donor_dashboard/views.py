@@ -23,6 +23,7 @@ import csv
 from itertools import chain
 from operator import attrgetter
 import json
+from django.utils.timezone import now
 
 
 @login_required
@@ -141,16 +142,16 @@ def manage_organization(request, organization_id):
         else:
             owner_access = False
 
+        update_donations()
+        cancel_expired_orders()
+
         # Fetch donations with related reviews
         donations = Donation.objects.filter(
             organization_id=organization.organization_id,
             active=True,
-        ).prefetch_related(
-            Prefetch(
-                "userreview_set",
-                queryset=UserReview.objects.order_by("modified_at"),
-            )
         )
+
+        reviewed_donations = get_donations_with_reviews(organization.organization_id)
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
@@ -183,6 +184,7 @@ def manage_organization(request, organization_id):
             .order_by("modified_at")
             .values("rating", "comment")
         )
+
         rating = reviews.aggregate(avg=Avg("rating"))["avg"]
         num_users = orders.values("user").distinct().count()
         form = AddDonationForm()
@@ -197,6 +199,7 @@ def manage_organization(request, organization_id):
                 "owner_access": owner_access,
                 "reviews": reviews,
                 "rating": rating,
+                "reviewed_donations": reviewed_donations,
                 "num_users": num_users,
                 "form": form,
             },
@@ -808,3 +811,48 @@ def remove_admin_owner(request, organization_id, admin_email):
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
+
+
+def update_donations():
+    """
+    Updates the donations to keep only those with pickup dates today or later as active.
+    All other donations will be marked as inactive.
+    """
+    today = now().date()  # Get the current date
+
+    # Filter donations with pickup dates today or later and ensure they are active
+    Donation.objects.filter(pickup_by__gte=today).update(active=True)
+
+    # Mark donations with pickup dates before today as inactive
+    Donation.objects.filter(pickup_by__lt=today).update(active=False)
+
+
+def cancel_expired_orders():
+    """
+    Updates the status of all pending orders to 'canceled' if the pickup date has expired.
+    """
+    today = now().date()  # Get the current date
+
+    # Identify orders with expired pickup dates and 'pending' status
+    expired_orders = Order.objects.filter(
+        donation__pickup_by__lt=today, order_status="pending"
+    )
+
+    # Update their status to 'canceled' and deactivate them
+    expired_orders.update(order_status="canceled", active=False)
+
+
+def get_donations_with_reviews(organization_id):
+    """
+    Fetch donations that have user reviews for a specific organization,
+    ordered by pickup date with the most recent donations on top.
+    """
+    donations_with_reviews = (
+        Donation.objects.filter(
+            organization=organization_id,
+            userreview__isnull=False,
+        )
+        .distinct()
+        .order_by("-pickup_by")  # Order by pickup date in descending order
+    )
+    return donations_with_reviews
