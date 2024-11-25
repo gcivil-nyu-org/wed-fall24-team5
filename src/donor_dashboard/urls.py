@@ -83,4 +83,9 @@ urlpatterns = [
         name="statistics_ratings",
     ),
     path("check_user/", views.check_user, name="check_user"),
+    path(
+        "upload-donation-image/",
+        views.upload_donation_image,
+        name="upload_donation_image",
+    ),
 ]

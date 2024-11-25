@@ -23,6 +23,7 @@ import csv
 from itertools import chain
 from operator import attrgetter
 import json
+import base64
 
 
 @login_required
@@ -154,7 +155,9 @@ def manage_organization(request, organization_id):
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization)
+            Order.objects.filter(
+                donation__organization=organization, order_status="pending"
+            )
             .prefetch_related(
                 "donation",
                 "user",
@@ -164,9 +167,7 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
-            .order_by(
-                "-donation__pickup_by", "donation__donation_id"
-            )  # Sort by pickup date descending, then by donation ID
+            .order_by("-donation__pickup_by", "donation__donation_id")
         )
 
         # Process dietary restrictions to replace underscores and apply title case
@@ -808,3 +809,29 @@ def remove_admin_owner(request, organization_id, admin_email):
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
+
+
+@login_required
+def upload_donation_image(request):
+    if request.method == "POST":
+        donation_id = request.POST.get("donation_id")
+        image = request.FILES.get("image")
+
+        if not donation_id or not image:
+            return JsonResponse({"success": False, "error": "Invalid data."})
+
+        try:
+            # Convert image to base64 string
+            image_data = base64.b64encode(image.read()).decode("utf-8")
+
+            # Update the donation object with the image string
+            donation = Donation.objects.get(donation_id=donation_id)
+            donation.image_data = (
+                image_data  # Assuming `image_data` is a TextField in the model
+            )
+            donation.save()
+
+            return JsonResponse({"success": True, "image_data": image_data})
+        except Donation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Donation not found."})
+    return JsonResponse({"success": False, "error": "Invalid request method."})

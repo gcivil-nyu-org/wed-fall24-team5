@@ -13,6 +13,9 @@ from database.models import (
 )
 from donor_dashboard.forms import AddOrganizationForm
 import json
+import base64
+from io import BytesIO
+from uuid import uuid4
 
 
 class DonorDashboardViewsTests(TestCase):
@@ -977,3 +980,114 @@ class AddOrganizationFormErrorsTests(TestCase):
             "An organization with the same details already exists. Please modify at least one field and try again.",
             [msg.message for msg in messages_list],
         )
+
+
+class UploadDonationImageTests(TestCase):
+    def setUp(self):
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="password",
+        )
+        self.client.login(email="testuser@example.com", password="password")
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user, organization=self.organization, access_level="owner"
+        )
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+        self.url = "/donor_dashboard/upload-donation-image/"  # Update with the actual URL for this view
+
+    def create_image_file(self, content=b"image content", name="test.png"):
+        """Helper method to create an in-memory image file."""
+        image_file = BytesIO(content)
+        image_file.name = name
+        return image_file
+
+    def test_successful_image_upload(self):
+        image_file = self.create_image_file()
+        response = self.client.post(
+            self.url,
+            {
+                "donation_id": self.donation.donation_id,
+                "image": image_file,
+            },
+        )
+        self.donation.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"success": True, "image_data": self.donation.image_data},
+        )
+        self.assertIsNotNone(self.donation.image_data)
+        self.assertEqual(
+            base64.b64decode(self.donation.image_data).decode("utf-8"), "image content"
+        )
+
+    def test_missing_donation_id(self):
+        image_file = self.create_image_file()
+        response = self.client.post(self.url, {"image": image_file})
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"success": False, "error": "Invalid data."},
+        )
+
+    def test_missing_image(self):
+        response = self.client.post(
+            self.url, {"donation_id": self.donation.donation_id}
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"success": False, "error": "Invalid data."},
+        )
+
+    def test_invalid_donation_id(self):
+        image_file = self.create_image_file()
+        invalid_donation_id = uuid4()
+        response = self.client.post(
+            self.url,
+            {
+                "donation_id": invalid_donation_id,
+                "image": image_file,
+            },
+        )
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"success": False, "error": "Donation not found."},
+        )
+
+    def test_invalid_request_method(self):
+        response = self.client.get(self.url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content,
+            {"success": False, "error": "Invalid request method."},
+        )
+
+    def test_unauthenticated_user(self):
+        self.client.logout()
+        response = self.client.post(self.url)
+
+        self.assertEqual(response.status_code, 302)  # Redirects to login page

@@ -75,6 +75,7 @@ class Donation(models.Model):
     active = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
+    image_data = models.TextField(blank=True, null=True)
 
     def __str__(self):
         return f"{self.food_item} - {self.organization.organization_name}"
