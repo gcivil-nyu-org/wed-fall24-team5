@@ -238,8 +238,8 @@ class DriveOrganization(models.Model):
     )
     drive = models.ForeignKey(CommunityDrive, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
-    meal_pledge = models.IntegerField()
-    volunteer_pledge = models.IntegerField()
+    meal_pledge = models.IntegerField(default=0)
+    volunteer_pledge = models.IntegerField(default=0)
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
