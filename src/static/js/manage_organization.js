@@ -245,3 +245,61 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const images = document.querySelectorAll(".image.is-clickable");
+    images.forEach(image => {
+        image.addEventListener("click", () => {
+            const donationId = image.getAttribute("data-donation-id");
+            triggerFileUpload(donationId);
+        });
+    });
+});
+
+
+function triggerFileUpload(donationId) {
+    document.getElementById(`file-upload-${donationId}`).click();
+}
+
+// Handle file upload and send to the server
+function uploadDonationImage(inputElement) {
+    const donationId = inputElement.dataset.id;
+    const file = inputElement.files[0];
+
+    if (!file) {
+        alert("No file selected.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("donation_id", donationId);
+    // http://127.0.0.1:8000/upload-donation-image/ 
+    fetch(`/donor_dashboard/upload-donation-image/`, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": getCsrfToken(), // Include CSRF token
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Image uploaded successfully!");
+                // Update the image src to the new image URL
+                location.reload();
+            } else {
+                alert("Failed to upload image. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error uploading image:", error);
+            alert("An error occurred while uploading the image.");
+        });
+}
+
+// Get CSRF token from the DOM (assumes Django template includes CSRF token)
+function getCsrfToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]").value;
+}
+
