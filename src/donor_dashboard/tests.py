@@ -12,10 +12,17 @@ from database.models import (
     DietaryRestriction,
 )
 from donor_dashboard.forms import AddOrganizationForm
+from donor_dashboard.views import (
+    update_donations,
+    cancel_expired_orders,
+    get_donations_with_reviews,
+)
 import json
 import base64
 from io import BytesIO
 from uuid import uuid4
+from django.utils.timezone import now
+from datetime import timedelta
 
 
 class DonorDashboardViewsTests(TestCase):
@@ -40,6 +47,63 @@ class DonorDashboardViewsTests(TestCase):
         self.org_admin = OrganizationAdmin.objects.create(
             user=self.user, organization=self.organization, access_level="owner"
         )
+
+        today = now().date()
+        # Create test donations
+        self.donation1 = Donation.objects.create(
+            food_item="Rice",
+            quantity=10,
+            organization=self.organization,
+            pickup_by=today,
+            active=True,
+        )
+        self.donation2 = Donation.objects.create(
+            food_item="Pasta",
+            quantity=5,
+            organization=self.organization,
+            pickup_by=today,
+            active=True,
+        )
+        self.donation3 = Donation.objects.create(
+            food_item="Bread",
+            quantity=15,
+            organization=self.organization,
+            pickup_by=today - timedelta(days=1),
+            active=True,
+        )
+
+        # Create test orders
+        self.order1 = Order.objects.create(
+            donation=self.donation1,
+            user=self.user,
+            order_quantity=1,
+            order_status="pending",
+            active=True,
+        )
+        self.order2 = Order.objects.create(
+            donation=self.donation2,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        self.order3 = Order.objects.create(
+            donation=self.donation3,
+            user=self.user,
+            order_quantity=2,
+            order_status="pending",
+            active=True,
+        )
+
+        # Add reviews to one donation
+        UserReview.objects.create(
+            donation=self.donation1,
+            user=self.user,
+            rating=4,
+            comment="Test review",
+            active=True,
+        )
+
         self.client.login(email="testuser@example.com", password="password")
 
     def test_get_org_list_view(self):
@@ -70,6 +134,41 @@ class DonorDashboardViewsTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertTemplateUsed(response, "donor_dashboard/organization_details.html")
         self.assertIsInstance(response.context["form"], AddOrganizationForm)
+
+    def test_update_donations(self):
+        update_donations()
+        today = now().date()
+
+        # Verify donations with pickup_by >= today are active
+        active_donations = Donation.objects.filter(pickup_by__gte=today, active=True)
+        self.assertEqual(active_donations.count(), 2)
+
+        # Verify donations with pickup_by < today are inactive
+        inactive_donations = Donation.objects.filter(pickup_by__lt=today, active=False)
+        self.assertEqual(inactive_donations.count(), 1)
+
+    def test_cancel_expired_orders(self):
+        cancel_expired_orders()
+        today = now().date()
+
+        # Verify expired orders are canceled and inactive
+        expired_orders = Order.objects.filter(
+            donation__pickup_by__lt=today, order_status="canceled", active=False
+        )
+        self.assertEqual(expired_orders.count(), 1)
+
+        # Verify non-expired orders remain pending
+        pending_orders = Order.objects.filter(
+            donation__pickup_by__gte=today, order_status="pending", active=True
+        )
+        self.assertEqual(pending_orders.count(), 2)
+
+    def test_get_donations_with_reviews(self):
+        donations = get_donations_with_reviews(self.organization.organization_id)
+
+        # Verify only donations with reviews are returned
+        self.assertEqual(len(donations), 1)
+        self.assertEqual(donations[0].food_item, "Rice")
 
     def test_organization_details_view_post_valid(self):
         form_data = {
@@ -123,7 +222,7 @@ class DonorDashboardViewsTests(TestCase):
                 args=[self.organization.organization_id],
             )
         )
-        self.assertEqual(len(response.context["orders"]), 1)
+        self.assertEqual(len(response.context["orders"]), 3)
         self.assertIn(self.order, response.context["orders"])
 
     def test_download_orders(self):
@@ -168,36 +267,25 @@ class DonorDashboardViewsTests(TestCase):
         self.assertIn(self.order.user.username, csv_content)
 
     def test_view_organization_no_orders(self):
-        self.organization1 = Organization.objects.create(
-            organization_name="Test Org1",
-            type="self",
-            address="123 Test Street",
-            zipcode="12345",
-            email="org@test.com",
-            website="https://test.org",
-            contact_number="1234567890",
-            active=True,
+        self.donation1.order_set.filter(order_status="pending").update(
+            order_status="picked_up"
         )
-        self.donation = Donation.objects.create(
-            food_item="Test Food",
-            quantity=10,
-            pickup_by=timezone.now().date(),
-            organization=self.organization1,
+        self.donation2.order_set.filter(order_status="pending").update(
+            order_status="picked_up"
         )
-        self.order = Order.objects.create(
-            donation=self.donation,
-            user=self.user,
-            order_quantity=3,
-            order_status="pending",
-            active=True,
-        )
+
         response = self.client.get(
             reverse(
                 "donor_dashboard:manage_organization",
                 args=[self.organization.organization_id],
             )
         )
-        self.assertEqual(len(response.context["orders"]), 0)
+        num_orders = (
+            len(response.context["orders"])
+            if response and response.context["orders"]
+            else 0
+        )
+        self.assertEqual(num_orders, 0)
 
 
 class DonationTests(TestCase):

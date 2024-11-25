@@ -74,7 +74,7 @@ Manage Organization
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
-                    <p class="heading">Total Donations</p>
+                    <p class="heading">Active Donations</p>
                     <p class="title">{{ donations.count }}</p>
                 </div>
             </div>
@@ -82,7 +82,7 @@ Manage Organization
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
-                    <p class="heading">Total Orders</p>
+                    <p class="heading">Pending Orders</p>
                     <p class="title">{{ orders.count }}</p>
                 </div>
             </div>
@@ -112,20 +112,20 @@ Manage Organization
     <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold mt-3">
         <ul>
             <li id="donations-tab">
-                <a>Donations</a>
+                <a>Active Donations</a>
             </li>
             <li id="orders-tab">
-                <a>Orders</a>
+                <a>Pending Orders</a>
             </li>
             <li id="reviews-tab">
-                <a>Reviews</a>
+                <a>All Reviews</a>
             </li>
         </ul>
     </div>
     <!-- Content for List of Donations tab -->
     <div id="donations-content" class="manage-tab">
         <div class="flex-container is-justify-content-space-between is-align-items-center mb-3">
-            <h2 class="subtitle mt-3"><strong>All Donations</strong></h2>
+            <h2 class="subtitle mt-3"><strong>Active Donations</strong></h2>
         {% if status %}
         <div class="buttons">
             <button id="add-donation-button" class="button is-dark">Add Donation</button>
@@ -196,7 +196,7 @@ Manage Organization
             {% endfor %}
         </div>
         {% else %}
-        <p class="box">No donations available at the moment.</p>
+        <p class="box">No active donations listed at the moment!</p>
         {% endif %}
     </div>
     
@@ -273,13 +273,13 @@ Manage Organization
         </div>
         {% endfor %}
         {% else %}
-        <p class="box">No orders to display.</p>
+        <p class="box">No pending orders to display!</p>
         {% endif %}
     </div>
     <!-- Content for My Reviews tab -->
     <div id="reviews-content" class="tab-content is-hidden manage-tab">
-        {% if donations %}
-        {% for donation in donations %}
+        {% if reviewed_donations %}
+        {% for donation in reviewed_donations %}
         {% if donation.userreview_set.all %}
         <div class="donation-dropdown mb-3">
             <button class="donation-dropdown-trigger button is-fullwidth is-info is-light" aria-haspopup="true">
@@ -337,7 +337,7 @@ Manage Organization
         {% endif %}
         {% endfor %}
         {% else %}
-        <p class="box">No donations to display.</p>
+        <p class="box">No reviews to display!</p>
         {% endif %}
     </div>
     <div id="addDonationModal" class="modal">
