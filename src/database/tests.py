@@ -4,7 +4,6 @@ from .models import (
     CommunityDrive,
     DietaryRestriction,
     DriveOrganization,
-    DriveVolunteer,
     Organization,
     UserProfile,
     OrganizationAdmin,
@@ -215,44 +214,3 @@ class ModelsTestCase(TestCase):
         # Test string representation
         expected_str = f"{self.organization2.organization_name} - {drive.name}"
         self.assertEqual(str(drive_org), expected_str)
-
-    def test_drive_volunteer_creation(self):
-        """Test DriveVolunteer creation and updates"""
-        drive = CommunityDrive.objects.create(
-            name="Holiday Food Drive",
-            description="Annual holiday food drive",
-            lead_organization=self.organization,
-            meal_target=1000,
-            volunteer_target=50,
-            start_date=date.today(),
-            end_date=date.today() + timedelta(days=30),
-        )
-
-        volunteer = DriveVolunteer.objects.create(
-            drive=drive, name="John Doe", email="john@example.com", phone="555-0123"
-        )
-
-        # Test initial creation
-        self.assertIsInstance(volunteer.participation_id, uuid.UUID)
-        self.assertEqual(volunteer.drive, drive)
-        self.assertEqual(volunteer.name, "John Doe")
-        self.assertEqual(volunteer.email, "john@example.com")
-        self.assertEqual(volunteer.phone, "555-0123")
-        self.assertTrue(volunteer.active)
-        self.assertIsNotNone(volunteer.created_at)
-        self.assertIsNotNone(volunteer.modified_at)
-
-        # Test updates
-        volunteer.phone = "555-9999"
-        volunteer.active = False
-        volunteer.save()
-
-        refreshed_volunteer = DriveVolunteer.objects.get(
-            participation_id=volunteer.participation_id
-        )
-        self.assertEqual(refreshed_volunteer.phone, "555-9999")
-        self.assertFalse(refreshed_volunteer.active)
-
-        # Test string representation
-        expected_str = f"John Doe - {drive}"
-        self.assertEqual(str(volunteer), expected_str)

@@ -239,24 +239,9 @@ class DriveOrganization(models.Model):
     drive = models.ForeignKey(CommunityDrive, on_delete=models.CASCADE)
     organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
     meal_pledge = models.IntegerField()
+    volunteer_pledge = models.IntegerField()
     created_at = models.DateTimeField(auto_now_add=True)
     modified_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.organization.organization_name} - {self.drive.name}"
-
-
-class DriveVolunteer(models.Model):
-    participation_id = models.UUIDField(
-        primary_key=True, default=uuid.uuid4, editable=False
-    )
-    drive = models.ForeignKey(CommunityDrive, on_delete=models.CASCADE)
-    name = models.CharField(max_length=255)
-    email = models.EmailField()
-    phone = models.CharField(max_length=20)
-    active = models.BooleanField(default=True)
-    created_at = models.DateTimeField(auto_now_add=True)
-    modified_at = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return f"{self.name} - {self.drive}"
