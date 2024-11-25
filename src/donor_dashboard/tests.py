@@ -12,7 +12,11 @@ from database.models import (
     DietaryRestriction,
 )
 from donor_dashboard.forms import AddOrganizationForm
-from donor_dashboard.views import update_donations, cancel_expired_orders, get_donations_with_reviews
+from donor_dashboard.views import (
+    update_donations,
+    cancel_expired_orders,
+    get_donations_with_reviews,
+)
 import json
 from django.utils.timezone import now
 from datetime import timedelta
@@ -43,14 +47,50 @@ class DonorDashboardViewsTests(TestCase):
 
         today = now().date()
         # Create test donations
-        self.donation1 = Donation.objects.create(food_item="Rice", quantity=10, organization=self.organization, pickup_by=today, active=True)
-        self.donation2 = Donation.objects.create(food_item="Pasta", quantity=5, organization=self.organization, pickup_by=today, active=True)
-        self.donation3 = Donation.objects.create(food_item="Bread", quantity=15, organization=self.organization, pickup_by=today - timedelta(days=1), active=True)
+        self.donation1 = Donation.objects.create(
+            food_item="Rice",
+            quantity=10,
+            organization=self.organization,
+            pickup_by=today,
+            active=True,
+        )
+        self.donation2 = Donation.objects.create(
+            food_item="Pasta",
+            quantity=5,
+            organization=self.organization,
+            pickup_by=today,
+            active=True,
+        )
+        self.donation3 = Donation.objects.create(
+            food_item="Bread",
+            quantity=15,
+            organization=self.organization,
+            pickup_by=today - timedelta(days=1),
+            active=True,
+        )
 
         # Create test orders
-        self.order1 = Order.objects.create(donation=self.donation1, user=self.user, order_quantity=1, order_status="pending", active=True)
-        self.order2 = Order.objects.create(donation=self.donation2, user=self.user, order_quantity=3, order_status="pending", active=True)
-        self.order3 = Order.objects.create(donation=self.donation3, user=self.user, order_quantity=2, order_status="pending", active=True)
+        self.order1 = Order.objects.create(
+            donation=self.donation1,
+            user=self.user,
+            order_quantity=1,
+            order_status="pending",
+            active=True,
+        )
+        self.order2 = Order.objects.create(
+            donation=self.donation2,
+            user=self.user,
+            order_quantity=3,
+            order_status="pending",
+            active=True,
+        )
+        self.order3 = Order.objects.create(
+            donation=self.donation3,
+            user=self.user,
+            order_quantity=2,
+            order_status="pending",
+            active=True,
+        )
 
         # Add reviews to one donation
         UserReview.objects.create(
@@ -109,11 +149,15 @@ class DonorDashboardViewsTests(TestCase):
         today = now().date()
 
         # Verify expired orders are canceled and inactive
-        expired_orders = Order.objects.filter(donation__pickup_by__lt=today, order_status="canceled", active=False)
+        expired_orders = Order.objects.filter(
+            donation__pickup_by__lt=today, order_status="canceled", active=False
+        )
         self.assertEqual(expired_orders.count(), 1)
 
         # Verify non-expired orders remain pending
-        pending_orders = Order.objects.filter(donation__pickup_by__gte=today, order_status="pending", active=True)
+        pending_orders = Order.objects.filter(
+            donation__pickup_by__gte=today, order_status="pending", active=True
+        )
         self.assertEqual(pending_orders.count(), 2)
 
     def test_get_donations_with_reviews(self):
@@ -220,8 +264,12 @@ class DonorDashboardViewsTests(TestCase):
         self.assertIn(self.order.user.username, csv_content)
 
     def test_view_organization_no_orders(self):
-        self.donation1.order_set.filter(order_status="pending").update(order_status="picked_up")
-        self.donation2.order_set.filter(order_status="pending").update(order_status="picked_up")
+        self.donation1.order_set.filter(order_status="pending").update(
+            order_status="picked_up"
+        )
+        self.donation2.order_set.filter(order_status="pending").update(
+            order_status="picked_up"
+        )
 
         response = self.client.get(
             reverse(
@@ -229,7 +277,11 @@ class DonorDashboardViewsTests(TestCase):
                 args=[self.organization.organization_id],
             )
         )
-        num_orders = len(response.context["orders"]) if response and response.context["orders"] else 0
+        num_orders = (
+            len(response.context["orders"])
+            if response and response.context["orders"]
+            else 0
+        )
         self.assertEqual(num_orders, 0)
 
 
