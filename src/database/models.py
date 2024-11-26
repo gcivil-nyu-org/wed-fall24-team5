@@ -213,3 +213,35 @@ class DietaryRestriction(models.Model):
 
     def __str__(self):
         return f"{self.user.username}: {self.restriction}"
+
+
+class CommunityDrive(models.Model):
+    drive_id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    lead_organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    meal_target = models.IntegerField()
+    volunteer_target = models.IntegerField()
+    start_date = models.DateField()
+    end_date = models.DateField()
+    active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.lead_organization.organization_name}"
+
+
+class DriveOrganization(models.Model):
+    participation_id = models.UUIDField(
+        primary_key=True, default=uuid.uuid4, editable=False
+    )
+    drive = models.ForeignKey(CommunityDrive, on_delete=models.CASCADE)
+    organization = models.ForeignKey(Organization, on_delete=models.CASCADE)
+    meal_pledge = models.IntegerField(default=0)
+    volunteer_pledge = models.IntegerField(default=0)
+    created_at = models.DateTimeField(auto_now_add=True)
+    modified_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"{self.organization.organization_name} - {self.drive.name}"
