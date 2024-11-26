@@ -8,7 +8,6 @@ from database.models import (
     DriveOrganization,
     User,
     Organization,
-    OrganizationAdmin,
 )
 from .forms import AddCommunityDriveForm
 
@@ -21,7 +20,7 @@ def get_drive_list(request):
     if request.method == "POST":
         form = AddCommunityDriveForm(request.POST, user=user)
         if form.is_valid():
-            drive = form.save()
+            form.save()
             messages.success(request, "Community drive successfully created.")
             return redirect("/community_drives")
     else:

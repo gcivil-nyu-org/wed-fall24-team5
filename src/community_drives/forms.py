@@ -1,6 +1,5 @@
 from django import forms
-from database.models import CommunityDrive, Organization, OrganizationAdmin
-from django.utils import timezone
+from database.models import CommunityDrive, Organization
 
 
 class AddCommunityDriveForm(forms.ModelForm):
@@ -143,14 +142,3 @@ class AddCommunityDriveForm(forms.ModelForm):
             self.fields["lead_organization"].queryset = Organization.objects.filter(
                 organizationadmin__user=user
             )
-
-    def clean(self):
-        cleaned_data = super().clean()
-        name = cleaned_data.get("name")
-        description = cleaned_data.get("description")
-        meal_target = cleaned_data.get("meal_target")
-        volunteer_target = cleaned_data.get("volunteer_target")
-        start_date = cleaned_data.get("start_date")
-        end_date = cleaned_data.get("end_date")
-
-        return cleaned_data
