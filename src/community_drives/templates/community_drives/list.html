@@ -1,0 +1,94 @@
+{% extends "_base.html" %}
+{% block title %}
+Community Drives
+{% endblock title %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/drive_list.js' %}"></script>
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <div class="level mt-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+            </div>
+        </div>
+    </div>
+    <h2 class="subtitle">Community Drives</h2>
+    <!--Tab Navigation Bar-->
+    <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold">
+        <ul>
+            <li id="all-drives-tab">
+                <a>
+                    <span>All Community Drives</span>
+                </a>
+            </li>
+            <li id="my-drives-tab">
+                <a>
+                    <span>My Community Drives</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div id="all-drives" class="drive-list">
+        <div class="columns is-multiline is-variable">
+            {% if drives %}
+            {% for drive in drives %}
+            <div class="column is-full">
+                <div class="card mb-5">
+                    <div class="card-content">
+                        <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
+                            <div class="column is-two-thirds is-full-mobile">
+                                <p class="title is-4 is-clipped">{{ drive.name }}</p>
+                                <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
+                                <p class="mt-1 short-text mb-2">{{ drive.description }}</p>
+                                <span class="tag is-primary is-light is-medium">Deadline: {{ drive.end_date }}</span>
+                                <span class="tag is-primary is-light is-medium">Active: {{ drive.active }}</span>
+                            </div>
+                            <div class="column is-narrow has-text-centered">
+                                <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
+                                <p>meals contributed</p>
+                                <a href="#" class="button is-primary mt-2">View Drive</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="box">No active community drives to display.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div id="my-drives" class="drive-list is-hidden">
+        <div class="columns is-multiline is-variable">
+            {% if my_drives %}
+            {% for drive in my_drives %}
+            <div class="column is-full">
+                <div class="card mb-5">
+                    <div class="card-content">
+                        <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
+                            <div class="column is-two-thirds is-full-mobile">
+                                <p class="title is-4 is-clipped">{{ drive.name }}</p>
+                                <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
+                                <p class="mt-1 short-text mb-2">{{ drive.description }}</p>
+                                <span class="tag is-primary is-light is-medium">Deadline: {{ drive.end_date }}</span>
+                                <span class="tag is-primary is-light is-medium">Active: {{ drive.active }}</span>
+                            </div>
+                            <div class="column is-narrow has-text-centered">
+                                <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
+                                <p>meals contributed</p>
+                                <a href="#" class="button is-primary mt-2">View Drive</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="box">You have no active community drives.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}
