@@ -1,0 +1,92 @@
+{% extends "_base.html" %}
+{% block title %}
+{{ drive.name }} - Community Drive
+{% endblock title %}
+{% load static %}
+{% block content %}
+<script src="{% static 'js/drive_dashboard.js' %}"></script>
+
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <!-- Drive Details -->
+    <div class="mt-5">
+        <h1 class="title">{{ drive.name }}</h1>
+        <p class="subtitle">{{ drive.description }}</p>
+        <div class="tags">
+            <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
+            <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
+            <span class="tag is-info">Start Date: {{ drive.start_date }}</span>
+            <span class="tag is-info">End Date: {{ drive.end_date }}</span>
+            <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
+        </div>
+        <hr>
+        <!-- Contribute Button -->
+        <button class="button is-primary open-modal" data-target="contribute-modal">Contribute</button>
+
+        <!-- Contributions Table -->
+        <table class="table is-fullwidth is-striped mt-4">
+            <thead>
+                <tr>
+                    <th>Organization</th>
+                    <th>Meals Contributed</th>
+                    <th>Volunteers Contributed</th>
+                </tr>
+            </thead>
+            <tbody id="contributions-table">
+                {% for org in drive.driveorganization_set.all %}
+                <tr>
+                    <td>{{ org.organization.organization_name }}</td>
+                    <td>{{ org.meal_pledge }}</td>
+                    <td>{{ org.volunteer_pledge }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <!-- Contribute Modal -->
+        <div class="modal" id="contribute-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Contribute to {{ drive.name|slice:":30" }}...</p>
+                    <button class="delete close-btn" aria-label="close"></button>
+                </header>
+                <form id="contribute-form" method="post" data-drive-id="{{ drive.drive_id }}">
+                    {% csrf_token %}
+                    <section class="modal-card-body">
+                        <div class="field">
+                            <label class="label">Donor Organization</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="donor_organization" name="donor_organization" required>
+                                        {% for org in active_user_orgs %}
+                                            <option value="{{ org.organization.organization_id }}">{{ org.organization.organization_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Meals</label>
+                            <div class="control">
+                                <input class="input" type="number" id="meals" name="meals" min="0" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Volunteers</label>
+                            <div class="control">
+                                <input class="input" type="number" id="volunteers" name="volunteers" min="0" required>
+                            </div>
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot">
+                        <button type="submit" class="button is-link">Contribute</button>
+                        <button type="button" class="button close-btn">Cancel</button>
+                    </footer>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
