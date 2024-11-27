@@ -883,3 +883,22 @@ def get_donations_with_reviews(organization_id):
         .order_by("-pickup_by")  # Order by pickup date in descending order
     )
     return donations_with_reviews
+
+
+@login_required
+def delete_donation_image(request):
+    if request.method == "POST":
+        donation_id = request.POST.get("donation_id")
+
+        if not donation_id:
+            return JsonResponse({"success": False, "error": "Invalid data."})
+
+        try:
+            donation = Donation.objects.get(donation_id=donation_id)
+            donation.image_data = None
+            donation.save()
+
+            return JsonResponse({"success": True})
+        except Donation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Donation not found."})
+    return JsonResponse({"success": False, "error": "Invalid request method."})

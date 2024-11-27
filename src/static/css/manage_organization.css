@@ -146,3 +146,33 @@
     object-fit: cover; /* Ensures the image fills the square without distortion */
     border-radius: 4px; /* Optional: Rounded corners */
 }
+
+.image-container {
+    position: relative;
+    display: inline-block;
+}
+
+.hover-options {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+    z-index: 10;
+}
+
+.image-container:hover .hover-options {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.7);
+    padding: 0.5rem;
+    border-radius: 8px;
+}
+
+.file-upload-hidden {
+    position: absolute;
+    opacity: 0;
+    width: 0;
+    height: 0;
+}

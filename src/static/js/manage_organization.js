@@ -303,3 +303,33 @@ function getCsrfToken() {
     return document.querySelector("[name=csrfmiddlewaretoken]").value;
 }
 
+function deleteDonation(inputElement) {
+    const donationId = inputElement.dataset.id;
+    if (confirm('Are you sure you want to delete this donation image?')) {
+
+        const formData = new FormData();
+        formData.append("donation_id", donationId);
+        // http://127.0.0.1:8000/delete-donation-image/ 
+        fetch(`/donor_dashboard/delete-donation-image/`, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCsrfToken(), // Include CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Image deleted successfully!");
+                    // Update the image src to the new image URL
+                    location.reload();
+                } else {
+                    alert("Failed to delete image. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting image:", error);
+                alert("An error occurred while deleting the image.");
+            });
+    }
+}
