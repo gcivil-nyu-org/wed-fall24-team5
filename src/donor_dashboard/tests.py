@@ -1179,3 +1179,78 @@ class UploadDonationImageTests(TestCase):
         response = self.client.post(self.url)
 
         self.assertEqual(response.status_code, 302)  # Redirects to login page
+
+
+class DeleteDonationImageTests(TestCase):
+    def setUp(self):
+        # Create a user and log in
+        User = get_user_model()
+        self.user = User.objects.create_user(
+            username="testuser@example.com",
+            email="testuser@example.com",
+            password="password",
+        )
+        self.client.login(email="testuser@example.com", password="password")
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user, organization=self.organization, access_level="owner"
+        )
+        self.donation = Donation.objects.create(
+            food_item="Test Food",
+            quantity=10,
+            pickup_by=timezone.now().date(),
+            organization=self.organization,
+        )
+
+        self.url = "/donor_dashboard/delete-donation-image/"
+
+    def test_successful_image_deletion(self):
+        response = self.client.post(
+            self.url, {"donation_id": self.donation.donation_id}
+        )
+        self.donation.refresh_from_db()
+
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(response.content, {"success": True})
+        self.assertIsNone(self.donation.image_data)
+
+    def test_missing_donation_id(self):
+        response = self.client.post(self.url, {})
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content, {"success": False, "error": "Invalid data."}
+        )
+
+    def test_nonexistent_donation(self):
+        invalid_donation_id = uuid4()
+        response = self.client.post(self.url, {"donation_id": invalid_donation_id})
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content, {"success": False, "error": "Donation not found."}
+        )
+
+    def test_invalid_request_method(self):
+        response = self.client.get(self.url)
+        self.assertEqual(response.status_code, 200)
+        self.assertJSONEqual(
+            response.content, {"success": False, "error": "Invalid request method."}
+        )
+
+    def test_unauthenticated_access(self):
+        self.client.logout()  # Log out the authenticated user
+        response = self.client.post(
+            self.url, {"donation_id": self.donation.donation_id}
+        )
+        self.assertEqual(response.status_code, 302)  # Redirect to login page
+        self.assertTrue(
+            response.url.startswith("/accounts/login/")
+        )  # Adjust the login URL if different

@@ -88,4 +88,9 @@ urlpatterns = [
         views.upload_donation_image,
         name="upload_donation_image",
     ),
+    path(
+        "delete-donation-image/",
+        views.delete_donation_image,
+        name="delete_donation_image",
+    ),
 ]

@@ -168,10 +168,24 @@ Manage Organization
                                             class="image is-square is-clickable" 
                                             data-donation-id="{{ donation.donation_id }}">
                                     <!-- djlint:on -->
-                                    <input type="file" id="file-upload-{{ donation.donation_id }}" 
-                                           class="is-hidden file-upload" 
-                                           data-id="{{ donation.donation_id }}" 
-                                           onchange="uploadDonationImage(this)">
+                                    <!-- Hover Options -->
+                                    <div class="hover-options">
+                                        <label class="button is-small is-primary" for="file-upload-{{ donation.donation_id }}">
+                                            Upload
+                                            <input type="file" 
+                                                   id="file-upload-{{ donation.donation_id }}" 
+                                                   class="file-upload-hidden" 
+                                                   data-id="{{ donation.donation_id }}" 
+                                                   onchange="uploadDonationImage(this)">
+                                        </label>
+                                        {% if donation.image_data %}
+                                        <button class="button is-small is-danger" 
+                                                data-id="{{ donation.donation_id }}" 
+                                                onclick="deleteDonation(this)">
+                                            Delete
+                                        </button>
+                                        {% endif %}
+                                    </div>
                                 </div>                                
                             </div>
                         </div>
