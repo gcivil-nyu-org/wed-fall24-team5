@@ -238,8 +238,12 @@ def organization_details(request, organization_id):
                         organization_id=organization_id,
                     )
                 else:
-                    messages.warning(request, "Something went wrong, please enter valid inputs")
-                    organization = Organization.objects.get(organization_id=organization_id)
+                    messages.warning(
+                        request, "Something went wrong, please enter valid inputs"
+                    )
+                    organization = Organization.objects.get(
+                        organization_id=organization_id
+                    )
                     form = AddOrganizationForm(instance=organization)
             else:
                 form = AddOrganizationForm(instance=organization)
