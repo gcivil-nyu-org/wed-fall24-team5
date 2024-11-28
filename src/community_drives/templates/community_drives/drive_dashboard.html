@@ -5,20 +5,33 @@
 {% load static %}
 {% block content %}
 <script src="{% static 'js/drive_dashboard.js' %}"></script>
-
+<link rel="stylesheet" href="{% static 'css/community_drive.css' %}">
 <div class="container">
     {% include "partials/notifications.html" %}
     <!-- Drive Details -->
     <div class="mt-5">
-        <h1 class="title">{{ drive.name }}</h1>
-        <p class="subtitle">{{ drive.description }}</p>
-        <div class="tags">
-            <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
-            <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
-            <span class="tag is-info">Start Date: {{ drive.start_date }}</span>
-            <span class="tag is-info">End Date: {{ drive.end_date }}</span>
-            <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
-        </div>
+        <div class="columns is-vcentered">
+            <div class="column">
+                <h1 class="title">{{ drive.name }}</h1>
+                <p class="subtitle">{{ drive.description }}</p>
+                <div class="tags">
+                    <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
+                    <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
+                    <span class="tag is-info">Start Date: {{ drive.start_date }}</span>
+                    <span class="tag is-info">End Date: {{ drive.end_date }}</span>
+                    <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
+                </div>
+            </div>
+            <div class="column is-one-third has-text-centered">
+                <!-- djlint:off -->
+                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
+                     alt="Default Image" 
+                     onerror="this.src='{% static 'default.png' %}';"
+                     class="image is-square"
+                     style="width: 100%; max-width: 300px; height: auto; object-fit: cover; border-radius: 4px;">
+                <!-- djlint:on -->
+            </div>
+        </div>        
         <hr>
         <!-- Contribute Button -->
         <button class="button is-primary open-modal" data-target="contribute-modal">Contribute</button>

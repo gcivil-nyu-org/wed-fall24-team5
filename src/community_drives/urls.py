@@ -11,4 +11,6 @@ urlpatterns = [
         views.contribute_to_drive,
         name="contribute_to_drive",
     ),
+    path("upload-drive-image/", views.upload_drive_image, name="upload_drive_image"),
+    path("delete-drive-image/", views.delete_drive_image, name="delete_drive_image"),
 ]
