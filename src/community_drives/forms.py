@@ -153,10 +153,10 @@ class AddCommunityDriveForm(forms.ModelForm):
         start_date = cleaned_data.get("start_date")
         end_date = cleaned_data.get("end_date")
 
-        if name.length() > 250:
+        if len(name) > 250:
             raise forms.ValidationError("Please enter a name between 1 and 250 characters.")
         
-        if description.length() > 1000:
+        if len(description) > 1000:
             raise forms.ValidationError("Please enter a name between 1 and 1000 characters.")
         
         if meal_target <= 0 or volunteer_target <- 0:
