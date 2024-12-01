@@ -58,7 +58,7 @@ INSTALLED_APPS = [
     "donor_dashboard",  # Custom app for Donor dashboard
     "recipient_dashboard",  # Custom app for recipient_dashboard
     "recipient_orders",  # View orders placed by a recipient
-    'instructions', # View application user instructions
+    "instructions",  # View application user instructions
     "user_profile",  # View user profile
     "messaging",  # Custom app for Messaging functionality
     "accounts.apps.AccountsConfig",  # Custom app for user accounts

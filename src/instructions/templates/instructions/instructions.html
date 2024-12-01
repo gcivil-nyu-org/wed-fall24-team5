@@ -1,0 +1,180 @@
+{% extends "_base.html" %}
+{% block title %}
+Instructions - Food Donation App
+{% endblock title %}
+{% load static %}
+{% block content %}
+<script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const tabs = document.querySelectorAll(".tabs li");
+        const tabContents = document.querySelectorAll(".tab-content");
+
+        tabs.forEach((tab, index) => {
+            tab.addEventListener("click", () => {
+                tabs.forEach(tab => tab.classList.remove("is-active"));
+                tabContents.forEach(content => content.classList.add("is-hidden"));
+
+                tab.classList.add("is-active");
+                tabContents[index].classList.remove("is-hidden");
+            });
+        });
+    });
+</script>
+
+<div class="container">
+    <h1 class="title mt-5">Help Page</h1>
+    <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold mt-3">
+        <ul>
+            <li class="is-active"><a>Recipient</a></li>
+            <li><a>Donor</a></li>
+            <li><a>Community Drive</a></li>
+        </ul>
+    </div>
+
+    <div class="tab-content">
+        <!-- Recipient Help -->
+        <div class="content">
+            <h2 class="subtitle">Recipient</h2>
+            <p>
+                The homepage for donation recipients is the
+                <a class="button is-white is-small" style="vertical-align: middle;" href="{% url 'recipient_dashboard' %}">
+                    <span class="icon is-small"><i class="fa fa-home" aria-hidden="true"></i></span>
+                    <span>Dashboard</span>
+                </a>
+                page. You can search for items here and reserve them.
+            </p>
+            <ul>
+                <li>View your statistics on the
+                    <a href="{% url 'recipient_stats' %}" class="icon-text has-text-link">
+                        <span>View My Stats</span>
+                        <span class="icon">
+                            <i class="fa fa-arrow-right"></i>
+                        </span>
+                    </a>
+                    page.
+                </li>
+                <li>Manage your reservations on the
+                    <a class="button is-white is-small" style="vertical-align: middle;" href="{% url 'recipient_orders' %}">
+                        <span class="icon is-small"><i class="fa fa-list" aria-hidden="true"></i></span>
+                        <span>Reservations</span>
+                    </a>
+                    page:
+                    <ul class="mt-0">
+                        <li>Mark your orders as picked up.</li>
+                        <li>Review picked up donations.</li>
+                        <li>Cancel or modify not yet picked up reservations.</li>
+                    </ul>
+                </li>
+                <li>Edit your profile and set dietary restrictions on the
+                    <a class="button is-white is-small" style="vertical-align: middle;" href="{% url 'user_profile:profile' %}">
+                        <span class="icon is-small"><i class="fa fa-user" aria-hidden="true"></i></span>
+                        <span>Profile</span>
+                    </a>
+                    page.</li>
+                <li>Communicate with donors on the
+                    <a class="button is-small is-outlined is-dark has-background-white" style="vertical-align: middle;" href="{% url 'messaging:messaging' %}">
+                        <span class="icon"><i class="fa fa-comment" aria-hidden="true"></i></span>
+                        <span>Messages</span>
+                    </a>
+                    page.</li>
+                    <ul class="mt-1">
+                        <li>You should coordinate with the organization through
+                            <a class="button is-small is-outlined is-dark has-background-white" style="vertical-align: middle;" href="{% url 'messaging:messaging' %}">
+                                <span class="icon"><i class="fa fa-comment" aria-hidden="true"></i></span>
+                                <span>Messages</span>
+                            </a>
+                            for pickup.
+                        </li>
+                    </ul>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content is-hidden">
+        <!-- Donor Help -->
+        <div class="content">
+            <h2 class="subtitle">Donor</h2>
+            <p>Manage your donations through the
+                <a class="button is-white is-small" style="vertical-align: middle;" href="{% url 'donor_dashboard:org_list' %}">
+                    <span class="icon is-small"><i class="fa fa-group" aria-hidden="true"></i></span>
+                    <span>Organizations</span>
+                </a>
+                tab. Donations must be made via an organization, even if the organization is just yourself!</p>
+            <ul>
+                <li>View or add organizations on the                 
+                    <a class="button is-white is-small" style="vertical-align: middle;" href="{% url 'donor_dashboard:org_list' %}">
+                        <span class="icon is-small"><i class="fa fa-group" aria-hidden="true"></i></span>
+                        <span>Organizations</span>
+                    </a>
+                page.
+                </li>
+                <li>For each organization:
+                    <ul>
+                        <li>Add donations.</li>
+                        <li>View active donations and pending orders.</li>
+                        <li>Download all orders (pending, picked up, and canceled).</li>
+                        <li>View reviews.</li>
+                        <li><strong>Owners</strong> can:
+                            <ul class="mt-0">
+                                <li>Edit organization details.</li>
+                                <li>Add administrators or other owners.</li>
+                                <li>Deactivate the organization.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                </li>
+                <li>View statistics by clicking
+                    <a href="#"
+                    class="has-text-weight-semibold has-text-link">
+                        <span>View All</span>
+                    </a>
+                    next to the statistics section.
+                </li>
+                <li>Check messages by clicking
+                    <a href="#" style="vertical-align: middle;"
+                    class="button is-info is-small">Messages</a>
+                    on the Manage Organization page.
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <div class="tab-content is-hidden">
+        <!-- Community Drive Help -->
+        <div class="content">
+            <h2 class="subtitle">Community Drive</h2>
+            <p>Manage your community food drives through the 
+                <a class="button is-white is-small" style="vertical-align: middle;" href="{% url 'community_drives:drive_list' %}">
+                    <span class="icon is-small"><i class="fa fa-heart" aria-hidden="true"></i></span>
+                    <span>Community Drives</span>
+                </a>
+                button.
+            </p>
+            <ul>
+                <li>
+                    You can start a community drive by clicking
+                    <button class="button is-small is-dark open-modal" style="vertical-align: middle;">Start A Community Drive</button>
+                </li>
+                <li>You should fill in:</li>
+                <ul class="mt-1">
+                    <li>Drive name</li>
+                    <li>Lead Organization for the Drive</li>
+                    <li>The target number of meals and volunteers</li>
+                    <li>The dates for the community drive</li>
+                    <li>A brief description of the drive</li>
+                </ul>
+                <li>Once you submit the community drive, other organizations will be able to pledge meals and volunteers to your community drive.</li>
+                <li>
+                    To contribute to the drive, you can click 
+                    <a href="#" class="button is-small is-primary" style="vertical-align: middle;">
+                        View Drive
+                    </a>
+                    to view more information and contribute.
+                </li>
+                <li>Under 'My Community Drives', you can also manage or delete Community Drives you have created.</li>
+            </ul>
+        </div>
+    </div>
+</div>
+
+{% endblock content %}
