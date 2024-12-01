@@ -177,8 +177,11 @@ def upload_drive_image(request):
 
             return JsonResponse({"success": True, "image_data": image_data})
         except CommunityDrive.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Community Drive not found."})
+            return JsonResponse(
+                {"success": False, "error": "Community Drive not found."}
+            )
     return JsonResponse({"success": False, "error": "Invalid request method."})
+
 
 @login_required
 def delete_drive_image(request):
@@ -195,5 +198,7 @@ def delete_drive_image(request):
 
             return JsonResponse({"success": True})
         except CommunityDrive.DoesNotExist:
-            return JsonResponse({"success": False, "error": "Community Drive not found."})
+            return JsonResponse(
+                {"success": False, "error": "Community Drive not found."}
+            )
     return JsonResponse({"success": False, "error": "Invalid request method."})

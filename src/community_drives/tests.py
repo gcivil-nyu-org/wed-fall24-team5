@@ -5,6 +5,7 @@ import base64
 from io import BytesIO
 from uuid import uuid4
 
+
 # Create your tests here.
 class CommunityDriveViewTests(TestCase):
     def setUp(self):
@@ -48,7 +49,7 @@ class CommunityDriveViewTests(TestCase):
         image_file = BytesIO(content)
         image_file.name = name
         return image_file
-    
+
     def test_upload_drive_image_success(self):
         image_file = self.create_image_file()
 
@@ -59,13 +60,17 @@ class CommunityDriveViewTests(TestCase):
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["success"], True)
-        
+
         # Verify the image was saved as base64
         self.drive.refresh_from_db()
-        self.assertEqual(base64.b64decode(self.drive.image_data).decode("utf-8"), "image content")
+        self.assertEqual(
+            base64.b64decode(self.drive.image_data).decode("utf-8"), "image content"
+        )
 
     def test_upload_drive_image_invalid_data(self):
-        response = self.client.post(self.upload_image_url, {"drive_id": "", "image": ""})
+        response = self.client.post(
+            self.upload_image_url, {"drive_id": "", "image": ""}
+        )
 
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["success"], False)
