@@ -191,6 +191,31 @@ class DonorDashboardViewsTests(TestCase):
         self.organization.refresh_from_db()
         self.assertEqual(self.organization.organization_name, "Updated Org")
 
+    def test_organization_details_view_post_invalid(self):
+        form_data = {
+            "organization_name": "",
+            "type": "self",
+            "address": "456 Updated Avenue",
+            "zipcode": "54321",
+            "email": "updated@test.com",
+            "website": "https://updated.org",
+            "contact_number": "0987654321",
+        }
+        response = self.client.post(
+            reverse(
+                "donor_dashboard:organization_details",
+                args=[self.organization.organization_id],
+            ),
+            form_data,
+        )
+        self.assertEqual(response.status_code, 200)
+        self.assertTemplateUsed(response, "donor_dashboard/organization_details.html")
+        self.assertIsInstance(response.context["form"], AddOrganizationForm)
+        messages_list = list(messages.get_messages(response.wsgi_request))
+        self.assertEqual(
+            str(messages_list[0]), "Something went wrong, please enter valid inputs"
+        )
+
     def test_delete_organization_view_post(self):
         response = self.client.post(
             reverse(
