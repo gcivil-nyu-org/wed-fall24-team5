@@ -153,22 +153,27 @@ class AddCommunityDriveForm(forms.ModelForm):
         start_date = cleaned_data.get("start_date")
         end_date = cleaned_data.get("end_date")
 
-        if len(name) > 250:
-            raise forms.ValidationError("Please enter a name between 1 and 250 characters.")
-        
-        if len(description) > 1000:
-            raise forms.ValidationError("Please enter a name between 1 and 1000 characters.")
-        
-        if meal_target <= 0 or volunteer_target <- 0:
+        if name is None or len(name) > 250:
+            raise forms.ValidationError(
+                "Please enter a name between 1 and 250 characters."
+            )
+
+        if description is None or len(description) > 1000:
+            raise forms.ValidationError(
+                "Please enter a name between 1 and 1000 characters."
+            )
+
+        if meal_target <= 0 or volunteer_target < 0:
             raise forms.ValidationError("Target numbers must be positive integers.")
-        
+
         try:
             today = timezone.now().date()
-            if start_date < today or end_date < today:
-                raise forms.ValidationError("Date cannot be in the past.")
-            if end_date < start_date:
-                raise forms.ValidationError("Start date must be before end date.")
+            if start_date and end_date:
+                if start_date < today or end_date < today:
+                    raise forms.ValidationError("Date cannot be in the past.")
+                if end_date < start_date:
+                    raise forms.ValidationError("Start date must be before end date.")
         except ValueError:
             raise forms.ValidationError("Invalid date format. Please use YYYY-MM-DD.")
-        
+
         return cleaned_data
