@@ -47,11 +47,13 @@
             </thead>
             <tbody id="contributions-table">
                 {% for org in drive.driveorganization_set.all %}
+                {% if org.meal_pledge != 0 or org.volunteer_pledge != 0 %}
                 <tr>
                     <td>{{ org.organization.organization_name }}</td>
                     <td>{{ org.meal_pledge }}</td>
                     <td>{{ org.volunteer_pledge }}</td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -72,11 +74,12 @@
                             <div class="control">
                                 <div class="select">
                                     <select id="donor_organization" name="donor_organization" required>
+                                        <option value="" disabled selected>Select Organization</option>
                                         {% for org in active_user_orgs %}
                                             <option value="{{ org.organization.organization_id }}">{{ org.organization.organization_name }}</option>
                                         {% endfor %}
                                     </select>
-                                </div>
+                                </div>                                
                             </div>
                         </div>
                         <div class="field">
