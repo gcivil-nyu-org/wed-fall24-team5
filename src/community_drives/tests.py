@@ -5,6 +5,7 @@ from database.models import CommunityDrive, Organization, OrganizationAdmin
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib import messages
+from django.utils.html import strip_tags
 
 
 class CommunityDrivesViewsTests(TestCase):
@@ -127,9 +128,7 @@ class AddCommunityDriveTests(TestCase):
         }
         response = self.client.post(reverse("community_drives:drive_list"), form_data)
         self.assertEqual(response.status_code, 302)
-        self.assertTrue(
-            CommunityDrive.objects.filter(name="New Drive").exists()
-        )
+        self.assertTrue(CommunityDrive.objects.filter(name="New Drive").exists())
         messages_list = list(messages.get_messages(response.wsgi_request))
         self.assertIn(
             "Community drive successfully created.",
@@ -149,4 +148,7 @@ class AddCommunityDriveTests(TestCase):
         response = self.client.post(reverse("community_drives:drive_list"), form_data)
         self.assertEqual(response.status_code, 302)
         messages_list = list(messages.get_messages(response.wsgi_request))
-        self.assertTrue(any(str(message) == "Target numbers must be positive integers." for message in messages_list))
+        self.assertIn(
+            "Target numbers must be positive integers.",
+            [strip_tags(msg.message) for msg in messages_list],
+        )
