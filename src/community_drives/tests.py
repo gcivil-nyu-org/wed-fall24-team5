@@ -1,7 +1,12 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from database.models import CommunityDrive, Organization, OrganizationAdmin, DriveOrganization
+from database.models import (
+    CommunityDrive,
+    Organization,
+    OrganizationAdmin,
+    DriveOrganization,
+)
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib import messages
@@ -159,6 +164,7 @@ class AddCommunityDriveTests(TestCase):
             "Target numbers must be positive integers.",
             [strip_tags(msg.message) for msg in messages_list],
         )
+
 
 class DriveImageTests(TestCase):
     def setUp(self):
