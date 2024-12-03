@@ -56,13 +56,10 @@ def get_drive_list(request):
 def drive_dashboard(request, drive_id):
     drive = get_object_or_404(CommunityDrive, pk=drive_id)
     # participating_organizations = DriveOrganization.objects.filter(drive=drive)
-    participating_organizations = DriveOrganization.objects.filter(
-        drive=drive
-    ).filter(
+    participating_organizations = DriveOrganization.objects.filter(drive=drive).filter(
         Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
     )
 
-    print(participating_organizations)
     active_user_orgs = request.user.organizationadmin_set.filter(
         organization__active=True
     )
@@ -80,7 +77,7 @@ def contribute_to_drive(request, drive_id):
             data = json.loads(request.body)
             meals = data.get("meals")
             volunteers = data.get("volunteers")
-            donor_organization_id = data.get("donor_organization")            
+            donor_organization_id = data.get("donor_organization")
 
             # Get the drive instance
             drive = get_object_or_404(CommunityDrive, drive_id=drive_id)
@@ -105,9 +102,7 @@ def contribute_to_drive(request, drive_id):
             drive_org.save()
 
             # Fetch all the DriveOrganization records for the drive
-            drive_organizations = DriveOrganization.objects.filter(
-                drive=drive
-            ).filter(
+            drive_organizations = DriveOrganization.objects.filter(drive=drive).filter(
                 Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
             )
 
@@ -180,28 +175,30 @@ def delete_drive_image(request):
 def get_participation_details(request, organization_id, drive_id):
     if request.method == "GET":
         # Fetch details based on organization and drive
-        drive_org = get_object_or_404(DriveOrganization, organization__organization_id=organization_id, drive_id=drive_id)
+        drive_org = get_object_or_404(
+            DriveOrganization,
+            organization__organization_id=organization_id,
+            drive_id=drive_id,
+        )
         data = {
             "meals": drive_org.meal_pledge,
             "volunteers": drive_org.volunteer_pledge,
         }
         return JsonResponse(data)
-    
+
+
 def delete_participation(request, organization_id, drive_id):
     if request.method == "DELETE":
         try:
             participation = DriveOrganization.objects.get(
-                organization_id=organization_id,
-                drive_id=drive_id
+                organization_id=organization_id, drive_id=drive_id
             )
             participation.delete()
 
             # Fetch all the DriveOrganization records for the drive
             drive_organizations = DriveOrganization.objects.filter(
                 drive_id=drive_id
-            ).filter(
-                Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
-            )
+            ).filter(Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1))
 
             # Prepare the response data, including updated table data
             contributions = [
@@ -216,4 +213,6 @@ def delete_participation(request, organization_id, drive_id):
             return JsonResponse({"success": True, "contributions": contributions})
         except DriveOrganization.DoesNotExist:
             return JsonResponse({"success": False, "error": "Participation not found"})
-    return JsonResponse({"success": False, "error": "Invalid request method"}, status=405)
+    return JsonResponse(
+        {"success": False, "error": "Invalid request method"}, status=405
+    )
