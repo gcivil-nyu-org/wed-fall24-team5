@@ -13,4 +13,14 @@ urlpatterns = [
     ),
     path("upload-drive-image/", views.upload_drive_image, name="upload_drive_image"),
     path("delete-drive-image/", views.delete_drive_image, name="delete_drive_image"),
+    path(
+        "participation-details/<uuid:organization_id>/<uuid:drive_id>/",
+        views.get_participation_details,
+        name="participation-details",
+    ),
+    path(
+        "delete_participation/<uuid:organization_id>/<uuid:drive_id>/",
+        views.delete_participation,
+        name="delete-participation",
+    ),
 ]
