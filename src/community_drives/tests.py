@@ -1,7 +1,7 @@
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
-from database.models import CommunityDrive, Organization, OrganizationAdmin
+from database.models import CommunityDrive, Organization, OrganizationAdmin, DriveOrganization
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib import messages
@@ -266,3 +266,89 @@ class DriveImageTests(TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json()["success"], False)
         self.assertEqual(response.json()["error"], "Invalid request method.")
+
+    def test_get_participation_details_success(self):
+        # Create a DriveOrganization record
+        DriveOrganization.objects.create(
+            organization=self.organization,
+            drive=self.drive,
+            meal_pledge=10,
+            volunteer_pledge=5,
+        )
+
+        url = reverse(
+            "community_drives:participation-details",
+            kwargs={
+                "organization_id": self.organization.organization_id,
+                "drive_id": self.drive.drive_id,
+            },
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), {"meals": 10, "volunteers": 5})
+
+    def test_get_participation_details_nonexistent(self):
+        url = reverse(
+            "community_drives:participation-details",
+            kwargs={
+                "organization_id": self.organization.organization_id,
+                "drive_id": uuid4(),
+            },
+        )
+        response = self.client.get(url)
+
+        self.assertEqual(response.status_code, 404)
+
+    def test_delete_participation_success(self):
+        # Create a DriveOrganization record
+        drive_org = DriveOrganization.objects.create(
+            organization=self.organization,
+            drive=self.drive,
+            meal_pledge=10,
+            volunteer_pledge=5,
+        )
+
+        url = reverse(
+            "community_drives:delete-participation",
+            kwargs={
+                "organization_id": self.organization.organization_id,
+                "drive_id": self.drive.drive_id,
+            },
+        )
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["success"], True)
+
+        # Verify the record was deleted
+        with self.assertRaises(DriveOrganization.DoesNotExist):
+            DriveOrganization.objects.get(pk=drive_org.pk)
+
+    def test_delete_participation_nonexistent(self):
+        url = reverse(
+            "community_drives:delete-participation",
+            kwargs={
+                "organization_id": self.organization.organization_id,
+                "drive_id": uuid4(),
+            },
+        )
+        response = self.client.delete(url)
+
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json()["success"], False)
+        self.assertEqual(response.json()["error"], "Participation not found")
+
+    def test_delete_participation_invalid_method(self):
+        url = reverse(
+            "community_drives:delete-participation",
+            kwargs={
+                "organization_id": self.organization.organization_id,
+                "drive_id": self.drive.drive_id,
+            },
+        )
+        response = self.client.post(url)  # Invalid method
+
+        self.assertEqual(response.status_code, 405)
+        self.assertEqual(response.json()["success"], False)
+        self.assertEqual(response.json()["error"], "Invalid request method")
