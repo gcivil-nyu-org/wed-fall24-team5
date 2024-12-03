@@ -54,7 +54,7 @@
         </div>        
         <hr>
         <!-- Contribute Button -->
-        <button class="button is-primary open-modal" data-target="contribute-modal">Contribute</button>
+        <button class="button is-primary open-modal" data-target="contribute-modal">Manage My Contributions</button>
 
         <!-- Contributions Table -->
         <table class="table is-fullwidth is-striped mt-4">
@@ -67,11 +67,13 @@
             </thead>
             <tbody id="contributions-table">
                 {% for org in drive.driveorganization_set.all %}
+                {% if org.meal_pledge != 0 or org.volunteer_pledge != 0 %}
                 <tr>
                     <td>{{ org.organization.organization_name }}</td>
                     <td>{{ org.meal_pledge }}</td>
                     <td>{{ org.volunteer_pledge }}</td>
                 </tr>
+                {% endif %}
                 {% endfor %}
             </tbody>
         </table>
@@ -92,11 +94,12 @@
                             <div class="control">
                                 <div class="select">
                                     <select id="donor_organization" name="donor_organization" required>
+                                        <option value="" disabled selected>Select Organization</option>
                                         {% for org in active_user_orgs %}
                                             <option value="{{ org.organization.organization_id }}">{{ org.organization.organization_name }}</option>
                                         {% endfor %}
                                     </select>
-                                </div>
+                                </div>                                
                             </div>
                         </div>
                         <div class="field">
@@ -112,9 +115,10 @@
                             </div>
                         </div>
                     </section>
-                    <footer class="modal-card-foot">
+                    <footer class="modal-card-foot is-justify-content-flex-end">
                         <button type="submit" class="button is-link">Contribute</button>
-                        <button type="button" class="button close-btn">Cancel</button>
+                        <button type="button" id="delete-btn" class="button is-danger ml-2" hidden>Delete Participation</button>
+                        <button type="button" class="button close-btn ml-2">Cancel</button>
                     </footer>
                 </form>
             </div>
