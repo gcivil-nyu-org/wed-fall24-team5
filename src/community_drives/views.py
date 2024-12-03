@@ -80,9 +80,7 @@ def contribute_to_drive(request, drive_id):
             data = json.loads(request.body)
             meals = data.get("meals")
             volunteers = data.get("volunteers")
-            donor_organization_id = data.get("donor_organization")
-
-            
+            donor_organization_id = data.get("donor_organization")            
 
             # Get the drive instance
             drive = get_object_or_404(CommunityDrive, drive_id=drive_id)
@@ -97,47 +95,9 @@ def contribute_to_drive(request, drive_id):
                 drive=drive, organization=donor_organization
             )
 
-            if drive_org.meal_pledge==0 and drive_org.volunteer_pledge==0 and int(meals) == 0 and int(volunteers) == 0:
-                error_message = "Meals and volunteers both cannot be 0!"
+            if int(meals) == 0 and int(volunteers) == 0:
+                error_message = "Meals and volunteers both cannot be 0! Click on 'Delete' to take back your contribution"
                 return JsonResponse({"success": False, "error": error_message})
-
-            # target_meals = (
-            #     drive.meal_target
-            # )  # Assuming the drive has a 'target_meals' field
-            # target_volunteers = drive.volunteer_target
-
-            # Check if the updated pledge exceeds the target
-            # total_meals_pledged = (
-            #     DriveOrganization.objects.filter(drive=drive).aggregate(
-            #         total_meals=Sum("meal_pledge")
-            #     )["total_meals"]
-            #     or 0
-            # )
-
-            # # Calculate the sum of all existing volunteer pledges for the drive
-            # total_volunteers_pledged = (
-            #     DriveOrganization.objects.filter(drive=drive).aggregate(
-            #         total_volunteers=Sum("volunteer_pledge")
-            #     )["total_volunteers"]
-            #     or 0
-            # )
-
-            # new_meal_pledge = total_meals_pledged + int(meals)
-            # new_volunteer_pledge = total_volunteers_pledged + int(volunteers)
-
-            # if new_meal_pledge > target_meals:
-            #     max_contributable_meals = target_meals - total_meals_pledged
-            #     error_message = f"Meal contribution exceeds target meals. \
-            #         Maximum of {max_contributable_meals} meal(s) can be contributed right now!"
-            #     return JsonResponse({"success": False, "error": error_message})
-
-            # if new_volunteer_pledge > target_volunteers:
-            #     max_contributable_volunteers = (
-            #         target_volunteers - total_volunteers_pledged
-            #     )
-            #     error_message = f"Volunteer contribution exceeds target volunteers. \
-            #         Maximum of {max_contributable_volunteers} volunteer(s) can be contributed right now!"
-            #     return JsonResponse({"success": False, "error": error_message})
 
             # Update the DriveOrganization with the new pledges
             drive_org.meal_pledge = int(meals)
@@ -235,11 +195,24 @@ def delete_participation(request, organization_id, drive_id):
                 drive_id=drive_id
             )
             participation.delete()
-            contributions = list(DriveOrganization.objects.filter(drive_id=drive_id).values(
-                "organization__organization_name",
-                "meal_pledge",
-                "volunteer_pledge"
-            ))
+
+            # Fetch all the DriveOrganization records for the drive
+            drive_organizations = DriveOrganization.objects.filter(
+                drive_id=drive_id
+            ).filter(
+                Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
+            )
+
+            # Prepare the response data, including updated table data
+            contributions = [
+                {
+                    "organization_name": org.organization.organization_name,
+                    "meals_contributed": org.meal_pledge,
+                    "volunteers_contributed": org.volunteer_pledge,
+                }
+                for org in drive_organizations
+            ]
+
             return JsonResponse({"success": True, "contributions": contributions})
         except DriveOrganization.DoesNotExist:
             return JsonResponse({"success": False, "error": "Participation not found"})
