@@ -73,6 +73,7 @@ def drive_dashboard(request, drive_id):
         if drive.volunteer_progress
         else 0
     )
+
     context = {
         "drive": drive,
         "meals_percentage": meals_percentage,
@@ -82,6 +83,28 @@ def drive_dashboard(request, drive_id):
         "can_edit": can_edit,
     }
     return render(request, "community_drives/drive_dashboard.html", context)
+
+
+def fetch_contributions(request, drive_id):
+    if request.method == "GET":
+        drive = get_object_or_404(CommunityDrive, pk=drive_id)
+
+        # Fetch all the DriveOrganization records for the drive
+        drive_organizations = DriveOrganization.objects.filter(drive=drive).filter(
+            Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
+        )
+        # Prepare the response data, including updated table data
+        contributions = [
+            {
+                "organization_name": org.organization.organization_name,
+                "meals_contributed": org.meal_pledge,
+                "volunteers_contributed": org.volunteer_pledge,
+                "created_at": org.created_at,
+            }
+            for org in drive_organizations
+        ]
+
+        return JsonResponse({"contributions": contributions})
 
 
 def contribute_to_drive(request, drive_id):
@@ -125,6 +148,7 @@ def contribute_to_drive(request, drive_id):
                     "organization_name": org.organization.organization_name,
                     "meals_contributed": org.meal_pledge,
                     "volunteers_contributed": org.volunteer_pledge,
+                    "created_at": org.created_at,
                 }
                 for org in drive_organizations
             ]
@@ -219,6 +243,7 @@ def delete_participation(request, organization_id, drive_id):
                     "organization_name": org.organization.organization_name,
                     "meals_contributed": org.meal_pledge,
                     "volunteers_contributed": org.volunteer_pledge,
+                    "created_at": org.created_at,
                 }
                 for org in drive_organizations
             ]

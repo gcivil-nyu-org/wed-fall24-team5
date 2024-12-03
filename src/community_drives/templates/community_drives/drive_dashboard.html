@@ -82,46 +82,9 @@
         {% if drive.driveorganization_set %}
         {% for org in drive.driveorganization_set.all %}
         {% if org.meal_pledge != 0 or org.volunteer_pledge != 0 %}
-        <div class="container py-4">
-            <article class="media is-align-items-center">
-                <figure class="media-left">
-                    <span class="icon is-medium has-text-primary">
-                        <span class="fa-stack fa-sm">
-                            <i class="fa fa-circle fa-stack-2x"></i>
-                            <i class="fa fa-heart fa-stack-1x fa-inverse"></i>
-                        </span>
-                    </span>
-                </figure>
-                <div class="media-content">
-                    <div class="card">
-                        <div class="card-content">
-                            <div class="columns is-vcentered">
-                                <div class="column is-half">
-                            <p>
-                                <strong><span class="has-text-primary">{{ org.organization.organization_name }}</span></strong> contributed
-                                <br />
-                                <small>{{ org.created_at }}</small>
-                            </p>
-                        </div>
-                        <div class="column has-text-centered">
-                            <p>
-                                <span class="tag is-success is-medium">{{ org.meal_pledge }}</span>
-                                <br />
-                                <small>meals</small>
-                            </p>
-                        </div>
-                        <div class="column has-text-centered">
-                            <p>
-                                <span class="tag is-info is-medium">{{ org.volunteer_pledge }}</span>
-                                <br />
-                                <small>volunteers</small>
-                            </p>
-                        </div>
-                        </div>
-                        </div>
-                    </div>
-                </div>
-            </article>
+        <div id="contributions">
+            <div class="container py-4">
+            </div>
         </div>
         {% endif %}
         {% endfor %}
@@ -176,4 +139,7 @@
         </div>
     </div>
 </div>
+<script>
+    const driveId = "{{ drive.drive_id }}"
+</script>
 {% endblock content %}
