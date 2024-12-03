@@ -19,6 +19,8 @@ document.addEventListener("DOMContentLoaded", () => {
             if (modalHeader) {
                 modalHeader.style.display = ""; // Reset display property
             }
+            // Initially hide the delete button
+            deleteBtn.hidden = true;
 
             // Clear the dropdown selection
             if (donorOrganizationDropdown) {
@@ -147,6 +149,7 @@ document.addEventListener("DOMContentLoaded", () => {
         .then(response => response.json())
         .then(data => {
             if (data.success) {
+                modal.classList.remove("is-active");
                 // Update the table or reset fields accordingly
                 contributionsTable.innerHTML = "";
 
