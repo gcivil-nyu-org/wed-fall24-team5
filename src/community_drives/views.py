@@ -49,7 +49,11 @@ def get_drive_list(request):
 
 
 def drive_dashboard(request, drive_id):
-    drive = get_object_or_404(CommunityDrive, pk=drive_id)
+    drives = CommunityDrive.objects.annotate(
+        meal_progress=Coalesce(Sum("driveorganization__meal_pledge"), 0),
+        volunteer_progress=Coalesce(Sum("driveorganization__volunteer_pledge"), 0),
+    )
+    drive = get_object_or_404(drives, pk=drive_id)
     participating_organizations = DriveOrganization.objects.filter(drive=drive)
     active_user_orgs = request.user.organizationadmin_set.filter(
         organization__active=True
@@ -58,8 +62,18 @@ def drive_dashboard(request, drive_id):
         org_admin.organization_id == drive.lead_organization.organization_id
         for org_admin in active_user_orgs
     )
+    meals_percentage = (
+        (drive.meal_progress / drive.meal_target) * 100 if drive.meal_progress else 0
+    )
+    volunteers_percentage = (
+        (drive.volunteer_progress / drive.volunteer_target) * 100
+        if drive.volunteer_progress
+        else 0
+    )
     context = {
         "drive": drive,
+        "meals_percentage": meals_percentage,
+        "volunteers_percentage": volunteers_percentage,
         "participating_organizations": participating_organizations,
         "active_user_orgs": active_user_orgs,
         "can_edit": can_edit,

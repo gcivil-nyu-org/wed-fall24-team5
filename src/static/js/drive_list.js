@@ -22,7 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // If no matching tab was found, set 'pending-tab' as the default active tab and show its content
     if (!activeTabExists) {
         const defaultTab = document.getElementById('all-drives-tab');
-        const defaultContent = document.getElementById('pending-orders');
+        const defaultContent = document.getElementById('all-drives');
 
         if (defaultTab && defaultContent) {
             defaultTab.classList.add('is-active');
@@ -83,6 +83,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.addEventListener('keydown', (event) => {
         if (event.key === "Escape") {
             closeAllModals();
+        }
+    });
+
+    document.querySelectorAll('.short-text').forEach(element => {
+        const maxChars = 300;
+        if (element.textContent.length > maxChars) {
+            element.textContent = element.textContent.slice(0, maxChars-3) + ' ...';
         }
     });
 });

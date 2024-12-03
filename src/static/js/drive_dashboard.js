@@ -18,7 +18,7 @@ document.addEventListener("DOMContentLoaded", () => {
         })
     );
 
-    contributeForm.addEventListener("submit", function(event) {
+    contributeForm.addEventListener("submit", function (event) {
         event.preventDefault(); // Prevent normal form submission
         const meals = document.getElementById("meals").value;
         const volunteers = document.getElementById("volunteers").value;
@@ -38,39 +38,69 @@ document.addEventListener("DOMContentLoaded", () => {
                 donor_organization: donorOrganization
             })
         })
-        .then(response => response.json())
-        .then(data => {
-            // Close the modal and show success message
-            modal.classList.remove("is-active");
-            document.getElementById("meals").value = "";
-            document.getElementById("volunteers").value = "";
-            if (data.success) {
-                contributionsTable.innerHTML = "";
+            .then(response => response.json())
+            .then(data => {
+                // Close the modal and show success message
+                modal.classList.remove("is-active");
+                document.getElementById("meals").value = "";
+                document.getElementById("volunteers").value = "";
+                if (data.success) {
+                    contributionsTable.innerHTML = "";
 
-                // Populate the table with the updated contributions
-                data.contributions.forEach(contribution => {
-                    const row = document.createElement('tr');
-                    row.innerHTML = `
+                    // Populate the table with the updated contributions
+                    data.contributions.forEach(contribution => {
+                        const row = document.createElement('tr');
+                        row.innerHTML = `
                         <td>${contribution.organization_name}</td>
                         <td>${contribution.meals_contributed}</td>
                         <td>${contribution.volunteers_contributed}</td>
                     `;
-                    contributionsTable.appendChild(row);
-                });
+                        contributionsTable.appendChild(row);
+                    });
 
-                alert("Thank you for your contribution!");
-            } else {
-                alert("Failed to contribute." + data.error);
+                    alert("Thank you for your contribution!");
+                } else {
+                    alert("Failed to contribute." + data.error);
+                }
+            })
+            .catch(error => {
+                // Close the modal and show success message
+                modal.classList.remove("is-active");
+                document.getElementById("meals").value = "";
+                document.getElementById("volunteers").value = "";
+                alert("There was an error submitting your contribution." + error.error);
+            });
+
+    });
+
+    // Render progress bars
+    const progressData = JSON.parse('{{ progress_data|safejson }}');
+
+    const labels = Object.keys(progressData).map(task => task.charAt(0).toUpperCase() + task.slice(1));
+    const data = Object.values(progressData);
+
+    const ctx = document.getElementById('progressChart').getContext('2d');
+    const progressChart = new Chart(ctx, {
+        type: 'bar', // Use bar chart for visualization
+        data: {
+            labels: labels,
+            datasets: [{
+                label: 'Progress (%)',
+                data: data,
+                backgroundColor: 'rgba(54, 162, 235, 0.5)',
+                borderColor: 'rgba(54, 162, 235, 1)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 100
+                }
             }
-        })
-        .catch(error => {
-            // Close the modal and show success message
-            modal.classList.remove("is-active");
-            document.getElementById("meals").value = "";
-            document.getElementById("volunteers").value = "";
-            alert("There was an error submitting your contribution." + error.error);
-        });
-        
+        }
     });
 });
 

@@ -10,10 +10,35 @@
     {% include "partials/notifications.html" %}
     <!-- Drive Details -->
     <div class="mt-5">
-        <div class="columns is-vcentered">
-            <div class="column">
+        <div class="columns is-vcentered is-4">
+            <div class="column is-narrow is-full-mobile">
+                <div class="image-container has-text-centered">
+                    <!-- djlint:off -->
+                    <img src="data:image/jpeg;base64,{{ drive.image_data }}" alt="Default Image"
+                        onerror="this.src='{% static 'default.png' %}';" class="image is-square"
+                        style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
+                    <!-- djlint:on -->
+                    <!-- Hover Options -->
+                    {% if can_edit %}
+                    <div class="hover-options">
+                        <label class="button is-small is-primary" for="file-upload-{{ drive.drive_id }}">
+                            Upload
+                            <input type="file" id="file-upload-{{ drive.drive_id }}" class="file-upload-hidden"
+                                data-id="{{ drive.drive_id }}" onchange="uploadDriveImage(this)">
+                        </label>
+                        {% if drive.image_data %}
+                        <button class="button is-small is-danger" data-id="{{ drive.drive_id }}"
+                            onclick="deleteDriveImage(this)">
+                            Delete
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="column is-three-fifths is-full-mobile is-full-tablet">
                 <h1 class="title">{{ drive.name }}</h1>
-                <p class="subtitle">{{ drive.description }}</p>
+                <p class="subtitle mt-4">{{ drive.description }}</p>
                 <div class="tags">
                     <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
                     <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
@@ -22,59 +47,85 @@
                     <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
                 </div>
             </div>
-            <div class="image-container has-text-centered mt-4 is-one-third">
-                <!-- djlint:off -->
-                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
-                     alt="Default Image" 
-                     onerror="this.src='{% static 'default.png' %}';"
-                     class="image is-square"
-                     style="width: 100%; max-width: 300px; height: auto; object-fit: cover; border-radius: 4px;">
-                <!-- djlint:on -->
-                <!-- Hover Options -->
-                {% if can_edit %}
-                <div class="hover-options">
-                    <label class="button is-small is-primary" for="file-upload-{{ drive.drive_id }}">
-                        Upload
-                        <input type="file" 
-                               id="file-upload-{{ drive.drive_id }}" 
-                               class="file-upload-hidden" 
-                               data-id="{{ drive.drive_id }}" 
-                               onchange="uploadDriveImage(this)">
-                    </label>
-                    {% if drive.image_data %}
-                    <button class="button is-small is-danger" 
-                            data-id="{{ drive.drive_id }}" 
-                            onclick="deleteDriveImage(this)">
-                        Delete
-                    </button>
-                    {% endif %}
+            <div class="column">
+                <div class="box">
+                    <p class="mb-2"><strong>
+                            {{ drive.meal_progress }} / {{ drive.meal_target }} meals ({{ meals_percentage|floatformat:1 }}%)
+                        </strong></p>
+                    <progress class="progress is-success" value="{{ meals_percentage }}" max="100"></progress>
                 </div>
-                {% endif %}
+
+                <!-- Volunteers Progress -->
+                <div class="box">
+                    <p class="mb-2"><strong>
+                            {{ drive.volunteer_progress }} / {{ drive.volunteer_target }} volunteers ({{ volunteers_percentage|floatformat:1 }}%)
+                        </strong></p>
+                    <progress class="progress is-info" value="{{ volunteers_percentage }}" max="100"></progress>
+                </div>
             </div>
-        </div>        
+        </div>
         <hr>
         <!-- Contribute Button -->
-        <button class="button is-primary open-modal" data-target="contribute-modal">Contribute</button>
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <h2 class="subtitle my-3"><strong>{{ drive.driveorganization_set.all|length }}
+                            Contributions</strong></h2>
+                </div>
+                <div class="level-item">
+                    <button class="button is-primary open-modal" data-target="contribute-modal">Contribute</button>
+                </div>
+            </div>
+        </div>
 
         <!-- Contributions Table -->
-        <table class="table is-fullwidth is-striped mt-4">
-            <thead>
-                <tr>
-                    <th>Organization</th>
-                    <th>Meals Contributed</th>
-                    <th>Volunteers Contributed</th>
-                </tr>
-            </thead>
-            <tbody id="contributions-table">
-                {% for org in drive.driveorganization_set.all %}
-                <tr>
-                    <td>{{ org.organization.organization_name }}</td>
-                    <td>{{ org.meal_pledge }}</td>
-                    <td>{{ org.volunteer_pledge }}</td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+        {% if drive.driveorganization_set %}
+        {% for org in drive.driveorganization_set.all %}
+        <div class="container py-4">
+            <article class="media is-align-items-center">
+                <figure class="media-left">
+                    <span class="icon is-medium has-text-primary">
+                        <span class="fa-stack fa-sm">
+                            <i class="fa fa-circle fa-stack-2x"></i>
+                            <i class="fa fa-heart fa-stack-1x fa-inverse"></i>
+                        </span>
+                    </span>
+                </figure>
+                <div class="media-content">
+                    <div class="card">
+                        <div class="card-content">
+                            <div class="columns is-vcentered">
+                                <div class="column is-half">
+                            <p>
+                                <strong><span class="has-text-primary">{{ org.organization.organization_name }}</span></strong> contributed
+                                <br />
+                                <small>{{ org.created_at }}</small>
+                            </p>
+                        </div>
+                        <div class="column has-text-centered">
+                            <p>
+                                <span class="tag is-success is-medium">{{ org.meal_pledge }}</span>
+                                <br />
+                                <small>meals</small>
+                            </p>
+                        </div>
+                        <div class="column has-text-centered">
+                            <p>
+                                <span class="tag is-info is-medium">{{ org.volunteer_pledge }}</span>
+                                <br />
+                                <small>volunteers</small>
+                            </p>
+                        </div>
+                        </div>
+                        </div>
+                    </div>
+                </div>
+            </article>
+        </div>
+        {% endfor %}
+        {% else %}
+        <p>No activity yet...</p>
+        {% endif %}
 
         <!-- Contribute Modal -->
         <div class="modal" id="contribute-modal">
@@ -93,7 +144,7 @@
                                 <div class="select">
                                     <select id="donor_organization" name="donor_organization" required>
                                         {% for org in active_user_orgs %}
-                                            <option value="{{ org.organization.organization_id }}">{{ org.organization.organization_name }}</option>
+                                        <option value="{{ org.organization.organization_id }}">{{ org.organization.organization_name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -121,5 +172,7 @@
         </div>
     </div>
 </div>
-
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.4.1/jquery.min.js"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
 {% endblock content %}
