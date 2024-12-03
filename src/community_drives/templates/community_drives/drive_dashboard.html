@@ -4,21 +4,54 @@
 {% endblock title %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/community_drive.css' %}">
 <script src="{% static 'js/drive_dashboard.js' %}"></script>
-
 <div class="container">
     {% include "partials/notifications.html" %}
     <!-- Drive Details -->
     <div class="mt-5">
-        <h1 class="title">{{ drive.name }}</h1>
-        <p class="subtitle">{{ drive.description }}</p>
-        <div class="tags">
-            <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
-            <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
-            <span class="tag is-info">Start Date: {{ drive.start_date }}</span>
-            <span class="tag is-info">End Date: {{ drive.end_date }}</span>
-            <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
-        </div>
+        <div class="columns is-vcentered">
+            <div class="column">
+                <h1 class="title">{{ drive.name }}</h1>
+                <p class="subtitle">{{ drive.description }}</p>
+                <div class="tags">
+                    <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
+                    <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
+                    <span class="tag is-info">Start Date: {{ drive.start_date }}</span>
+                    <span class="tag is-info">End Date: {{ drive.end_date }}</span>
+                    <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
+                </div>
+            </div>
+            <div class="image-container has-text-centered mt-4 is-one-third">
+                <!-- djlint:off -->
+                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
+                     alt="Default Image" 
+                     onerror="this.src='{% static 'default.png' %}';"
+                     class="image is-square"
+                     style="width: 100%; max-width: 300px; height: auto; object-fit: cover; border-radius: 4px;">
+                <!-- djlint:on -->
+                <!-- Hover Options -->
+                {% if can_edit %}
+                <div class="hover-options">
+                    <label class="button is-small is-primary" for="file-upload-{{ drive.drive_id }}">
+                        Upload
+                        <input type="file" 
+                               id="file-upload-{{ drive.drive_id }}" 
+                               class="file-upload-hidden" 
+                               data-id="{{ drive.drive_id }}" 
+                               onchange="uploadDriveImage(this)">
+                    </label>
+                    {% if drive.image_data %}
+                    <button class="button is-small is-danger" 
+                            data-id="{{ drive.drive_id }}" 
+                            onclick="deleteDriveImage(this)">
+                        Delete
+                    </button>
+                    {% endif %}
+                </div>
+                {% endif %}
+            </div>
+        </div>        
         <hr>
         <!-- Contribute Button -->
         <button class="button is-primary open-modal" data-target="contribute-modal">Contribute</button>

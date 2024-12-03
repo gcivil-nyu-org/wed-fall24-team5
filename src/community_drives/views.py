@@ -3,15 +3,11 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.db.models import Sum
 from django.db.models.functions import Coalesce
-from database.models import (
-    CommunityDrive,
-    DriveOrganization,
-    User,
-    Organization,
-)
+from database.models import CommunityDrive, DriveOrganization, User, Organization
 from .forms import AddCommunityDriveForm
 from django.http import JsonResponse
 import json
+import base64
 
 
 @login_required
@@ -61,10 +57,15 @@ def drive_dashboard(request, drive_id):
     active_user_orgs = request.user.organizationadmin_set.filter(
         organization__active=True
     )
+    can_edit = any(
+        org_admin.organization_id == drive.lead_organization.organization_id
+        for org_admin in active_user_orgs
+    )
     context = {
         "drive": drive,
         "participating_organizations": participating_organizations,
         "active_user_orgs": active_user_orgs,
+        "can_edit": can_edit,
     }
     return render(request, "community_drives/drive_dashboard.html", context)
 
@@ -155,3 +156,52 @@ def contribute_to_drive(request, drive_id):
             return JsonResponse({"success": False, "error": str(e)})
 
     return JsonResponse({"success": False, "error": "Invalid request"})
+
+
+@login_required
+def upload_drive_image(request):
+    if request.method == "POST":
+        drive_id = request.POST.get("drive_id")
+        image = request.FILES.get("image")
+
+        if not drive_id or not image:
+            return JsonResponse({"success": False, "error": "Invalid data."})
+
+        try:
+            # Convert image to base64 string
+            image_data = base64.b64encode(image.read()).decode("utf-8")
+
+            # Update the donation object with the image string
+            drive = CommunityDrive.objects.get(drive_id=drive_id)
+            drive.image_data = (
+                image_data  # Assuming `image_data` is a TextField in the model
+            )
+            drive.save()
+
+            return JsonResponse({"success": True, "image_data": image_data})
+        except CommunityDrive.DoesNotExist:
+            return JsonResponse(
+                {"success": False, "error": "Community Drive not found."}
+            )
+    return JsonResponse({"success": False, "error": "Invalid request method."})
+
+
+@login_required
+def delete_drive_image(request):
+    if request.method == "POST":
+        drive_id = request.POST.get("drive_id")
+
+        if not drive_id:
+            return JsonResponse({"success": False, "error": "Invalid data."})
+
+        try:
+            drive = CommunityDrive.objects.get(drive_id=drive_id)
+            drive.image_data = None
+            drive.save()
+
+            return JsonResponse({"success": True})
+        except CommunityDrive.DoesNotExist:
+            return JsonResponse(
+                {"success": False, "error": "Community Drive not found."}
+            )
+    return JsonResponse({"success": False, "error": "Invalid request method."})

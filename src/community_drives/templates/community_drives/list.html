@@ -4,6 +4,7 @@ Community Drives
 {% endblock title %}
 {% load static %}
 {% block content %}
+<link rel="stylesheet" href="{% static 'css/community_drive.css' %}">
 <script src="{% static 'js/drive_list.js' %}"></script>
 <div class="container">
     {% include "partials/notifications.html" %}
@@ -112,6 +113,15 @@ Community Drives
                 <div class="card mb-5">
                     <div class="card-content">
                         <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
+                            <div class="image-container has-text-centered mt-4">
+                                <!-- djlint:off -->
+                                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
+                                    alt="Default Image" 
+                                    onerror="this.src='{% static 'default.png' %}';"
+                                    class="image is-square"
+                                    style="width: 600px; height: 300px; object-fit: cover; border-radius: 4px;">
+                                <!-- djlint:on -->
+                            </div>  
                             <div class="column is-two-thirds is-full-mobile">
                                 <p class="title is-4 is-clipped">{{ drive.name }}</p>
                                 <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
@@ -142,6 +152,33 @@ Community Drives
                 <div class="card mb-5">
                     <div class="card-content">
                         <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
+                            <div class="image-container has-text-centered mt-4">
+                                <!-- djlint:off -->
+                                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
+                                        alt="Donation Image" 
+                                        onerror="this.src='{% static 'default.png' %}';"
+                                        class="image is-square is-clickable" 
+                                        data-drive-id="{{ drive.drive_id }}">
+                                <!-- djlint:on -->
+                                <!-- Hover Options -->
+                                <div class="hover-options">
+                                    <label class="button is-small is-primary" for="file-upload-{{ drive.drive_id }}">
+                                        Upload
+                                        <input type="file" 
+                                               id="file-upload-{{ drive.drive_id }}" 
+                                               class="file-upload-hidden" 
+                                               data-id="{{ drive.drive_id }}" 
+                                               onchange="uploadDriveImage(this)">
+                                    </label>
+                                    {% if drive.image_data %}
+                                    <button class="button is-small is-danger" 
+                                            data-id="{{ drive.drive_id }}" 
+                                            onclick="deleteDriveImage(this)">
+                                        Delete
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
                             <div class="column is-two-thirds is-full-mobile">
                                 <p class="title is-4 is-clipped">{{ drive.name }}</p>
                                 <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
