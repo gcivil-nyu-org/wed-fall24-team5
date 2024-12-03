@@ -24,7 +24,7 @@ class CommunityDriveViewTests(TestCase):
         self.client.login(email="testuser@example.com", password="password")
 
         # Set up a test organization
-        self.organization = Organization.objects.create(
+        self.organization1 = Organization.objects.create(
             organization_name="Test Org",
             type="self",
             address="123 Test Street",
@@ -159,9 +159,31 @@ class AddCommunityDriveTests(TestCase):
             "Target numbers must be positive integers.",
             [strip_tags(msg.message) for msg in messages_list],
         )
-=======
+
 class DriveImageTests(TestCase):
     def setUp(self):
+        # Set up test data
+        User = get_user_model()
+        self.user = User.objects.create_user(username="testuser", password="testpass")
+
+        # Logging in the user
+        self.client.login(username="testuser", password="testpass")
+
+        self.organization = Organization.objects.create(
+            organization_name="Test Org",
+            type="self",
+            address="123 Test Street",
+            zipcode="12345",
+            email="org@test.com",
+            website="https://test.org",
+            contact_number="1234567890",
+            active=True,
+        )
+
+        self.org_admin = OrganizationAdmin.objects.create(
+            user=self.user, organization=self.organization, access_level="owner"
+        )
+
         # Set up a test community drive
         self.drive = CommunityDrive.objects.create(
             name="Test Drive",
