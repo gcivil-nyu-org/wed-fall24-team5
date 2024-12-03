@@ -8,6 +8,7 @@ from database.models import (
     DriveOrganization,
     User,
     Organization,
+    OrganizationAdmin,
 )
 from .forms import AddCommunityDriveForm
 from django.http import JsonResponse
@@ -59,10 +60,12 @@ def drive_dashboard(request, drive_id):
     active_user_orgs = request.user.organizationadmin_set.filter(
         organization__active=True
     )
+    can_edit = any(org_admin.organization_id == drive.lead_organization.organization_id for org_admin in active_user_orgs)
     context = {
         "drive": drive,
         "participating_organizations": participating_organizations,
         "active_user_orgs": active_user_orgs,
+        "can_edit": can_edit
     }
     return render(request, "community_drives/drive_dashboard.html", context)
 
