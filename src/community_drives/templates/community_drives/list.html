@@ -89,6 +89,87 @@ Community Drives
             </form>
         </div>
     </div>
+    <div id="edit-drive-modal" class="modal">
+        <div class="modal-background"></div>
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p class="modal-card-title">Edit Community Drive</p>
+                <button class="close-modal" aria-label="close">×</button>
+            </header>
+            
+            <form method="POST">
+                {% csrf_token %}
+                <section class="section modal-card-body">
+                    <div class="card-content">
+                        <div class="field">
+                            {{ form.name.label_tag }}
+                            <div class="control">
+                                {{ form.name }}
+                            </div>
+                            <p class="help">Please do not exceed 250 characters.</p>
+                        </div>
+    
+                        <div class="field">
+                            {{ form.lead_organization.label_tag }}
+                            <div class="control">
+                                {{ form.lead_organization }}
+                            </div>
+                            <p class="help">Please choose an organization.</p>
+                        </div>
+    
+                        <div class="field is-grouped">
+                            <div class="field is-expanded">
+                                {{ form.meal_target.label_tag }}
+                                <div class="control is-expanded">
+                                    {{ form.meal_target }}
+                                </div>
+                                <p class="help">Please enter a positive integer.</p>
+                            </div>
+    
+                            <div class="field is-expanded">
+                                {{ form.volunteer_target.label_tag }}
+                                <div class="control is-expanded">
+                                    {{ form.volunteer_target }}
+                                </div>
+                                <p class="help">Please enter a positive integer.</p>
+                            </div>
+                        </div>
+    
+                        <div class="field is-grouped">
+                            <div class="field is-expanded">
+                                {{ form.start_date.label_tag }}
+                                <div class="control is-expanded">
+                                    {{ form.start_date }}
+                                </div>
+                            </div>
+    
+                            <div class="field is-expanded">
+                                {{ form.end_date.label_tag }}
+                                <div class="control is-expanded">
+                                    {{ form.end_date }}
+                                </div>
+                            </div>
+                        </div>
+    
+                        <div class="field">
+                            {{ form.description.label_tag }}
+                            <div class="control">
+                                {{ form.description }}
+                            </div>
+                            <p class="help">Please do not exceed 500 characters.</p>
+                        </div>
+                    </div>
+                </section>
+    
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button type="submit" class="button is-primary">Update</button>
+                        <button type="button" class="button close-modal">Cancel</button>
+                    </div>
+                </footer>
+            </form>
+        </div>
+    </div>
     <h2 class="subtitle">Community Drives</h2>
     <!--Tab Navigation Bar-->
     <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold">
@@ -193,15 +274,30 @@ Community Drives
                             <div class="column is-narrow has-text-centered">
                                 <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
                                 <p>meals contributed</p>
-                                <a href="#" class="button is-primary mt-2">View Drive</a>
-                                <form
-                                    id="delete-drive-{{ drive.drive_id }}"
-                                    method="post"
-                                    action="{% url 'community_drives:delete_drive' drive.drive_id %}"
-                                >
-                                    {% csrf_token %}
-                                    <button href="#" class="button is-danger mt-2" onclick="confirmDeleteDrive('{{ drive.drive_id }}')">Delete Drive</button>
-                                </form>
+                                
+                                <div class="is-flex is-flex-direction-column" style="gap: 0.5rem;">
+                                    <a href="{% url 'community_drives:drive_dashboard' drive.drive_id %}" 
+                                       class="button is-primary">View Drive</a>
+                                    
+                                    {% if user.organizationadmin_set.all %}
+                                        <button class="button is-info edit-drive-btn"
+                                                data-drive-id="{{ drive.drive_id }}"
+                                                data-name="{{ drive.name }}"
+                                                data-description="{{ drive.description }}"
+                                                data-meal-target="{{ drive.meal_target }}"
+                                                data-volunteer-target="{{ drive.volunteer_target }}"
+                                                data-start-date="{{ drive.start_date|date:'Y-m-d' }}"
+                                                data-end-date="{{ drive.end_date|date:'Y-m-d' }}"
+                                                data-lead-org="{{ drive.lead_organization.organization_id }}">
+                                            Edit Drive
+                                        </button>
+                                        
+                                        <form method="POST" action="{% url 'community_drives:delete_drive' drive.drive_id %}">
+                                            {% csrf_token %}
+                                            <button type="submit" class="button is-danger is-fullwidth">Delete Drive</button>
+                                        </form>
+                                    {% endif %}
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -215,4 +311,47 @@ Community Drives
         </div>
     </div>
 </div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const editButtons = document.querySelectorAll('.edit-drive-btn');
+        const editDriveModal = document.getElementById('edit-drive-modal');
+        
+        editButtons.forEach(button => {
+            button.addEventListener('click', async function() {
+                const driveId = this.getAttribute('data-drive-id');
+                const drive = {
+                    name: this.getAttribute('data-name'),
+                    description: this.getAttribute('data-description'),
+                    meal_target: this.getAttribute('data-meal-target'),
+                    volunteer_target: this.getAttribute('data-volunteer-target'),
+                    start_date: this.getAttribute('data-start-date'),
+                    end_date: this.getAttribute('data-end-date'),
+                    lead_organization: this.getAttribute('data-lead-org')
+                };
+                
+                // Populate the edit form
+                const form = editDriveModal.querySelector('form');
+                form.setAttribute('action', `/community_drives/edit-drive/${driveId}/`);
+                form.querySelector('[name="name"]').value = drive.name;
+                form.querySelector('[name="description"]').value = drive.description;
+                form.querySelector('[name="meal_target"]').value = drive.meal_target;
+                form.querySelector('[name="volunteer_target"]').value = drive.volunteer_target;
+                form.querySelector('[name="start_date"]').value = drive.start_date;
+                form.querySelector('[name="end_date"]').value = drive.end_date;
+                form.querySelector('[name="lead_organization"]').value = drive.lead_organization;
+                
+                // Show the modal
+                editDriveModal.classList.add('is-active');
+            });
+        });
+        
+        // Close modal functionality
+        const closeButtons = editDriveModal.querySelectorAll('.close-modal, .modal-background');
+        closeButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                editDriveModal.classList.remove('is-active');
+            });
+        });
+    });
+</script>
 {% endblock content %}
