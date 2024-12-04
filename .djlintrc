@@ -1,7 +1,7 @@
 {
   "exclude": "node_modules,venv,static",
   "line-length": "140",
-  "ignore": "no-self-closing-tags,prefer-double-quotes,H030,H031,H021, H029",
+  "ignore": "no-self-closing-tags,prefer-double-quotes,H030,H031,H021,H029",
   "require": "require-doctype-first,prefer-compact-if",
   "profile": "django",
   "indent": "4"
