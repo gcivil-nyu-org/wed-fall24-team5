@@ -33,4 +33,6 @@ urlpatterns = [
     path("database/", include("database.urls")),
     path("organization/", include("donor_dashboard.urls", namespace="organization")),
     path("recipient_orders/", include("recipient_orders.urls")),
+    path("community_drives/", include("community_drives.urls")),
+    path("instructions/", include("instructions.urls")),
 ]

@@ -1,12 +1,21 @@
 {% extends "_base.html" %}
+{% load static %}
 {% load dashboard_filters %}
 
 {% block title %}
 Donation Dashboard
 {% endblock title %}
 
+{% block extra_head %}
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react/18.2.0/umd/react.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/react-dom/18.2.0/umd/react-dom.production.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/lucide/0.263.1/umd/lucide.min.js"></script>
+{% endblock extra_head %}
+
 {% block content %}
 <div class="container">
+    <div id="page-loader"></div>
+
     {% include "partials/notifications.html" %}
     <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
     <form method="get">
@@ -126,64 +135,77 @@ Donation Dashboard
     </nav>
     <div class="columns is-multiline is-variable is-4">
         {% for donation in donations %}
-        <div class="column is-full-mobile is-half-tablet is-half-desktop">
+        <div class="column is-full-mobile is-full-tablet is-half-desktop">
             <div class="card mb-5">
                 <div class="card-content">
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item">
-                                <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                    <div class="columns is-vcentered">
+                        <div class="column is-narrow is-full-mobile">
+                            <div class="image-container has-text-centered">
+                                <!-- djlint:off -->
+                                <img src="data:image/jpeg;base64,{{ donation.image_data }}" alt="Default Image"
+                                    onerror="this.src='{% static 'default.png' %}';" class="image"
+                                    style="width: 150px; max-height: 80%; object-fit: cover; border-radius: 10px;">
+                                <!-- djlint:on -->
                             </div>
                         </div>
-                        <div class="level-right">
-                            <div class="level-item">
-                                <span class="tag is-primary is-light is-medium mt-3">{{ donation.quantity }}
-                                    Available</span>
+                        <div class="column">
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item">
+                                        <p class="title is-4 is-clipped">{{ donation.food_item }}</p>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <span class="tag is-primary is-light is-medium">{{ donation.quantity }}
+                                            Available</span>
+                                    </div>
+                                </div>
                             </div>
-                        </div>
-                    </div>
-                    <div class="content">
-                        <div class="columns is-flex-direction-column-mobile">
-                            <div class="column is-two-thirds">
-                                <a class="button is-link is-light is-fullwidth"
-                                    style="white-space: normal; word-wrap: break-word; display: flex; flex-direction: column; align-items: flex-center;"
-                                    href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
-                                    target="_blank" rel="noopener noreferrer">
-                                    <span>{{ donation.organization.organization_name }}</span>
-                                    <span>{{ donation.organization.address }}</span>
-                                    {% if distances %}
-                                    <span class="mt-1 has-text-weight-normal">
-                                        <i class="fa fa-map-marker"></i>
-                                        {{ distances|get_item:donation.organization.organization_id|floatformat:1 }}
-                                        miles away
-                                    </span>
-                                    {% endif %}
-                                    <!-- Rating Stars -->
-                                    <span class="mt-1">
-                                        {% if donation.avg_rating %}
-                                        {% with ""|center:5 as range %}
-                                        {% for _ in range %}
-                                        {% if forloop.counter <= donation.avg_rating %} <i
-                                            class="fa fa-star has-text-warning"></i>
-                                            {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %} <i
-                                                class="fa fa-star-half-o has-text-warning"></i>
-                                                {% else %}
-                                                <i class="fa fa-star-o has-text-warning"></i>
-                                                {% endif %}
-                                                {% endfor %}
-                                                {% endwith %}
-                                                {% else %}
-                                                <span class="has-text-grey-light">
-                                                    <i class="fa fa-star-o"></i>
-                                                    No ratings
-                                                </span>
-                                                {% endif %}
-                                    </span>
-                                </a>
-                            </div>
-                            <div class="column is-one-third has-text-centered">
-                                <strong>Pickup by:</strong>
-                                <p>{{ donation.pickup_by }}</p>
+                            <div class="content">
+                                <div class="columns is-flex-direction-column-mobile is-vcentered">
+                                    <div class="column is-two-thirds">
+                                        <a class="button is-link is-light is-fullwidth"
+                                            style="white-space: normal; word-wrap: break-word; display: flex; flex-direction: column; align-items: flex-center;"
+                                            href="https://www.google.com/maps/dir/?api=1&destination={{ donation.organization.address|urlencode }}"
+                                            target="_blank" rel="noopener noreferrer">
+                                            <span class="short-text">{{ donation.organization.organization_name }}</span>
+                                            <span class="short-text">{{ donation.organization.address }}</span>
+                                            {% if distances %}
+                                            <span class="mt-1 has-text-weight-normal">
+                                                <i class="fa fa-map-marker"></i>
+                                                {{ distances|get_item:donation.organization.organization_id|floatformat:1 }}
+                                                miles away
+                                            </span>
+                                            {% endif %}
+                                            <!-- Rating Stars -->
+                                            <span class="mt-1">
+                                                {% if donation.avg_rating %}
+                                                {% with ""|center:5 as range %}
+                                                {% for _ in range %}
+                                                {% if forloop.counter <= donation.avg_rating %} <i
+                                                    class="fa fa-star has-text-warning"></i>
+                                                    {% elif forloop.counter < donation.avg_rating|floatformat:0|add:"1" %} <i
+                                                        class="fa fa-star-half-o has-text-warning"></i>
+                                                        {% else %}
+                                                        <i class="fa fa-star-o has-text-warning"></i>
+                                                        {% endif %}
+                                                        {% endfor %}
+                                                        {% endwith %}
+                                                        {% else %}
+                                                        <span class="has-text-grey-light">
+                                                            <i class="fa fa-star-o"></i>
+                                                            No ratings
+                                                        </span>
+                                                        {% endif %}
+                                            </span>
+                                        </a>
+                                    </div>
+                                    <div class="column is-one-third has-text-centered">
+                                        <strong>Pickup by:</strong>
+                                        <p>{{ donation.pickup_by }}</p>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -198,8 +220,84 @@ Donation Dashboard
     {% else %}
     <p class="box">No donations available at the moment.</p>
     {% endif %}
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // Show loader when navigation starts
+            document.addEventListener('readystatechange', function () {
+                const loader = document.getElementById('page-loader');
+                if (document.readyState === 'loading') {
+                    loader.style.display = 'block';
+                } else {
+                    loader.style.display = 'none';
+                }
+            });
+
+            // Show loader when clicking links/submitting forms
+            document.addEventListener('click', function (e) {
+                if (e.target.tagName === 'A' || e.target.closest('a') || e.target.closest('form')) {
+                    const loader = document.getElementById('page-loader');
+                    loader.style.display = 'block';
+                }
+            });
+
+            // Show loader when submitting forms
+            document.addEventListener('submit', function () {
+                const loader = document.getElementById('page-loader');
+                loader.style.display = 'block';
+            });
+        });
+    </script>
 </div>
 
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        const loader = document.getElementById('page-loader');
+        loader.innerHTML = `
+            <div class="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center" style="display: none;">
+                <div class="flex flex-col items-center gap-4">
+                    <!-- Replace the URL with your preferred GIF -->
+                    <img src="{% static 'images/loading.gif' %}" alt="Loading..." width="300" height="300">
+                    <p class="text-lg font-medium text-gray-600">Loading...</p>
+                </div>
+            </div>
+        `;
+
+        function showLoader() {
+            const loaderEl = loader.querySelector('div');
+            if (loaderEl) loaderEl.style.display = 'flex';
+        }
+
+        function hideLoader() {
+            const loaderEl = loader.querySelector('div');
+            if (loaderEl) loaderEl.style.display = 'none';
+        }
+
+        if (document.readyState === 'loading') {
+            showLoader();
+        }
+
+        window.addEventListener('load', hideLoader);
+
+        document.addEventListener('click', function (e) {
+            const clickedElement = e.target;
+            if (
+                clickedElement.tagName === 'A' ||
+                clickedElement.closest('a') ||
+                clickedElement.closest('form button[type="submit"]')
+            ) {
+                showLoader();
+            }
+        });
+
+        document.addEventListener('submit', function () {
+            showLoader();
+        });
+
+        if (document.readyState === 'complete') {
+            hideLoader();
+        }
+    });
+</script>
 <script>
     function getUserLocation() {
         if ("geolocation" in navigator) {
@@ -227,5 +325,13 @@ Donation Dashboard
             alert('Geolocation is not supported by your browser. Please enter an address manually.');
         }
     };
+</script>
+<script>
+    document.querySelectorAll('.short-text').forEach(element => {
+        const maxChars = 30;
+        if (element.textContent.length > maxChars) {
+            element.textContent = element.textContent.slice(0, maxChars-3) + ' ...';
+        }
+    });
 </script>
 {% endblock content %}

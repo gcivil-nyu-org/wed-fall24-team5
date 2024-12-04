@@ -23,23 +23,8 @@ import csv
 from itertools import chain
 from operator import attrgetter
 import json
-
-
-@login_required
-def add_organization(request):
-    if request.method == "POST":
-        form = AddOrganizationForm(request.POST)
-        if form.is_valid():
-            organization = form.save()
-            org_user = User.objects.get(email=request.user.email)
-            OrganizationAdmin.objects.create(
-                user=org_user, organization=organization, access_level="owner"
-            )
-            messages.success(request, "Organization successfully added.")
-            return redirect("/")
-    else:
-        form = AddOrganizationForm()
-    return render(request, "add_organization.html", {"form": form})
+import base64
+from django.utils.timezone import now
 
 
 @login_required
@@ -73,6 +58,38 @@ def get_org_list(request):
                 user=org_user, organization=organization, access_level="owner"
             )
             messages.success(request, "Organization successfully added.")
+            return redirect("/donor_dashboard")
+        else:
+            # Handle errors using Django messages
+            if form.errors.get("organization_name"):
+                messages.warning(
+                    request, "Organization Name is invalid. Please try again."
+                )
+            if form.errors.get("address"):
+                messages.warning(request, "Address is not valid. Please try again.")
+            if form.errors.get("zipcode"):
+                messages.warning(request, "Zipcode is not valid. Please try again.")
+            if form.errors.get("contact_number"):
+                messages.warning(
+                    request, "Contact Number is not valid. Please try again."
+                )
+            if form.errors.get("email"):
+                messages.warning(request, "Email is not valid. Please try again.")
+            if form.errors.get("website"):
+                messages.warning(request, "Website is not valid. Please try again.")
+            if form.errors.get("__all__"):
+                messages.warning(
+                    request,
+                    "An organization with the same details already exists. Please modify at least one field and try again.",
+                )
+
+            # Fallback error message
+            if not any(form.errors):
+                messages.warning(
+                    request, "Registration failed. Please check the form for errors."
+                )
+
+            # Pass the form with errors back to the template
             return redirect("/donor_dashboard")
     else:
         form = AddOrganizationForm()
@@ -126,19 +143,22 @@ def manage_organization(request, organization_id):
         else:
             owner_access = False
 
+        update_donations()
+        cancel_expired_orders()
+
         # Fetch donations with related reviews
         donations = Donation.objects.filter(
-            organization_id=organization.organization_id, active=True
-        ).prefetch_related(
-            Prefetch(
-                "userreview_set",
-                queryset=UserReview.objects.filter(active=True).order_by("modified_at"),
-            )
+            organization_id=organization.organization_id,
+            active=True,
         )
+
+        reviewed_donations = get_donations_with_reviews(organization.organization_id)
 
         # Prefetch orders and dietary restrictions for each user
         orders = (
-            Order.objects.filter(donation__organization=organization, active=True)
+            Order.objects.filter(
+                donation__organization=organization, order_status="pending"
+            )
             .prefetch_related(
                 "donation",
                 "user",
@@ -148,7 +168,7 @@ def manage_organization(request, organization_id):
                     to_attr="dietary_restrictions",
                 ),
             )
-            .order_by("donation__donation_id")
+            .order_by("-donation__pickup_by", "donation__donation_id")
         )
 
         # Process dietary restrictions to replace underscores and apply title case
@@ -165,6 +185,7 @@ def manage_organization(request, organization_id):
             .order_by("modified_at")
             .values("rating", "comment")
         )
+
         rating = reviews.aggregate(avg=Avg("rating"))["avg"]
         num_users = orders.values("user").distinct().count()
         form = AddDonationForm()
@@ -179,6 +200,7 @@ def manage_organization(request, organization_id):
                 "owner_access": owner_access,
                 "reviews": reviews,
                 "rating": rating,
+                "reviewed_donations": reviewed_donations,
                 "num_users": num_users,
                 "form": form,
             },
@@ -215,6 +237,14 @@ def organization_details(request, organization_id):
                         "donor_dashboard:manage_organization",
                         organization_id=organization_id,
                     )
+                else:
+                    messages.warning(
+                        request, "Something went wrong, please enter valid inputs"
+                    )
+                    organization = Organization.objects.get(
+                        organization_id=organization_id
+                    )
+                    form = AddOrganizationForm(instance=organization)
             else:
                 form = AddOrganizationForm(instance=organization)
 
@@ -512,7 +542,7 @@ def modify_donation(request, donation_id):
 
 @login_required
 def delete_donation(request, donation_id):
-    donation = get_object_or_404(Donation, donation_id=donation_id, active=True)
+    donation = get_object_or_404(Donation, donation_id=donation_id)
     if request.method == "POST":
         donation.active = False  # Set the active field to False for soft delete
         donation.quantity = 0
@@ -534,7 +564,7 @@ def delete_donation(request, donation_id):
 
 @login_required
 def manage_order(request, order_id):
-    order = get_object_or_404(Order, order_id=order_id, active=True)
+    order = get_object_or_404(Order, order_id=order_id)
     donation = Donation.objects.get(donation_id=order.donation_id)
 
     order.order_status = "picked_up" if order.order_status == "pending" else "pending"
@@ -546,32 +576,87 @@ def manage_order(request, order_id):
     )
 
 
+def sanitize_csv_field(value):
+    """
+    Escape potential CSV injection by adding a single quote
+    to values starting with special characters. Convert non-string values to strings.
+    """
+    if not isinstance(value, str):
+        value = str(value)
+
+    # List of potentially dangerous prefixes
+    dangerous_prefixes = ("=", "+", "-", "@", "\t", "\n")
+
+    # If value starts with any dangerous prefix, prepend a single quote
+    if value.startswith(dangerous_prefixes):
+        return f"'{value}"
+    return value
+
+
+def sanitize_order(order, organization):
+    """
+    Sanitizes all the fields of an order object and returns a list of sanitized fields.
+    """
+    return [
+        sanitize_csv_field(order.donation.food_item if order.donation else ""),
+        sanitize_csv_field(order.user.email if order.user else ""),
+        sanitize_csv_field(
+            f"{order.user.first_name} {order.user.last_name}" if order.user else ""
+        ),
+        sanitize_csv_field(order.order_quantity),
+        sanitize_csv_field(
+            order.donation.pickup_by.strftime("%Y-%m-%d")
+            if order.donation and order.donation.pickup_by
+            else ""
+        ),
+        sanitize_csv_field(organization.address),
+        sanitize_csv_field(order.order_status),
+        sanitize_csv_field(
+            order.order_created_at.strftime("%Y-%m-%d %H:%M:%S")
+            if order.order_created_at
+            else ""
+        ),
+        sanitize_csv_field(
+            order.order_modified_at.strftime("%Y-%m-%d %H:%M:%S")
+            if order.order_modified_at
+            else ""
+        ),
+    ]
+
+
 @login_required
 def download_orders(request, organization_id):
     organization = Organization.objects.get(organization_id=organization_id)
-    orders = Order.objects.filter(donation__organization=organization).prefetch_related(
-        "donation"
+    # Order by creation date (most recent first)
+    orders = (
+        Order.objects.filter(donation__organization=organization)
+        .prefetch_related("donation", "user")
+        .order_by("-donation__pickup_by")
     )
+    current_date = timezone.now().strftime("%Y%m%d")
+
     response = HttpResponse(content_type="text/csv")
-    response["Content-Disposition"] = "attachment; filename=orders.csv"
+    filename = f"{organization.organization_id}_orders_{current_date}.csv"
+    response["Content-Disposition"] = f'attachment; filename="{filename}"'
 
     writer = csv.writer(response)
     writer.writerow(
-        ["ID", "Donation", "User", "Quantity", "Pickup Date", "Address", "Status"]
+        [
+            "Item",
+            "Reserved By (Email)",
+            "Reserved By (Name)",
+            "Quantity",
+            "Pickup Date",
+            "Address",
+            "Order Status",
+            "Order Created On",
+            "Order Modified On",
+        ]
     )
 
     for order in orders:
-        writer.writerow(
-            [
-                order.order_id,
-                order.donation.food_item,
-                order.user,
-                order.order_quantity,
-                order.donation.pickup_by,
-                organization.address,
-                order.order_status,
-            ]
-        )
+        sanitized_order = sanitize_order(order, organization)
+        writer.writerow(sanitized_order)
 
     return response
 
@@ -735,3 +820,93 @@ def remove_admin_owner(request, organization_id, admin_email):
         return redirect(
             "donor_dashboard:manage_organization", organization_id=organization_id
         )
+
+
+@login_required
+def upload_donation_image(request):
+    if request.method == "POST":
+        donation_id = request.POST.get("donation_id")
+        image = request.FILES.get("image")
+
+        if not donation_id or not image:
+            return JsonResponse({"success": False, "error": "Invalid data."})
+
+        try:
+            # Convert image to base64 string
+            image_data = base64.b64encode(image.read()).decode("utf-8")
+
+            # Update the donation object with the image string
+            donation = Donation.objects.get(donation_id=donation_id)
+            donation.image_data = (
+                image_data  # Assuming `image_data` is a TextField in the model
+            )
+            donation.save()
+
+            return JsonResponse({"success": True, "image_data": image_data})
+        except Donation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Donation not found."})
+    return JsonResponse({"success": False, "error": "Invalid request method."})
+
+
+def update_donations():
+    """
+    Updates the donations to keep only those with pickup dates today or later as active.
+    All other donations will be marked as inactive.
+    """
+    today = now().date()  # Get the current date
+
+    # Filter donations with pickup dates today or later and ensure they are active
+    Donation.objects.filter(pickup_by__gte=today).update(active=True)
+
+    # Mark donations with pickup dates before today as inactive
+    Donation.objects.filter(pickup_by__lt=today).update(active=False)
+
+
+def cancel_expired_orders():
+    """
+    Updates the status of all pending orders to 'canceled' if the pickup date has expired.
+    """
+    today = now().date()  # Get the current date
+
+    # Identify orders with expired pickup dates and 'pending' status
+    expired_orders = Order.objects.filter(
+        donation__pickup_by__lt=today, order_status="pending"
+    )
+
+    # Update their status to 'canceled' and deactivate them
+    expired_orders.update(order_status="canceled", active=False)
+
+
+def get_donations_with_reviews(organization_id):
+    """
+    Fetch donations that have user reviews for a specific organization,
+    ordered by pickup date with the most recent donations on top.
+    """
+    donations_with_reviews = (
+        Donation.objects.filter(
+            organization=organization_id,
+            userreview__isnull=False,
+        )
+        .distinct()
+        .order_by("-pickup_by")  # Order by pickup date in descending order
+    )
+    return donations_with_reviews
+
+
+@login_required
+def delete_donation_image(request):
+    if request.method == "POST":
+        donation_id = request.POST.get("donation_id")
+
+        if not donation_id:
+            return JsonResponse({"success": False, "error": "Invalid data."})
+
+        try:
+            donation = Donation.objects.get(donation_id=donation_id)
+            donation.image_data = None
+            donation.save()
+
+            return JsonResponse({"success": True})
+        except Donation.DoesNotExist:
+            return JsonResponse({"success": False, "error": "Donation not found."})
+    return JsonResponse({"success": False, "error": "Invalid request method."})

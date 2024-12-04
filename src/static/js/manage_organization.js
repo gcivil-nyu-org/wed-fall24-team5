@@ -126,15 +126,36 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
 
+    const submitButton = document.querySelector('button[type="submit"]');
+
     // Existing code for modals, delete confirmation, etc.
     const quantityInput = document.getElementById("id_quantity");
     const quantityWarning = document.getElementById("quantity-warning");
     quantityInput.addEventListener("input", function () {
         const quantityValue = quantityInput.value;
-        if (quantityValue <= 0) {
+        if (quantityValue <= 0 || quantityValue > 200) {
             quantityWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
         } else {
             quantityWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
+        }
+    });
+
+    const foodItemInput = document.getElementById("id_food_item");
+    const foodItemWarning = document.getElementById("donation-name-warning");
+    foodItemInput.addEventListener("input", function () {
+        const foodItemValue = foodItemInput.value;
+        if (foodItemValue.length > 250 || foodItemValue.length === 0) {
+            foodItemWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            foodItemWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
         }
     });
 
@@ -144,23 +165,29 @@ document.addEventListener("DOMContentLoaded", function () {
         const dateValue = dateInput.value;
         if (!isValidDate(dateValue)) {
             dateWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
         } else {
             dateWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
         }
     });
 
     function isValidDate(dateString) {
-        const inputDate = new Date(dateString);
-        if (isNaN(inputDate)) {
-            return false;
-        }
+        if (!dateString) return false;
+
+        const inputDate = new Date(`${dateString}T00:00:00`);
+        if (isNaN(inputDate)) return false;
 
         const currentDate = new Date();
+        currentDate.setHours(0, 0, 0, 0); // Normalize to start of the day
+
         const range = new Date();
         range.setDate(currentDate.getDate() + 7);
+        range.setHours(23, 59, 59, 999); // End of the range day
 
-        // Check if the date is within one week in the future
-        return inputDate > currentDate && inputDate <= range;
+        return inputDate >= currentDate && inputDate <= range;
     }
 
     var addDonationButton = document.getElementById("add-donation-button");
@@ -218,3 +245,91 @@ document.addEventListener("DOMContentLoaded", function () {
         }
     };
 });
+
+document.addEventListener("DOMContentLoaded", () => {
+    const images = document.querySelectorAll(".image.is-clickable");
+    images.forEach(image => {
+        image.addEventListener("click", () => {
+            const donationId = image.getAttribute("data-donation-id");
+            triggerFileUpload(donationId);
+        });
+    });
+});
+
+
+function triggerFileUpload(donationId) {
+    document.getElementById(`file-upload-${donationId}`).click();
+}
+
+// Handle file upload and send to the server
+function uploadDonationImage(inputElement) {
+    const donationId = inputElement.dataset.id;
+    const file = inputElement.files[0];
+
+    if (!file) {
+        alert("No file selected.");
+        return;
+    }
+
+    const formData = new FormData();
+    formData.append("image", file);
+    formData.append("donation_id", donationId);
+    // http://127.0.0.1:8000/upload-donation-image/ 
+    fetch(`/donor_dashboard/upload-donation-image/`, {
+        method: "POST",
+        body: formData,
+        headers: {
+            "X-CSRFToken": getCsrfToken(), // Include CSRF token
+        },
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert("Image uploaded successfully!");
+                // Update the image src to the new image URL
+                location.reload();
+            } else {
+                alert("Failed to upload image. Please try again.");
+            }
+        })
+        .catch(error => {
+            console.error("Error uploading image:", error);
+            alert("An error occurred while uploading the image.");
+        });
+}
+
+// Get CSRF token from the DOM (assumes Django template includes CSRF token)
+function getCsrfToken() {
+    return document.querySelector("[name=csrfmiddlewaretoken]").value;
+}
+
+function deleteDonation(inputElement) {
+    const donationId = inputElement.dataset.id;
+    if (confirm('Are you sure you want to delete this donation image?')) {
+
+        const formData = new FormData();
+        formData.append("donation_id", donationId);
+        // http://127.0.0.1:8000/delete-donation-image/ 
+        fetch(`/donor_dashboard/delete-donation-image/`, {
+            method: "POST",
+            body: formData,
+            headers: {
+                "X-CSRFToken": getCsrfToken(), // Include CSRF token
+            },
+        })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Image deleted successfully!");
+                    // Update the image src to the new image URL
+                    location.reload();
+                } else {
+                    alert("Failed to delete image. Please try again.");
+                }
+            })
+            .catch(error => {
+                console.error("Error deleting image:", error);
+                alert("An error occurred while deleting the image.");
+            });
+    }
+}

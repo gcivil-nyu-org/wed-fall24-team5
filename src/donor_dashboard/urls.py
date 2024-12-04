@@ -5,7 +5,6 @@ app_name = "donor_dashboard"  # pylint: disable=invalid-name
 
 urlpatterns = [
     path("", views.get_org_list, name="org_list"),
-    path("add-organization/", views.add_organization, name="add_organization"),
     path(
         "manage_organization/<uuid:organization_id>/",
         views.manage_organization,
@@ -84,4 +83,14 @@ urlpatterns = [
         name="statistics_ratings",
     ),
     path("check_user/", views.check_user, name="check_user"),
+    path(
+        "upload-donation-image/",
+        views.upload_donation_image,
+        name="upload_donation_image",
+    ),
+    path(
+        "delete-donation-image/",
+        views.delete_donation_image,
+        name="delete_donation_image",
+    ),
 ]

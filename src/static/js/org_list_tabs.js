@@ -44,4 +44,18 @@ document.addEventListener('DOMContentLoaded', () => {
             localStorage.setItem('activeTab', tab.id);
         });
     });
+
+    document.querySelectorAll('.short-text').forEach(element => {
+        const maxChars = 20;
+        if (element.textContent.length > maxChars) {
+            element.textContent = element.textContent.slice(0, maxChars-3) + '...';
+        }
+    });
+
+    document.querySelectorAll('.short-addr').forEach(element => {
+        const maxChars = 35;
+        if (element.textContent.length > maxChars) {
+            element.textContent = element.textContent.slice(0, maxChars-3) + '...';
+        }
+    });
 });

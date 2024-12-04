@@ -17,4 +17,20 @@ urlpatterns = [
         views.org_get_messages,
         name="org_get_messages",
     ),
+    path(
+        "room/<str:room_id>/get_new_messages/",
+        views.get_new_messages,
+        name="get_new_messages",
+    ),
+    path("room/<str:room_id>/send_message/", views.send_message, name="send_message"),
+    path(
+        "org/<str:organization_id>/room/<str:room_id>/get_new_messages/",
+        views.org_get_new_messages,
+        name="org_get_new_messages",
+    ),
+    path(
+        "org/<str:organization_id>/room/<str:room_id>/send_message/",
+        views.org_send_message,
+        name="org_send_message",
+    ),
 ]

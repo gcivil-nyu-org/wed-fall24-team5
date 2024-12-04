@@ -1,0 +1,207 @@
+{% extends "_base.html" %}
+{% block title %}
+Community Drives
+{% endblock title %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/community_drive.css' %}">
+<script src="{% static 'js/drive_list.js' %}"></script>
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <div class="level mt-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+            </div>
+        </div>
+        <!-- Button to open the modal -->
+        <div class="level-right">
+            <div class="level-item">
+                <button class="button is-dark open-modal" data-target="add-drive-modal">Start A Community Drive</button>
+            </div>
+        </div>
+    </div>
+    <!-- Modal structure -->
+    <div class="modal" id="add-drive-modal">
+        <div class="modal-background"></div>
+        <!-- djlint:off -->
+        <div class="modal-card">
+            <!-- djlint:on -->
+            <header class="modal-card-head">
+                <p class="modal-card-title is-5">Start A Community Drive</p>
+                <a class="tag is-delete"></a>
+            </header>
+            <form method="post">
+                {% csrf_token %}
+                <section class="modal-card-body">
+                    <div class="card-content">
+                        <div class="field">
+                            <label class="label">{{ form.name.label_tag }}</label>
+                            <div class="control">{{ form.name }}</div>
+                            <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">
+                                Please enter a name between 1 and 250 characters.</p>
+                        </div>
+                        <div class="field">
+                            <label class="label">{{ form.lead_organization.label_tag }}</label>
+                            <div class="control">{{ form.lead_organization }}</div>
+                            <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">
+                                Please choose an organization.</p>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="field is-expanded">
+                                <label class="label">{{ form.meal_target.label_tag }}</label>
+                                <div class="control is-expanded">{{ form.meal_target }}</div>
+                            </div>
+                            <div class="field is-expanded">
+                                <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">
+                                    Please enter a positive integer.</p>
+                                <label class="label">{{ form.volunteer_target.label_tag }}</label>
+                                <div class="control is-expanded">{{ form.volunteer_target }}</div>
+                                <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">
+                                    Please enter a positive integer.</p>
+                            </div>
+                        </div>
+                        <div class="field is-grouped">
+                            <div class="field is-expanded">
+                                <label class="label">{{ form.start_date.label_tag }}</label>
+                                <div class="control is-expanded">{{ form.start_date }}</div>
+                            </div>
+                            <div class="field is-expanded">
+                                <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">
+                                    Date must not be in the past.</p>
+                                <label class="label">{{ form.end_date.label_tag }}</label>
+                                <div class="control is-expanded">{{ form.end_date }}</div>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">{{ form.description.label_tag }}</label>
+                            <div class="control">{{ form.description }}</div>
+                            <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">
+                                Please do not exceed 500 characters.</p>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button type="submit" class="button is-link">Add</button>
+                        <button class="button close-btn">Cancel</button>
+                    </div>
+                </footer>
+            </form>
+        </div>
+    </div>
+    <h2 class="subtitle">Community Drives</h2>
+    <!--Tab Navigation Bar-->
+    <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold">
+        <ul>
+            <li id="all-drives-tab">
+                <a>
+                    <span>All Community Drives</span>
+                </a>
+            </li>
+            <li id="my-drives-tab">
+                <a>
+                    <span>My Community Drives</span>
+                </a>
+            </li>
+        </ul>
+    </div>
+    <div id="all-drives" class="drive-list">
+        <div class="columns is-multiline is-variable">
+            {% if drives %}
+            {% for drive in drives %}
+            <div class="column is-full">
+                <div class="card mb-5">
+                    <div class="card-content">
+                        <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
+                            <div class="image-container has-text-centered my-4 ml-4">
+                                <!-- djlint:off -->
+                                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
+                                    alt="Default Image" 
+                                    onerror="this.src='{% static 'default.png' %}';"
+                                    class="image"
+                                    style="width: 200px; max-height: 80%; object-fit: cover; border-radius: 10px;">
+                                <!-- djlint:on -->
+                            </div>  
+                            <div class="column is-two-thirds is-full-mobile">
+                                <p class="title is-4 is-clipped">{{ drive.name }}</p>
+                                <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
+                                <p class="mt-1 short-text mb-4">{{ drive.description }}</p>
+                                <span class="tag is-primary is-light is-medium">Deadline: {{ drive.end_date }}</span>
+                                <span class="tag is-primary is-light is-medium">Active: {{ drive.active }}</span>
+                            </div>
+                            <div class="column is-narrow has-text-centered">
+                                <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
+                                <p>meals contributed</p>
+                                <a href="{% url 'community_drives:drive_dashboard' drive.drive_id %}" class="button is-primary mt-2">View Drive</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="box">No active community drives to display.</p>
+            {% endif %}
+        </div>
+    </div>
+    <div id="my-drives" class="drive-list is-hidden">
+        <div class="columns is-multiline is-variable">
+            {% if my_drives %}
+            {% for drive in my_drives %}
+            <div class="column is-full">
+                <div class="card mb-5">
+                    <div class="card-content">
+                        <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
+                            <div class="image-container has-text-centered my-4 ml-4">
+                                <!-- djlint:off -->
+                                <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
+                                        alt="Donation Image" 
+                                        onerror="this.src='{% static 'default.png' %}';"
+                                        class="image is-clickable" 
+                                        data-drive-id="{{ drive.drive_id }}"
+                                        style="width: 200px; max-height: 80%; object-fit: cover; border-radius: 10px;">
+                                <!-- djlint:on -->
+                                <!-- Hover Options -->
+                                <div class="hover-options">
+                                    <label class="button is-small is-primary" for="file-upload-{{ drive.drive_id }}">
+                                        Upload
+                                        <input type="file" 
+                                               id="file-upload-{{ drive.drive_id }}" 
+                                               class="file-upload-hidden" 
+                                               data-id="{{ drive.drive_id }}" 
+                                               onchange="uploadDriveImage(this)">
+                                    </label>
+                                    {% if drive.image_data %}
+                                    <button class="button is-small is-danger" 
+                                            data-id="{{ drive.drive_id }}" 
+                                            onclick="deleteDriveImage(this)">
+                                        Delete
+                                    </button>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="column is-two-thirds is-full-mobile">
+                                <p class="title is-4 is-clipped">{{ drive.name }}</p>
+                                <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
+                                <p class="mt-1 short-text mb-4">{{ drive.description }}</p>
+                                <span class="tag is-primary is-light is-medium">Deadline: {{ drive.end_date }}</span>
+                                <span class="tag is-primary is-light is-medium">Active: {{ drive.active }}</span>
+                            </div>
+                            <div class="column is-narrow has-text-centered">
+                                <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
+                                <p>meals contributed</p>
+                                <a href="#" class="button is-primary mt-2">View Drive</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+            {% else %}
+            <p class="box">You have no active community drives.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock content %}

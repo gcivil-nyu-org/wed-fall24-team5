@@ -5,16 +5,23 @@ Organizations Dashboard
 {% load static %}
 {% block content %}
 <link rel="stylesheet" href="{% static 'css/manage_organization.css' %}">
+<link rel="stylesheet" href="{% static 'css/tooltips.css' %}">
 <script src="{% static 'js/org_list_tabs.js' %}"></script>
 <script src="{% static 'js/add_org.js' %}"></script>
 <div class="container">
     {% include "partials/notifications.html" %}
-    <div class="flex-container">
-        <h1 class="title mt-5">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
-        <!-- Button to open the modal -->
-        <div class="buttons">
-            <button class="button  is-dark" id="open-modal">Add Organization</button>
+    <div class="level mt-5">
+        <div class="level-left">
+            <div class="level-item">
+                <h1 class="title">Welcome, {{ user.first_name }} {{ user.last_name }}!</h1>
+            </div>
         </div>
+        <!-- Button to open the modal -->
+         <div class="level-right">
+            <div class="level-item">
+                <button class="button is-dark" id="open-modal">Add Organization</button>
+            </div>
+         </div>
     </div>
     <!-- Modal structure -->
     <div class="modal" id="org-modal">
@@ -79,7 +86,7 @@ Organizations Dashboard
             </li>
             <li id="in-active-tab">
                 <a>
-                    <span>In Active</span>
+                    <span>Inactive</span>
                 </a>
             </li>
         </ul>
@@ -88,21 +95,43 @@ Organizations Dashboard
         <div class="columns is-multiline is-variable is-4">
             {% if active_org_list %}
             {% for org in active_org_list %}
-            <div class="column is-full-mobile is-one-third-tablet is-one-third-desktop">
+            <div class="column is-full-mobile is-half-tablet is-one-third-desktop">
                 <div class="card mb-5 is-flex is-flex-direction-column">
                     <div class="card-content is-flex-grow-1">
                         <div class="level">
-                            <div class="level-left"  style="max-width: 45%;">
+                            <div class="level-left"  style="max-width: 60%;">
                                 <div class="level-item" style="max-width: 100%;">
-                                    <p class="title is-5 is-clipped" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_name }}</p>
+                                        <p class="title is-5 is-clipped short-text" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_name }}</p>
                                 </div>
                             </div>
                             <div class="level-right">
                                 <div class="level-item">
-                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.access_level }}</span>
+                                    <span class="tag is-primary is-light is-medium">{{ org.access_level }}</span>
                                 </div>
                                 <div class="level-item">
-                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                    <span class="tag is-primary is-light is-medium">
+                                        {% if org.org_type == "grocery_store" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </span>
+                                        {% elif org.org_type == "restaurant" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-cutlery"></i>
+                                        </span>
+                                        {% elif org.org_type == "food_pantry" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-shopping-basket"></i>
+                                        </span>
+                                        {% elif org.org_type == "self" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-user-o"></i>
+                                        </span>
+                                        {% else %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                        {% endif %}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -110,7 +139,7 @@ Organizations Dashboard
                             <p>
                             <div class="button is-link is-light has-text-centered"
                                 style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
-                                {{ org.org_address }}
+                                <p class="short-addr">{{ org.org_address }}</p>
                             </div>
                             </p>
                             <p class="icon-text mt-1 block" style="word-wrap: break-word; overflow-wrap: break-word;">
@@ -143,21 +172,43 @@ Organizations Dashboard
         <div class="columns is-multiline is-variable is-4">
             {% if inactive_org_list %}
             {% for org in inactive_org_list %}
-            <div class="column is-full-mobile is-one-third-tablet is-one-third-desktop">
+            <div class="column is-full-mobile is-half-tablet is-one-third-desktop">
                 <div class="card mb-5 is-flex is-flex-direction-column">
                     <div class="card-content is-flex-grow-1">
                         <div class="level">
-                            <div class="level-left"  style="max-width: 45%;">
+                            <div class="level-left"  style="max-width: 60%;">
                                 <div class="level-item" style="max-width: 100%;">
-                                    <p class="title is-5 is-clipped" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_name }}</p>
+                                    <p class="title is-5 is-clipped short-text" style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">{{ org.org_name }}</p>
                                 </div>
                             </div>
                             <div class="level-right">
                                 <div class="level-item">
-                                    <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                                    <span class="tag is-primary is-light is-medium">Inactive</span>
                                 </div>
                                 <div class="level-item">
-                                    <span class="tag is-primary is-light is-medium mt-1">{{ org.org_type }}</span>
+                                    <span class="tag is-primary is-light is-medium">
+                                        {% if org.org_type == "grocery_store" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-shopping-cart"></i>
+                                        </span>
+                                        {% elif org.org_type == "restaurant" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-cutlery"></i>
+                                        </span>
+                                        {% elif org.org_type == "food_pantry" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-shopping-basket"></i>
+                                        </span>
+                                        {% elif org.org_type == "self" %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-user-o"></i>
+                                        </span>
+                                        {% else %}
+                                        <span class="icon is-small has-text-primary">
+                                            <i class="fa fa-tag"></i>
+                                        </span>
+                                        {% endif %}
+                                    </span>
                                 </div>
                             </div>
                         </div>
@@ -165,7 +216,7 @@ Organizations Dashboard
                             <p>
                             <div class="button is-link is-light has-text-centered"
                                 style="white-space: normal; word-wrap: break-word; overflow-wrap: break-word;">
-                                {{ org.org_address }}
+                                <p class="short-addr">{{ org.org_address }}</p>
                             </div>
                             </p>
                             <p class="icon-text mt-1 block" style="word-wrap: break-word; overflow-wrap: break-word;">

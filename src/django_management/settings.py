@@ -58,9 +58,11 @@ INSTALLED_APPS = [
     "donor_dashboard",  # Custom app for Donor dashboard
     "recipient_dashboard",  # Custom app for recipient_dashboard
     "recipient_orders",  # View orders placed by a recipient
+    "instructions",  # View application user instructions
     "user_profile",  # View user profile
     "messaging",  # Custom app for Messaging functionality
     "accounts.apps.AccountsConfig",  # Custom app for user accounts
+    "community_drives",  # Custom app for community drives
     "django.contrib.sites",  # Sites framework (enables associating data with different sites/domains) # noqa
     "compressor",  # Compresses linked and inline JavaScript or CSS into a single cached file # noqa
     "channels",  # A library that extends Django to handle WebSocket connections for real-time features like chat.

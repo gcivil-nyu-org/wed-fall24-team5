@@ -1,0 +1,145 @@
+{% extends "_base.html" %}
+{% block title %}
+{{ drive.name }} - Community Drive
+{% endblock title %}
+{% load static %}
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/community_drive.css' %}">
+<script src="{% static 'js/drive_dashboard.js' %}"></script>
+<div class="container">
+    {% include "partials/notifications.html" %}
+    <!-- Drive Details -->
+    <div class="mt-5">
+        <div class="columns is-vcentered is-4">
+            <div class="column is-narrow is-full-mobile">
+                <div class="image-container has-text-centered">
+                    <!-- djlint:off -->
+                    <img src="data:image/jpeg;base64,{{ drive.image_data }}" alt="Default Image"
+                        onerror="this.src='{% static 'default.png' %}';" class="image is-square"
+                        style="width: 200px; height: 200px; object-fit: cover; border-radius: 10px;">
+                    <!-- djlint:on -->
+                    <!-- Hover Options -->
+                    {% if can_edit %}
+                    <div class="hover-options">
+                        <label class="button is-small is-primary" for="file-upload-{{ drive.drive_id }}">
+                            Upload
+                            <input type="file" id="file-upload-{{ drive.drive_id }}" class="file-upload-hidden"
+                                data-id="{{ drive.drive_id }}" onchange="uploadDriveImage(this)">
+                        </label>
+                        {% if drive.image_data %}
+                        <button class="button is-small is-danger" data-id="{{ drive.drive_id }}"
+                            onclick="deleteDriveImage(this)">
+                            Delete
+                        </button>
+                        {% endif %}
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="column is-three-fifths is-full-mobile is-full-tablet">
+                <h1 class="title">{{ drive.name }}</h1>
+                <p class="subtitle mt-4">{{ drive.description }}</p>
+                <div class="tags">
+                    <span class="tag is-info">Meal Target: {{ drive.meal_target }}</span>
+                    <span class="tag is-info">Volunteer Target: {{ drive.volunteer_target }}</span>
+                    <span class="tag is-info">Start Date: {{ drive.start_date }}</span>
+                    <span class="tag is-info">End Date: {{ drive.end_date }}</span>
+                    <span class="tag is-success">{{ drive.active|yesno:"Active,Inactive" }}</span>
+                </div>
+            </div>
+            <div class="column">
+                <div class="box">
+                    <p class="mb-2"><strong>
+                            {{ drive.meal_progress }} / {{ drive.meal_target }} meals ({{ meals_percentage|floatformat:1 }}%)
+                        </strong></p>
+                    <progress class="progress is-success" value="{{ meals_percentage }}" max="100"></progress>
+                </div>
+
+                <!-- Volunteers Progress -->
+                <div class="box">
+                    <p class="mb-2"><strong>
+                            {{ drive.volunteer_progress }} / {{ drive.volunteer_target }} volunteers ({{ volunteers_percentage|floatformat:1 }}%)
+                        </strong></p>
+                    <progress class="progress is-info" value="{{ volunteers_percentage }}" max="100"></progress>
+                </div>
+            </div>
+        </div>
+        <hr>
+        <!-- Contribute Button -->
+        <div class="level">
+            <div class="level-left">
+                <div class="level-item">
+                    <h2 class="subtitle my-3"><strong>{{ drive.driveorganization_set.all|length }}
+                            Contributions</strong></h2>
+                </div>
+                <div class="level-item">
+                    <button class="button is-primary open-modal" data-target="contribute-modal">Manage My Contributions</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contributions Table -->
+        {% if drive.driveorganization_set %}
+        {% for org in drive.driveorganization_set.all %}
+        {% if org.meal_pledge != 0 or org.volunteer_pledge != 0 %}
+        <div id="contributions">
+            <div class="container py-4">
+            </div>
+        </div>
+        {% endif %}
+        {% endfor %}
+        {% else %}
+        <p>No activity yet...</p>
+        {% endif %}
+
+        <!-- Contribute Modal -->
+        <div class="modal" id="contribute-modal">
+            <div class="modal-background"></div>
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Contribute to {{ drive.name|slice:":30" }}...</p>
+                    <button class="delete close-btn" aria-label="close"></button>
+                </header>
+                <form id="contribute-form" method="post" data-drive-id="{{ drive.drive_id }}">
+                    {% csrf_token %}
+                    <section class="modal-card-body">
+                        <div class="field">
+                            <label class="label">Donor Organization</label>
+                            <div class="control">
+                                <div class="select">
+                                    <select id="donor_organization" name="donor_organization" required>
+                                        <option value="" disabled selected>Select Organization</option>
+                                        {% for org in active_user_orgs %}
+                                        <option value="{{ org.organization.organization_id }}">{{ org.organization.organization_name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>                                
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Meals</label>
+                            <div class="control">
+                                <input class="input" type="number" id="meals" name="meals" min="0" required>
+                            </div>
+                        </div>
+                        <div class="field">
+                            <label class="label">Volunteers</label>
+                            <div class="control">
+                                <input class="input" type="number" id="volunteers" name="volunteers" min="0" required>
+                            </div>
+                        </div>
+                    </section>
+                    <footer class="modal-card-foot is-justify-content-flex-end">
+                        <button type="submit" class="button is-link">Contribute</button>
+                        <button type="button" id="delete-btn" class="button is-danger ml-2" hidden>Delete Participation</button>
+                        <button type="button" class="button close-btn ml-2">Cancel</button>
+                    </footer>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    const driveId = "{{ drive.drive_id }}"
+</script>
+{% endblock content %}

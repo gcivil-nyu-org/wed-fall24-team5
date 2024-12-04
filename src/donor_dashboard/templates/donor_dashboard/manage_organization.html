@@ -22,7 +22,7 @@ Manage Organization
         </ul>
     </nav>
     <div class="flex-container is-justify-content-space-between is-align-items-center">
-        <h2 class="title mt-5">
+        <h2 class="title mt-5" style="max-width: 70%;">
             <strong>{{ organization.organization_name }}</strong>
         </h2>
         <div id="organization-id" hidden>{{ organization.organization_id }}</div>
@@ -32,11 +32,11 @@ Manage Organization
                 <a href="{% url 'messaging:org_messaging_view' organization.organization_id %}"
                     class="button is-info">Messages</a>
                 <a href="{% url 'donor_dashboard:organization_details' organization.organization_id %}"
-                    class="button is-info">Manage Organization</a>
+                    class="button is-info">Manage</a>
                 <form id="delete-form" class="is-inline-block"
                     action="{% url 'donor_dashboard:delete_organization' organization.organization_id %}" method="post">
                     {% csrf_token %}
-                    <button type="button" class="button is-danger" onclick="confirmDelete()">Make Organization Inactive </button>
+                    <button type="button" class="button is-danger" onclick="confirmDelete()">Deactivate </button>
                 </form>
             </div>
             {% else %}
@@ -47,7 +47,7 @@ Manage Organization
             {% endif %}
         {% else %}
             <div class="media-right">
-                <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+                <span class="tag is-primary is-medium mt-1">In Active</span>
             </div>
         {% endif %}
     </div>
@@ -74,7 +74,7 @@ Manage Organization
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
-                    <p class="heading">Total Donations</p>
+                    <p class="heading">Active Donations</p>
                     <p class="title">{{ donations.count }}</p>
                 </div>
             </div>
@@ -82,7 +82,7 @@ Manage Organization
         <div class="column is-full-mobile has-text-centered">
             <div class="card pt-2 pb-2">
                 <div class="card-content">
-                    <p class="heading">Total Orders</p>
+                    <p class="heading">Pending Orders</p>
                     <p class="title">{{ orders.count }}</p>
                 </div>
             </div>
@@ -112,27 +112,27 @@ Manage Organization
     <div class="tabs is-centered is-toggle is-toggle-rounded is-fullwidth has-text-weight-semibold mt-3">
         <ul>
             <li id="donations-tab">
-                <a>Donations</a>
+                <a>Active Donations</a>
             </li>
             <li id="orders-tab">
-                <a>Orders</a>
+                <a>Pending Orders</a>
             </li>
             <li id="reviews-tab">
-                <a>Reviews</a>
+                <a>All Reviews</a>
             </li>
         </ul>
     </div>
     <!-- Content for List of Donations tab -->
     <div id="donations-content" class="manage-tab">
         <div class="flex-container is-justify-content-space-between is-align-items-center mb-3">
-            <h2 class="subtitle mt-3"><strong>All Donations</strong></h2>
+            <h2 class="subtitle mt-3"><strong>Active Donations</strong></h2>
         {% if status %}
         <div class="buttons">
             <button id="add-donation-button" class="button is-dark">Add Donation</button>
         </div>
         {% else %}
         <div class="media-right">
-            <span class="tag is-primary is-light is-medium mt-1">In Active</span>
+            <span class="tag is-primary is-medium mt-1">In Active</span>
         </div>
         {% endif %}
         </div>
@@ -150,6 +150,9 @@ Manage Organization
                                 <span class="tag is-primary is-light is-medium mt-1">{{ donation.quantity }}
                                     Available</span>
                             </div>
+                            <div class="media-right mt-2-mobile">
+                                <span class="tag is-primary is-light is-medium mt-1"> Created at: {{ donation.created_at }}</span>
+                            </div>
                         </div>
                         <div class="content">
                             <div class="columns is-flex-direction-column-mobile">
@@ -157,9 +160,37 @@ Manage Organization
                                     <strong>Pickup by:</strong>
                                     <p>{{ donation.pickup_by }}</p>
                                 </div>
+                                <div class="image-container has-text-centered mt-4">
+                                    <!-- djlint:off -->
+                                    <img src="data:image/jpeg;base64,{{ donation.image_data }}" 
+                                            alt="Donation Image" 
+                                            onerror="this.src='{% static 'default.png' %}';"
+                                            class="image is-square is-clickable" 
+                                            data-donation-id="{{ donation.donation_id }}">
+                                    <!-- djlint:on -->
+                                    <!-- Hover Options -->
+                                    <div class="hover-options">
+                                        <label class="button is-small is-primary" for="file-upload-{{ donation.donation_id }}">
+                                            Upload
+                                            <input type="file" 
+                                                   id="file-upload-{{ donation.donation_id }}" 
+                                                   class="file-upload-hidden" 
+                                                   data-id="{{ donation.donation_id }}" 
+                                                   onchange="uploadDonationImage(this)">
+                                        </label>
+                                        {% if donation.image_data %}
+                                        <button class="button is-small is-danger" 
+                                                data-id="{{ donation.donation_id }}" 
+                                                onclick="deleteDonation(this)">
+                                            Delete
+                                        </button>
+                                        {% endif %}
+                                    </div>
+                                </div>                                
                             </div>
                         </div>
                     </div>
+                    {% if donation.active %}
                     <footer class="card-footer">
                         <a href="#" class="card-footer-item edit-link" data-id="{{ donation.donation_id }}"
                             data-food-item="{{ donation.food_item }}" data-quantity="{{ donation.quantity }}"
@@ -173,16 +204,32 @@ Manage Organization
                                 onclick="submitDeleteForm('{{ donation.donation_id }}')">Delete</a>
                         </form>
                     </footer>
+                    {% endif %}
                 </div>
             </div>
             {% endfor %}
         </div>
         {% else %}
-        <p class="box">No donations available at the moment.</p>
+        <p class="box">No active donations listed at the moment!</p>
         {% endif %}
     </div>
+    
     <!-- Content for Orders Received tab -->
     <div id="orders-content" class="is-hidden manage-tab">
+        <div class="flex-container is-justify-content-space-between is-align-items-center mb-3">
+            <h2 class="subtitle mt-3"><strong>Pending Orders</strong></h2>
+        {% if status %}
+        <div class="buttons">
+            <a class="button is-dark" href="{% url 'donor_dashboard:download_orders' organization.organization_id %}">
+                Download Orders
+            </a>
+        </div>
+        {% else %}
+        <div class="media-right">
+            <span class="tag is-primary is-medium mt-1">In Active</span>
+        </div>
+        {% endif %}
+        </div>
         {% if orders %}
         {% regroup orders by donation.donation_id as food_item_orders %}
         {% for group in food_item_orders %}
@@ -200,48 +247,39 @@ Manage Organization
                 <div class="fixed-grid has-4-cols-desktop has-3-cols-tablet has-1-cols-mobile">
                     <div class="grid">
                         {% for order in group.list %}
-                        <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%">
-                            <div>
-                                <div class="is-size-5">{{ order.user.first_name }} {{ order.user.last_name }}</div>
-                                <div class="tag my-1 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved
+                            <div class="cell has-text-centered is-flex is-flex-direction-column is-justify-content-space-between" style="height: 100%">
+                                <div>
+                                    <div class="is-size-5">{{ order.user.first_name }} {{ order.user.last_name }}</div>
+                                    <div class="tag my-1 is-size-6 is-primary is-light">{{ order.order_quantity }} Reserved
+                                    </div>
+                                    <!-- Display dietary restrictions -->
+                                    <div class="mt-2">
+                                        <strong>Dietary Restrictions:</strong>
+                                        {% if order.user.dietary_restrictions %}
+                                        <ul>
+                                            {% for restriction in order.user.dietary_restrictions %}
+                                            <li>{{ restriction.restriction }}</li>
+                                            {% endfor %}
+                                        </ul>
+                                        {% else %}
+                                        <ul>
+                                            <li>None</li>
+                                        </ul>
+                                        {% endif %}
+                                    </div>
                                 </div>
-                                <!-- Display dietary restrictions -->
-                                <div class="mt-2">
-                                    <strong>Dietary Restrictions:</strong>
-                                    {% if order.user.dietary_restrictions %}
-                                    <ul>
-                                        {% for restriction in order.user.dietary_restrictions %}
-                                        <li>{{ restriction.restriction }}</li>
-                                        {% endfor %}
-                                    </ul>
-                                    {% else %}
-                                    <ul>
-                                        <li>None</li>
-                                    </ul>
-                                    {% endif %}
+                                <!-- Status and button at the bottom -->
+                                <div>
+                                    <div class="tag is-info my-2 is-size-6 is-primary is-light">
+                                        Current Status: Pending
+                                    </div>
+                                    <br>
+                                    <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
+                                        class="button is-small is-rounded is-info is-light is-outlined">
+                                        Mark as complete
+                                    </a>
                                 </div>
                             </div>
-                            <!-- Status and button at the bottom -->
-                            <div>
-                                <div class="tag is-info my-2 is-size-6 is-primary is-light">
-                                    Current Status:
-                                    {% if order.order_status == "pending" %}
-                                    Pending
-                                    {% else %}
-                                    Complete
-                                    {% endif %}
-                                </div>
-                                <br>
-                                <a href="{% url 'donor_dashboard:manage_order' order.order_id %}"
-                                    class="button is-small is-rounded is-info is-light is-outlined">
-                                    {% if order.order_status == "pending" %}
-                                    Mark as complete
-                                    {% else %}
-                                    Mark as pending
-                                    {% endif %}
-                                </a>
-                            </div>
-                        </div>
                         {% endfor %}
                     </div>
                 </div>
@@ -249,13 +287,13 @@ Manage Organization
         </div>
         {% endfor %}
         {% else %}
-        <p class="box">No orders to display.</p>
+        <p class="box">No pending orders to display!</p>
         {% endif %}
     </div>
     <!-- Content for My Reviews tab -->
     <div id="reviews-content" class="tab-content is-hidden manage-tab">
-        {% if donations %}
-        {% for donation in donations %}
+        {% if reviewed_donations %}
+        {% for donation in reviewed_donations %}
         {% if donation.userreview_set.all %}
         <div class="donation-dropdown mb-3">
             <button class="donation-dropdown-trigger button is-fullwidth is-info is-light" aria-haspopup="true">
@@ -313,7 +351,7 @@ Manage Organization
         {% endif %}
         {% endfor %}
         {% else %}
-        <p class="box">No donations to display.</p>
+        <p class="box">No reviews to display!</p>
         {% endif %}
     </div>
     <div id="addDonationModal" class="modal">
@@ -327,16 +365,17 @@ Manage Organization
                 <div class="field">
                     <label class="label">{{ form.food_item.label_tag }}</label>
                     <div class="control">{{ form.food_item }}</div>
+                    <p id="donation-name-warning" class="is-size-7 has-text-danger" style="display: none;">Food item name must be at least 1 character and less than 250 characters.</p>
                 </div>
                 <div class="field">
                     <label class="label">{{ form.quantity.label_tag }}</label>
                     <div class="control">{{ form.quantity }}</div>
-                    <p id="quantity-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a positive integer.</p>
+                    <p id="quantity-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a positive integer less than 200.</p>
                 </div>
                 <div class="field">
                     <label class="label" for="pickup_by">{{ form.pickup_by.label_tag }}</label>
                     <div class="control">{{ form.pickup_by }}</div>
-                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date within 1 week from today.</p>
+                    <p id="date-warning" class="is-size-7 has-text-danger" style="display: none;">Please enter a valid date between today and 1 week from today.</p>
                 </div>
                 <div class="field" hidden>
                     <label class="label">Organization</label>
