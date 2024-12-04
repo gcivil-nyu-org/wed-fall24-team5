@@ -110,6 +110,7 @@ Community Drives
         <div class="columns is-multiline is-variable">
             {% if drives %}
             {% for drive in drives %}
+            {% if drive.active %}
             <div class="column is-full">
                 <div class="card mb-5">
                     <div class="card-content">
@@ -139,6 +140,7 @@ Community Drives
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
             {% else %}
             <p class="box">No active community drives to display.</p>
@@ -149,6 +151,7 @@ Community Drives
         <div class="columns is-multiline is-variable">
             {% if my_drives %}
             {% for drive in my_drives %}
+            {% if drive.active %}
             <div class="column is-full">
                 <div class="card mb-5">
                     <div class="card-content">
@@ -192,11 +195,20 @@ Community Drives
                                 <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
                                 <p>meals contributed</p>
                                 <a href="#" class="button is-primary mt-2">View Drive</a>
+                                <form
+                                    id="delete-drive-{{ drive.drive_id }}"
+                                    method="post"
+                                    action="{% url 'community_drives:delete_drive' drive.drive_id %}"
+                                >
+                                    {% csrf_token %}
+                                    <button href="#" class="button is-danger mt-2" onclick="confirmDeleteDrive('{{ drive.drive_id }}')">Delete Drive</button>
+                                </form>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
+            {% endif %}
             {% endfor %}
             {% else %}
             <p class="box">You have no active community drives.</p>
