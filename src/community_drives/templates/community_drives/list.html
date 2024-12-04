@@ -193,7 +193,7 @@ Community Drives
                             <div class="column is-narrow has-text-centered">
                                 <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
                                 <p>meals contributed</p>
-                                <a href="#" class="button is-primary mt-2">View Drive</a>
+                                <a href="{% url 'community_drives:drive_dashboard' drive.drive_id %}" class="button is-primary mt-2">View Drive</a>
                                 <form
                                     id="delete-drive-{{ drive.drive_id }}"
                                     method="post"
