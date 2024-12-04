@@ -190,7 +190,7 @@ document.addEventListener('DOMContentLoaded', () => {
     document.querySelectorAll('.short-text').forEach(element => {
         const maxChars = 300;
         if (element.textContent.length > maxChars) {
-            element.textContent = element.textContent.slice(0, maxChars-3) + ' ...';
+            element.textContent = element.textContent.slice(0, maxChars - 3) + ' ...';
         }
     });
 });
@@ -210,6 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // function triggerFileUpload(donationId) {
 //     document.getElementById(`file-upload-${donationId}`).click();
 // }
+
+function confirmDeleteDrive(driveId) {
+    if (confirm('Are you sure you want to delete this drive?')) {
+        document.getElementById('delete-form-' + driveId).submit();
+    }
+}
 
 // Handle file upload and send to the server
 function uploadDriveImage(inputElement) {

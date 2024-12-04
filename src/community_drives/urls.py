@@ -28,4 +28,9 @@ urlpatterns = [
         views.delete_participation,
         name="delete-participation",
     ),
+    path(
+        "delete-drive/<uuid:drive_id>/",
+        views.delete_drive,
+        name="delete_drive",
+    ),
 ]

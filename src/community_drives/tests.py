@@ -380,3 +380,36 @@ class DriveImageTests(TestCase):
         self.assertEqual(response.status_code, 405)
         self.assertEqual(response.json()["success"], False)
         self.assertEqual(response.json()["error"], "Invalid request method")
+
+    def test_delete_drive_success(self):
+        url = reverse(
+            "community_drives:delete_drive", kwargs={"drive_id": self.drive.drive_id}
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(response.status_code, 302)  # Expect redirect after success
+        self.drive.refresh_from_db()
+        self.assertFalse(self.drive.active)  # Ensure the drive is deactivated
+        drive_orgs = DriveOrganization.objects.filter(drive=self.drive)
+        for drive_org in drive_orgs:
+            self.assertEqual(drive_org.meal_pledge, 0)
+            self.assertEqual(drive_org.volunteer_pledge, 0)
+
+    def test_delete_drive_nonexistent(self):
+        invalid_drive_id = uuid4()
+        url = reverse(
+            "community_drives:delete_drive", kwargs={"drive_id": invalid_drive_id}
+        )
+
+        response = self.client.post(url)
+
+        self.assertEqual(
+            response.status_code, 302
+        )  # Expect redirect even if deletion fails
+        messages = list(response.wsgi_request._messages)
+        self.assertEqual(len(messages), 1)
+        self.assertEqual(
+            str(messages[0]),
+            "Failed to delete community drive. Couldn't find the drive.",
+        )

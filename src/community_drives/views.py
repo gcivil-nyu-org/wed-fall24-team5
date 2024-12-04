@@ -1,3 +1,4 @@
+from datetime import timezone
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
@@ -257,3 +258,26 @@ def delete_participation(request, organization_id, drive_id):
     return JsonResponse(
         {"success": False, "error": "Invalid request method"}, status=405
     )
+
+
+def delete_drive(request, drive_id):
+    if request.method == "POST":
+        try:
+            drive = CommunityDrive.objects.get(drive_id=drive_id)
+            drive.active = False
+            drive.save()
+            for drive_org in DriveOrganization.objects.filter(drive=drive):
+                drive_org.meal_pledge = 0
+                drive_org.volunteer_pledge = 0
+                drive_org.modified_at = timezone.now()
+                drive_org.save()
+
+            messages.success(
+                request, f"Community drive '{drive}' successfully deleted."
+            )
+            return redirect("/community_drives")
+        except CommunityDrive.DoesNotExist:
+            messages.error(
+                request, "Failed to delete community drive. Couldn't find the drive."
+            )
+            return redirect("/community_drives")
