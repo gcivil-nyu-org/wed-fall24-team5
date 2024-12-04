@@ -250,4 +250,7 @@ class CommunityDriveViewTests(TestCase):
         )  # Expect redirect even if deletion fails
         messages = list(response.wsgi_request._messages)
         self.assertEqual(len(messages), 1)
-        self.assertEqual(str(messages[0]), "Failed to delete community drive.")
+        self.assertEqual(
+            str(messages[0]),
+            "Failed to delete community drive. Couldn't find the drive.",
+        )
