@@ -275,7 +275,7 @@ Community Drives
                                 <p class="is-size-4 has-text-weight-semibold">{{ drive.meal_progress }} / {{ drive.meal_target }}</p>
                                 <p>meals contributed</p>
                                 
-                                <div class="buttons is-centered mt-2">
+                                <div class="is-flex is-flex-direction-column" style="gap: 0.5rem;">
                                     <a href="{% url 'community_drives:drive_dashboard' drive.drive_id %}" 
                                        class="button is-primary">View Drive</a>
                                     
@@ -292,10 +292,9 @@ Community Drives
                                             Edit Drive
                                         </button>
                                         
-                                        <form method="POST" action="{% url 'community_drives:delete_drive' drive.drive_id %}" 
-                                              style="display: inline;">
+                                        <form method="POST" action="{% url 'community_drives:delete_drive' drive.drive_id %}">
                                             {% csrf_token %}
-                                            <button type="submit" class="button is-danger">Delete Drive</button>
+                                            <button type="submit" class="button is-danger is-fullwidth">Delete Drive</button>
                                         </form>
                                     {% endif %}
                                 </div>

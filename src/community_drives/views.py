@@ -282,6 +282,7 @@ def delete_drive(request, drive_id):
             )
             return redirect("/community_drives")
 
+
 @login_required
 def edit_drive(request, drive_id):
     if request.method == "POST":
