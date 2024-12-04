@@ -281,3 +281,17 @@ def delete_drive(request, drive_id):
                 request, "Failed to delete community drive. Couldn't find the drive."
             )
             return redirect("/community_drives")
+
+@login_required
+def edit_drive(request, drive_id):
+    if request.method == "POST":
+        drive = get_object_or_404(CommunityDrive, pk=drive_id)
+        form = AddCommunityDriveForm(request.POST, user=request.user, instance=drive)
+        if form.is_valid():
+            form.save()
+            messages.success(request, "Community drive successfully updated.")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+        return redirect("/community_drives")
+    return JsonResponse({"success": False, "error": "Invalid request method."})
