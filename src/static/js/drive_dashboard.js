@@ -3,7 +3,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const openModalBtns = document.querySelectorAll(".open-modal");
     const closeModalBtns = document.querySelectorAll(".close-btn");
     const contributeForm = document.getElementById("contribute-form");
-    const contributionsTable = document.getElementById("contributions-table");
+    const contributionsTable = document.getElementById("contributions");
     const orgDropdown = document.getElementById("donor_organization");
     const mealsInput = document.getElementById("meals");
     const volunteersInput = document.getElementById("volunteers");
@@ -42,7 +42,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Fetch participation details dynamically when dropdown changes
     orgDropdown.addEventListener("change", () => {
         const selectedOrgId = orgDropdown.value;
-        const driveId = contributeForm.dataset.driveId;
         mealsInput.value = "";
         volunteersInput.value = "";
     
@@ -76,6 +75,20 @@ document.addEventListener("DOMContentLoaded", () => {
                 deleteBtn.hidden = true; // Ensure the delete button stays hidden on error
             });
     });
+
+    fetch(`/community_drives/fetch-contributions/${driveId}/`)
+        .then(response => {
+            if (!response.ok) {
+                throw new Error("Network response was not ok");
+            }
+            return response.json();
+        })
+        .then(data => {
+            updateContributions(data);
+        })
+        .catch(error => {
+            console.error("Error fetching contributions:", error);
+        });
         
 
     // Handle form submission
@@ -84,7 +97,6 @@ document.addEventListener("DOMContentLoaded", () => {
         const meals = mealsInput.value;
         const volunteers = volunteersInput.value;
         const donorOrganization = orgDropdown.value;
-        const driveId = contributeForm.dataset.driveId;
 
         // Send data via AJAX (using Fetch API)
         fetch(`/community_drives/drives/${driveId}/contribute/`, {
@@ -106,19 +118,10 @@ document.addEventListener("DOMContentLoaded", () => {
                 mealsInput.value = "";
                 volunteersInput.value = "";
                 if (data.success) {
+                    contributionsTable.replaceChildren();
                     contributionsTable.innerHTML = "";
-
                     // Populate the table with the updated contributions
-                    data.contributions.forEach(contribution => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${contribution.organization_name}</td>
-                            <td>${contribution.meals_contributed}</td>
-                            <td>${contribution.volunteers_contributed}</td>
-                        `;
-                        contributionsTable.appendChild(row);
-                    });
-
+                    updateContributions(data);
                     alert("Thank you for your contribution!");
                 } else {
                     alert("Failed to contribute." + data.error);
@@ -137,7 +140,6 @@ document.addEventListener("DOMContentLoaded", () => {
     deleteBtn.addEventListener("click", (event) => {
         event.preventDefault(); // Prevent form submission if delete button is clicked
         const selectedOrgId = orgDropdown.value;
-        const driveId = contributeForm.dataset.driveId;
 
         // Make AJAX request to delete participation
         fetch(`/community_drives/delete_participation/${selectedOrgId}/${driveId}/`, {
@@ -152,17 +154,7 @@ document.addEventListener("DOMContentLoaded", () => {
                 modal.classList.remove("is-active");
                 // Update the table or reset fields accordingly
                 contributionsTable.innerHTML = "";
-
-                    // Populate the table with the updated contributions
-                    data.contributions.forEach(contribution => {
-                        const row = document.createElement("tr");
-                        row.innerHTML = `
-                            <td>${contribution.organization_name}</td>
-                            <td>${contribution.meals_contributed}</td>
-                            <td>${contribution.volunteers_contributed}</td>
-                        `;
-                        contributionsTable.appendChild(row);
-                    });
+                updateContributions(data);
                 alert("Contribution successfully deleted!");
             } else {
                 alert("Failed to delete contribution: " + data.error);
@@ -174,6 +166,67 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     });
 });
+
+
+function updateContributions(data) {
+    const contributionsTable = document.getElementById("contributions");
+    data.contributions.forEach(contribution => {
+        const row = document.createElement("article");
+        row.className = 'media is-align-items-center';
+        const iconContainer = document.createElement('figure');
+        iconContainer.className = 'media-left';
+        iconContainer.innerHTML = `
+            <span class="icon is-medium has-text-primary">
+                <span class="fa-stack fa-sm">
+                    <i class="fa fa-circle fa-stack-2x"></i>
+                    <i class="fa fa-heart fa-stack-1x fa-inverse"></i>
+                </span>
+            </span>
+        `;
+        row.appendChild(iconContainer);
+
+        const cardContainer = document.createElement('div');
+        cardContainer.className = 'media-content';
+        const formattedDate = new Date(contribution.created_at).toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+        cardContainer.innerHTML = `
+            <div class="card">
+            <div class="card-content">
+                <div class="columns is-vcentered">
+                <div class="column is-half">
+                    <p>
+                    <strong><span class="has-text-primary">${contribution.organization_name}</span></strong> contributed
+                    <br />
+                    <small>${formattedDate}</small>
+                    </p>
+                </div>
+                <div class="column has-text-centered">
+                    <p>
+                    <span class="tag is-success is-medium">${contribution.meals_contributed}</span>
+                    <br />
+                    <small>meals</small>
+                    </p>
+                </div>
+                <div class="column has-text-centered">
+                    <p>
+                    <span class="tag is-info is-medium">${contribution.volunteers_contributed}</span>
+                    <br />
+                    <small>volunteers</small>
+                    </p>
+                </div>
+            </div>
+            </div>
+            </div>
+        `;
+        row.appendChild(cardContainer);
+        contributionsTable.appendChild(row);
+    });
+}
 
 
 function uploadDriveImage(inputElement) {

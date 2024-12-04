@@ -114,19 +114,19 @@ Community Drives
                 <div class="card mb-5">
                     <div class="card-content">
                         <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
-                            <div class="image-container has-text-centered mt-4">
+                            <div class="image-container has-text-centered my-4 ml-4">
                                 <!-- djlint:off -->
                                 <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
                                     alt="Default Image" 
                                     onerror="this.src='{% static 'default.png' %}';"
-                                    class="image is-square"
-                                    style="width: 600px; height: 300px; object-fit: cover; border-radius: 4px;">
+                                    class="image"
+                                    style="width: 200px; max-height: 80%; object-fit: cover; border-radius: 10px;">
                                 <!-- djlint:on -->
                             </div>  
                             <div class="column is-two-thirds is-full-mobile">
                                 <p class="title is-4 is-clipped">{{ drive.name }}</p>
                                 <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
-                                <p class="mt-1 short-text mb-2">{{ drive.description }}</p>
+                                <p class="mt-1 short-text mb-4">{{ drive.description }}</p>
                                 <span class="tag is-primary is-light is-medium">Deadline: {{ drive.end_date }}</span>
                                 <span class="tag is-primary is-light is-medium">Active: {{ drive.active }}</span>
                             </div>
@@ -153,13 +153,14 @@ Community Drives
                 <div class="card mb-5">
                     <div class="card-content">
                         <div class="columns is-vcentered is-flex-direction-column-mobile is-justify-content-space-between">
-                            <div class="image-container has-text-centered mt-4">
+                            <div class="image-container has-text-centered my-4 ml-4">
                                 <!-- djlint:off -->
                                 <img src="data:image/jpeg;base64,{{ drive.image_data }}" 
                                         alt="Donation Image" 
                                         onerror="this.src='{% static 'default.png' %}';"
-                                        class="image is-square is-clickable" 
-                                        data-drive-id="{{ drive.drive_id }}">
+                                        class="image is-clickable" 
+                                        data-drive-id="{{ drive.drive_id }}"
+                                        style="width: 200px; max-height: 80%; object-fit: cover; border-radius: 10px;">
                                 <!-- djlint:on -->
                                 <!-- Hover Options -->
                                 <div class="hover-options">
@@ -183,7 +184,7 @@ Community Drives
                             <div class="column is-two-thirds is-full-mobile">
                                 <p class="title is-4 is-clipped">{{ drive.name }}</p>
                                 <p class="subtitle is-6 mt-2"><strong>Organizer:</strong> {{ drive.lead_organization }}</p>
-                                <p class="mt-1 short-text mb-2">{{ drive.description }}</p>
+                                <p class="mt-1 short-text mb-4">{{ drive.description }}</p>
                                 <span class="tag is-primary is-light is-medium">Deadline: {{ drive.end_date }}</span>
                                 <span class="tag is-primary is-light is-medium">Active: {{ drive.active }}</span>
                             </div>

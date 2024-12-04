@@ -49,12 +49,15 @@ def get_drive_list(request):
 
 
 def drive_dashboard(request, drive_id):
-    drive = get_object_or_404(CommunityDrive, pk=drive_id)
-    # participating_organizations = DriveOrganization.objects.filter(drive=drive)
+    drives = CommunityDrive.objects.annotate(
+        meal_progress=Coalesce(Sum("driveorganization__meal_pledge"), 0),
+        volunteer_progress=Coalesce(Sum("driveorganization__volunteer_pledge"), 0),
+    )
+    drive = get_object_or_404(drives, pk=drive_id)
+    participating_organizations = DriveOrganization.objects.filter(drive=drive)
     participating_organizations = DriveOrganization.objects.filter(drive=drive).filter(
         Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
     )
-
     active_user_orgs = request.user.organizationadmin_set.filter(
         organization__active=True
     )
@@ -62,13 +65,46 @@ def drive_dashboard(request, drive_id):
         org_admin.organization_id == drive.lead_organization.organization_id
         for org_admin in active_user_orgs
     )
+    meals_percentage = (
+        (drive.meal_progress / drive.meal_target) * 100 if drive.meal_progress else 0
+    )
+    volunteers_percentage = (
+        (drive.volunteer_progress / drive.volunteer_target) * 100
+        if drive.volunteer_progress
+        else 0
+    )
+
     context = {
         "drive": drive,
+        "meals_percentage": meals_percentage,
+        "volunteers_percentage": volunteers_percentage,
         "participating_organizations": participating_organizations,
         "active_user_orgs": active_user_orgs,
         "can_edit": can_edit,
     }
     return render(request, "community_drives/drive_dashboard.html", context)
+
+
+def fetch_contributions(request, drive_id):
+    if request.method == "GET":
+        drive = get_object_or_404(CommunityDrive, pk=drive_id)
+
+        # Fetch all the DriveOrganization records for the drive
+        drive_organizations = DriveOrganization.objects.filter(drive=drive).filter(
+            Q(meal_pledge__gte=1) | Q(volunteer_pledge__gte=1)
+        )
+        # Prepare the response data, including updated table data
+        contributions = [
+            {
+                "organization_name": org.organization.organization_name,
+                "meals_contributed": org.meal_pledge,
+                "volunteers_contributed": org.volunteer_pledge,
+                "created_at": org.created_at,
+            }
+            for org in drive_organizations
+        ]
+
+        return JsonResponse({"contributions": contributions})
 
 
 def contribute_to_drive(request, drive_id):
@@ -112,6 +148,7 @@ def contribute_to_drive(request, drive_id):
                     "organization_name": org.organization.organization_name,
                     "meals_contributed": org.meal_pledge,
                     "volunteers_contributed": org.volunteer_pledge,
+                    "created_at": org.created_at,
                 }
                 for org in drive_organizations
             ]
@@ -206,6 +243,7 @@ def delete_participation(request, organization_id, drive_id):
                     "organization_name": org.organization.organization_name,
                     "meals_contributed": org.meal_pledge,
                     "volunteers_contributed": org.volunteer_pledge,
+                    "created_at": org.created_at,
                 }
                 for org in drive_organizations
             ]

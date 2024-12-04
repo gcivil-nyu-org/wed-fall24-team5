@@ -19,6 +19,11 @@ urlpatterns = [
         name="participation-details",
     ),
     path(
+        "fetch-contributions/<uuid:drive_id>/",
+        views.fetch_contributions,
+        name="fetch-contributions",
+    ),
+    path(
         "delete_participation/<uuid:organization_id>/<uuid:drive_id>/",
         views.delete_participation,
         name="delete-participation",
