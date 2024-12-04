@@ -223,7 +223,9 @@ class CommunityDriveViewTests(TestCase):
         self.assertEqual(response.json()["error"], "Invalid request method")
 
     def test_delete_drive_success(self):
-        url = reverse("community_drives:delete_drive", kwargs={"drive_id": self.drive.drive_id})
+        url = reverse(
+            "community_drives:delete_drive", kwargs={"drive_id": self.drive.drive_id}
+        )
 
         response = self.client.post(url)
 
@@ -237,11 +239,15 @@ class CommunityDriveViewTests(TestCase):
 
     def test_delete_drive_nonexistent(self):
         invalid_drive_id = uuid4()
-        url = reverse("community_drives:delete_drive", kwargs={"drive_id": invalid_drive_id})
+        url = reverse(
+            "community_drives:delete_drive", kwargs={"drive_id": invalid_drive_id}
+        )
 
         response = self.client.post(url)
 
-        self.assertEqual(response.status_code, 302)  # Expect redirect even if deletion fails
+        self.assertEqual(
+            response.status_code, 302
+        )  # Expect redirect even if deletion fails
         messages = list(response.wsgi_request._messages)
         self.assertEqual(len(messages), 1)
         self.assertEqual(str(messages[0]), "Failed to delete community drive.")

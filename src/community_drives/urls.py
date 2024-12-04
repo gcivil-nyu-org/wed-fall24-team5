@@ -32,5 +32,5 @@ urlpatterns = [
         "delete-drive/<uuid:drive_id>/",
         views.delete_drive,
         name="delete_drive",
-    )
+    ),
 ]

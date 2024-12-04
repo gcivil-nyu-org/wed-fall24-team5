@@ -256,6 +256,7 @@ def delete_participation(request, organization_id, drive_id):
         {"success": False, "error": "Invalid request method"}, status=405
     )
 
+
 def delete_drive(request, drive_id):
     if request.method == "POST":
         try:
@@ -268,8 +269,10 @@ def delete_drive(request, drive_id):
                 drive_org.modified_at = timezone.now()
                 drive_org.save()
 
-            messages.success(request, f"Community drive '{drive}' successfully deleted.")
+            messages.success(
+                request, f"Community drive '{drive}' successfully deleted."
+            )
             return redirect("/community_drives")
-        except:
-            messages.error(request, "Failed to delete community drive.")
+        except CommunityDrive.DoesNotExist:
+            messages.error(request, "Failed to delete community drive. Couldn't find the drive.")
             return redirect("/community_drives")
