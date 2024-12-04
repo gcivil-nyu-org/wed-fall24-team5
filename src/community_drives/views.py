@@ -274,5 +274,7 @@ def delete_drive(request, drive_id):
             )
             return redirect("/community_drives")
         except CommunityDrive.DoesNotExist:
-            messages.error(request, "Failed to delete community drive. Couldn't find the drive.")
+            messages.error(
+                request, "Failed to delete community drive. Couldn't find the drive."
+            )
             return redirect("/community_drives")
