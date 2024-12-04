@@ -20,7 +20,10 @@ def get_drive_list(request):
         if form.is_valid():
             form.save()
             messages.success(request, "Community drive successfully created.")
-            return redirect("/community_drives")
+        else:
+            for error in form.errors.values():
+                messages.error(request, error)
+        return redirect("/community_drives")
     else:
         form = AddCommunityDriveForm(user=user)
 
