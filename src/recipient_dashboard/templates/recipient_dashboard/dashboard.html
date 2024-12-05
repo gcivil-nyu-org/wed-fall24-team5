@@ -143,8 +143,8 @@ Donation Dashboard
                             <div class="image-container has-text-centered">
                                 <!-- djlint:off -->
                                 <img src="data:image/jpeg;base64,{{ donation.image_data }}" alt="Default Image"
-                                    onerror="this.src='{% static 'default.png' %}';" class="image"
-                                    style="width: 150px; max-height: 80%; object-fit: cover; border-radius: 10px;">
+                                    onerror="this.src='{% static 'default.png' %}';" class="image is-square"
+                                    style="max-width: 150px; height: 100%; object-fit: cover; border-radius: 10px;">
                                 <!-- djlint:on -->
                             </div>
                         </div>

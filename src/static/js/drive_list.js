@@ -86,10 +86,111 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
+    // Frontend form validation warnings
+    const submitButton = document.querySelector('button[type="submit"]');
+
+    const nameInput = document.getElementById("id_name");
+    const nameWarning = document.getElementById("name-warning");
+    nameInput.addEventListener("input", function () {
+        const nameValue = nameInput.value;
+        if (nameValue.length > 250) {
+            nameWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            nameWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
+        }
+    });
+
+    const descriptionInput = document.getElementById("id_description");
+    const descriptionWarning = document.getElementById("description-warning");
+    descriptionInput.addEventListener("input", function () {
+        const descriptionValue = descriptionInput.value;
+        if (descriptionValue.length > 1000) {
+            descriptionWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            descriptionWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
+        }
+    });
+
+    const targetInput = document.getElementById("id_meal_target");
+    const targetWarning = document.getElementById("target-warning");
+    targetInput.addEventListener("input", function () {
+        const targetValue = targetInput.value;
+        if (targetValue && targetValue <= 0) {
+            targetWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            targetWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
+        }
+    });
+
+    const volunteerInput = document.getElementById("id_volunteer_target");
+    const volunteerWarning = document.getElementById("volunteer-warning");
+    volunteerInput.addEventListener("input", function () {
+        const volunteerValue = volunteerInput.value;
+        if (volunteerValue && volunteerValue <= 0) {
+            volunteerWarning.style.display = "block";
+            submitButton.setAttribute("disabled", "true");
+            submitButton.classList.add("is-disabled");
+        } else {
+            volunteerWarning.style.display = "none";
+            submitButton.removeAttribute("disabled");
+            submitButton.classList.remove("is-disabled");
+        }
+    });
+
+    const startDateInput = document.getElementById("id_start_date");
+    const endDateInput = document.getElementById("id_end_date");
+    const dateWarning = document.getElementById("date-warning");
+
+    function validateDates() {
+        const startDateValue = new Date(startDateInput.value);
+        const endDateValue = new Date(endDateInput.value);
+        const today = new Date();
+
+        // Clear the error message if either field is empty
+        if (!startDateInput.value || !endDateInput.value) {
+            dateWarning.textContent = "";
+            dateWarning.style.display = "none";
+            return;
+        }
+
+        // Check if both dates are in the future
+        if (startDateValue <= today || endDateValue <= today) {
+            dateWarning.textContent = "Date must not be in the past.";
+            dateWarning.style.display = "block";
+            return;
+        }
+
+        // Check if end date is after the start date
+        if (startDateValue > endDateValue) {
+            dateWarning.textContent = "Start date must be before the end date.";
+            dateWarning.style.display = "block";
+            return;
+        }
+
+        // Clear error message if all validations pass
+        dateWarning.textContent = "";
+        dateWarning.style.display = "none";
+    }
+
+    startDateInput.addEventListener("input", validateDates());
+    endDateInput.addEventListener("input", validateDates());
+
     document.querySelectorAll('.short-text').forEach(element => {
         const maxChars = 300;
         if (element.textContent.length > maxChars) {
-            element.textContent = element.textContent.slice(0, maxChars-3) + ' ...';
+            element.textContent = element.textContent.slice(0, maxChars - 3) + ' ...';
         }
     });
 });
@@ -109,6 +210,12 @@ document.addEventListener('DOMContentLoaded', () => {
 // function triggerFileUpload(donationId) {
 //     document.getElementById(`file-upload-${donationId}`).click();
 // }
+
+function confirmDeleteDrive(driveId) {
+    if (confirm('Are you sure you want to delete this drive?')) {
+        document.getElementById('delete-form-' + driveId).submit();
+    }
+}
 
 // Handle file upload and send to the server
 function uploadDriveImage(inputElement) {
