@@ -79,10 +79,12 @@ class SearchDonationForm(forms.Form):
     min_quantity = forms.IntegerField(
         required=False,
         label="Quantity Available",
+        min_value=1,  # This enforces minimum value of 1
         widget=forms.NumberInput(
             attrs={
                 "class": "input",
-                "placeholder": "0",
+                "placeholder": "1",  # Updated placeholder to reflect minimum value
+                "min": "1",  # HTML5 validation for number input
                 "style": """
                 background-color: transparent;
                 border-color: #CCC;
