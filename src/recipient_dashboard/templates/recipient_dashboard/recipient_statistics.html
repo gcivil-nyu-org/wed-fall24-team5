@@ -46,7 +46,7 @@ User Statistics
                         {% if rating is None %}
                         <p class="title has-text-grey">No ratings</p>
                         {% else %}
-                        <p class="title">{{ rating }} / 5</p>
+                        <p class="title">{{ rating|floatformat:1 }} / 5</p>
                         {% endif %}
                     </div>
                 </div>
