@@ -250,53 +250,74 @@ Donation Dashboard
 </div>
 
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
-        const loader = document.getElementById('page-loader');
-        loader.innerHTML = `
-            <div class="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center" style="display: none;">
-                <div class="flex flex-col items-center gap-4">
-                    <!-- Replace the URL with your preferred GIF -->
-                    <img src="{% static 'images/loading.gif' %}" alt="Loading..." width="300" height="300">
-                    <p class="text-lg font-medium text-gray-600">Loading...</p>
-                </div>
+document.addEventListener('DOMContentLoaded', function () {
+    const loader = document.getElementById('page-loader');
+    loader.innerHTML = `
+        <div class="fixed inset-0 bg-white bg-opacity-80 z-50 flex items-center justify-center" style="display: none;">
+            <div class="flex flex-col items-center gap-4">
+                 <img src="{% static 'images/loading.gif' %}" alt="Loading..." width="300" height="300">
+                <p class="text-lg font-medium text-gray-600">Loading...</p>
             </div>
-        `;
+        </div>
+    `;
 
-        function showLoader() {
-            const loaderEl = loader.querySelector('div');
-            if (loaderEl) loaderEl.style.display = 'flex';
-        }
+    const showLoader = () => {
+        const loaderEl = loader.querySelector('div');
+        if (loaderEl) loaderEl.style.display = 'flex';
+    };
 
-        function hideLoader() {
-            const loaderEl = loader.querySelector('div');
-            if (loaderEl) loaderEl.style.display = 'none';
-        }
+    const hideLoader = () => {
+        const loaderEl = loader.querySelector('div');
+        if (loaderEl) loaderEl.style.display = 'none';
+    };
 
-        if (document.readyState === 'loading') {
-            showLoader();
-        }
+    // Show loader initially if page is still loading
+    if (document.readyState === 'loading') {
+        showLoader();
+    }
 
-        window.addEventListener('load', hideLoader);
+    // Hide loader when page is fully loaded
+    window.addEventListener('load', hideLoader);
 
-        document.addEventListener('click', function (e) {
-            const clickedElement = e.target;
-            if (
-                clickedElement.tagName === 'A' ||
-                clickedElement.closest('a') ||
-                clickedElement.closest('form button[type="submit"]')
-            ) {
-                showLoader();
-            }
-        });
-
-        document.addEventListener('submit', function () {
-            showLoader();
-        });
-
-        if (document.readyState === 'complete') {
+    // Add pageshow event to handle back/forward navigation
+    window.addEventListener('pageshow', function(event) {
+        // If navigating back from browser cache
+        if (event.persisted) {
             hideLoader();
         }
     });
+
+    // Show loader on clicks that will trigger navigation
+    document.addEventListener('click', function (e) {
+        const clickedElement = e.target;
+        if (
+            clickedElement.tagName === 'A' ||
+            clickedElement.closest('a') ||
+            clickedElement.closest('form button[type="submit"]')
+        ) {
+            showLoader();
+        }
+    });
+
+    // Show loader on form submissions
+    document.addEventListener('submit', function () {
+        showLoader();
+    });
+
+    // Hide loader if page is already complete
+    if (document.readyState === 'complete') {
+        hideLoader();
+    }
+
+    // Make loader functions globally available
+    window.showLoader = showLoader;
+    window.hideLoader = hideLoader;
+
+    // Add popstate event to handle back button
+    window.addEventListener('popstate', function() {
+        hideLoader();
+    });
+});
 </script>
 <script>
     function getUserLocation() {
