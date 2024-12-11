@@ -1,4 +1,4 @@
-# Food Waste Reduction App
+# BiteBack
 
 - `develop` branch: [![Build Status](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5.svg?token=MTgnqHfTp8UjvtysZ5vw&branch=develop)](https://app.travis-ci.com/gcivil-nyu-org/wed-fall24-team5?branch=develop)
   [![Coverage Status](https://coveralls.io/repos/github/gcivil-nyu-org/wed-fall24-team5/badge.svg?branch=develop)](https://coveralls.io/github/gcivil-nyu-org/wed-fall24-team5?branch=develop)
